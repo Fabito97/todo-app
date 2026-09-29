@@ -1,25 +1,39 @@
-# Next.js Todo App (Version 1)
+# Next.js Todo App (Version 1.1)
 
 A fast, resilient, and accessible Todo application built with Next.js 16 App Router, TypeScript, Tailwind CSS, and Zod.
 
-## Version 1 Architecture & Storage
+## Architecture & Storage
 
-In **Version 1**, all todos are stored client-side in the browser's `localStorage` under the key `todos:v1`. The UI components interact exclusively through an asynchronous `TodoService` abstraction (`src/services/todo-service.ts` implemented by `LocalTodoService`), ensuring strict separation of concerns and a seamless upgrade path for Version 2 (API routes + database).
+All todos are stored client-side in the browser's `localStorage` under the key `todos:v1`. The UI components interact exclusively through an asynchronous `TodoService` abstraction (`src/services/todo-service.ts` implemented by `LocalTodoService`), ensuring strict separation of concerns, complete backwards compatibility with legacy Version 1 items, and a seamless upgrade path for Version 2 (API routes + database).
 
 ## Features
 
-- **Add Todos**: Add new tasks with validation (non-empty, trimmed, maximum 200 characters).
-- **List & Filter**: View all todos, or filter by **Active** or **Completed** states. Contextual empty messages appear when lists have no items.
+- **Add Rich Todos**: Add tasks with title alone, or expand the details panel to include:
+  - **Priority**: `high`, `medium`, or `low` (defaults to `medium`).
+  - **Due Date**: Date picker with automatic overdue detection for uncompleted tasks.
+  - **Category**: Custom category tag with quick presets (Work, Personal, Shopping, Other).
+  - **Description**: Detailed notes up to 1,000 characters.
+- **Rich Display & Inline Edit**:
+  - Color-coded priority badges (rose for high, amber for medium, blue for low).
+  - Overdue warning badges for past-due incomplete tasks.
+  - Category tags and collapsible notes viewer.
+  - Full-field inline edit drawer for editing title, description, priority, due date, and category.
+- **Enhanced Filtering & Sorting**:
+  - Filter by **Status** (All, Active, Completed).
+  - Filter by **Priority** (All, High, Medium, Low).
+  - Filter by **Category** (All categories or specific tags).
+  - Sort by **Newest**, **Due Date** (earliest first), or **Priority** (high to low).
+  - Contextual empty state messages adapting to active filters.
 - **Active Counter**: Real-time counter displaying remaining active items.
 - **Toggle Completion**: Mark items as complete or active with immediate persistence across page reloads.
-- **Inline Editing**: Double-click or click Edit to modify todo titles inline. Press <kbd>Enter</kbd> to save or <kbd>Escape</kbd> to cancel.
 - **Delete Items**: Delete todos permanently.
 - **Storage Resilience**:
   - Automatically recovers from corrupt `localStorage` data by initializing a fresh list and displaying a status banner.
+  - Seamlessly parses legacy Version 1 stored items without metadata loss.
   - If storage writes fail (e.g., storage quota exceeded or private browsing restrictions), the app continues operating smoothly in memory and alerts the user with a non-dismissible status notice.
 - **Accessibility & Keyboard Navigation**:
   - Full keyboard support: navigate with <kbd>Tab</kbd>, activate with <kbd>Enter</kbd> / <kbd>Space</kbd>, cancel edit with <kbd>Escape</kbd>.
-  - Accessible names and roles (`aria-label`, `aria-current`, `role="status"`).
+  - Accessible names, roles, and states (`aria-label`, `aria-current`, `aria-pressed`, `role="status"`).
 - **Mobile Responsive**: Fully responsive layout optimized for screens down to 375px width without horizontal overflow.
 
 ## Tech Stack

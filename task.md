@@ -251,7 +251,7 @@ definitions, the API contract, and the data model live in
 
 ## V1.1 Slice 05: Finish version 1.1
 
-- [ ] Run `/finish 1.1` — audit, README update, and release notes
+- [x] Run `/finish 1.1` — audit, README update, and release notes
 - [ ] Human reviews output, merges branch to `main`, and tags `v1.1`
 
 ---
