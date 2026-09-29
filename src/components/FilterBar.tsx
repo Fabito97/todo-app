@@ -42,13 +42,36 @@ export function FilterBar({
   sortBy = "newest",
   onSortChange = () => {},
 }: FilterBarProps) {
+  const hasActiveFilters =
+    currentFilter !== "all" ||
+    priorityFilter !== "all" ||
+    categoryFilter !== "all";
+
+  const handleResetFilters = () => {
+    onFilterChange("all");
+    onPriorityFilterChange("all");
+    onCategoryFilterChange("all");
+  };
+
   return (
     <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-700/80 text-xs text-slate-500 dark:text-slate-300">
       {/* Top Row: Counter & Status Tabs */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-        <span className="font-medium">
-          {activeCount} {activeCount === 1 ? "item" : "items"} left
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="font-medium">
+            {activeCount} {activeCount === 1 ? "item" : "items"} left
+          </span>
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              aria-label="Reset filters"
+              className="px-2 py-0.5 rounded-md text-[11px] font-medium text-indigo-600 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors cursor-pointer"
+            >
+              Reset filters
+            </button>
+          )}
+        </div>
 
         <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-100/90 dark:bg-slate-900/60 backdrop-blur-xs">
           {STATUS_FILTERS.map(({ label, value }) => {

@@ -142,4 +142,40 @@ describe("TodoItem", () => {
 
     expect(onDelete).toHaveBeenCalledWith(mockTodo.id);
   });
+
+  it("applies distinct priority left-accent border classes for high, medium, and low priority", () => {
+    const { rerender } = render(
+      <TodoItem
+        todo={{ ...mockTodo, priority: "high" }}
+        onToggle={vi.fn()}
+        onEdit={vi.fn()}
+        onDelete={vi.fn()}
+      />
+    );
+
+    const item = screen.getByRole("listitem");
+    expect(item.className).toMatch(/border-l-4/);
+    expect(item.className).toMatch(/border-l-rose-500/);
+
+    rerender(
+      <TodoItem
+        todo={{ ...mockTodo, priority: "medium" }}
+        onToggle={vi.fn()}
+        onEdit={vi.fn()}
+        onDelete={vi.fn()}
+      />
+    );
+    expect(screen.getByRole("listitem").className).toMatch(/border-l-amber-500/);
+
+    rerender(
+      <TodoItem
+        todo={{ ...mockTodo, priority: "low" }}
+        onToggle={vi.fn()}
+        onEdit={vi.fn()}
+        onDelete={vi.fn()}
+      />
+    );
+    expect(screen.getByRole("listitem").className).toMatch(/border-l-blue-500/);
+  });
 });
+

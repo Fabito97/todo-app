@@ -95,6 +95,12 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
     low: "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-950/70 dark:text-blue-300 dark:border-blue-700",
   }[todo.priority || "medium"];
 
+  const priorityAccentBorder = {
+    high: "border-l-rose-500 dark:border-l-rose-400",
+    medium: "border-l-amber-500 dark:border-l-amber-400",
+    low: "border-l-blue-500 dark:border-l-blue-400",
+  }[todo.priority || "medium"];
+
   return (
     <li
       role="listitem"
@@ -104,7 +110,7 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
           handleCancelEdit();
         }
       }}
-      className="group flex flex-col p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-800/70 backdrop-blur-sm transition-all hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-xs"
+      className={`group flex flex-col p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 border-l-4 ${priorityAccentBorder} bg-white dark:bg-slate-800/70 backdrop-blur-sm transition-all hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-xs`}
     >
       {/* Normal view mode */}
       {!isEditing ? (

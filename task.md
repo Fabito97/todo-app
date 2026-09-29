@@ -302,11 +302,11 @@ definitions, the API contract, and the data model live in
 
 ## V1.2 Slice 03: Intuitive dashboard UI redesign (progress bar, stats, priority accents, filter reset)
 
-- [ ] Write tests in `test/app/page.test.tsx`, `test/components/FilterBar.test.tsx`, `test/components/TodoItem.test.tsx`, and `e2e/todo.spec.ts` and watch them fail
-- [ ] Update `src/app/page.tsx` to display a completion progress bar (`role="progressbar"`, `aria-valuenow`, `aria-valuemin={0}`, `aria-valuemax={100}`) with percentage and quick-glance stat pills (**Total**, **Active**, **Completed**)
-- [ ] Update `src/components/FilterBar.tsx` into a cohesive two-tier toolbar with a one-click **Reset filters** button (`aria-label="Reset filters"`) visible whenever status, priority, or category filter is non-default
-- [ ] Update `src/components/TodoItem.tsx` with priority-colored left accent borders (`border-l-4`, `high` rose, `medium` amber, `low` blue) and refined metadata pills
-- [ ] Run `npm run verify && npm run e2e` and commit
+- [x] Write tests in `test/app/page.test.tsx`, `test/components/FilterBar.test.tsx`, `test/components/TodoItem.test.tsx`, and `e2e/todo.spec.ts` and watch them fail
+- [x] Update `src/app/page.tsx` to display a completion progress bar (`role="progressbar"`, `aria-valuenow`, `aria-valuemin={0}`, `aria-valuemax={100}`) with percentage and quick-glance stat pills (**Total**, **Active**, **Completed**)
+- [x] Update `src/components/FilterBar.tsx` into a cohesive two-tier toolbar with a one-click **Reset filters** button (`aria-label="Reset filters"`) visible whenever status, priority, or category filter is non-default
+- [x] Update `src/components/TodoItem.tsx` with priority-colored left accent borders (`border-l-4`, `high` rose, `medium` amber, `low` blue) and refined metadata pills
+- [x] Run `npm run verify && npm run e2e` and commit
 
 **Acceptance criteria**
 
