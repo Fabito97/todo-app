@@ -60,3 +60,8 @@ coverage/
 test-results/
 playwright-report/
 .scaffold_tmp/
+
+# Autopilot working files (permanent record goes in docs/)
+review.md
+autopilot-report.md
+
