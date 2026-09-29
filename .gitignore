@@ -1,0 +1,62 @@
+# Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode
+# Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode
+
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
+
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+.history
+.ionide
+
+# Miscellaneous files
+*.workspace
+*.log
+
+## Intellij+all Patch ###
+# Ignore everything but code style settings and run configurations
+# that are supposed to be shared within teams.
+
+.idea/*
+.idea
+
+!.idea/codeStyles
+!.idea/runConfigurations
+
+# IntelliJ
+out/
+
+# End of https://www.toptal.com/developers/gitignore/api/visualstudiocode
+
+# Secrets and environment (keep .env.example tracked)
+.env
+.env.*
+!.env.example
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Test output
+test-results/
+playwright-report/
+.scaffold_tmp/
