@@ -99,3 +99,12 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Review**: In-session review by autopilot; verified clean git renames (`97%–100%` similarity), `@/` path alias resolution, and zero test files remaining in `src/`.
 - **Bug or issue caught**: None.
 - **Rule or prompt improvement**: None.
+
+## 2026-09-29 - V1.2 Slice 02: Softer dark mode palette and interactive Theme Toggle
+- **Commit**: `1ecf379 feat(ui): add softer slate dark mode palette and interactive ThemeToggle`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (55 pass across 9 test files in `test/`), e2e (10 pass).
+- **Review**: In-session review by autopilot; verified `src/services/theme-storage.ts` boundary compliance, `.dark` class toggling, `theme:v1` persistence, and softer slate dark surfaces.
+- **Bug or issue caught**: ESLint `react-hooks/set-state-in-effect` caught redundant `setThemeState` call inside `useEffect` in `use-theme.ts`; resolved by relying on lazy `useState(() => getStoredTheme())` initialization and syncing only the DOM in `useEffect`.
+- **Rule or prompt improvement**: None.
