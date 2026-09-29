@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Todo App", () => {
+test.describe.serial("Todo App", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => localStorage.clear());
@@ -78,6 +78,36 @@ test.describe("Todo App", () => {
 
     await page.reload();
     await expect(page.getByText("Edited Title")).toBeVisible();
+  });
+
+  test("can edit rich todo details and it persists after reload", async ({ page }) => {
+    const input = page.getByRole("textbox", { name: /todo title/i });
+    await input.fill("Editable Todo");
+    await page.getByRole("button", { name: /add todo/i }).click();
+
+    const editBtn = page.getByRole("button", { name: /edit editable todo/i });
+    await editBtn.click();
+
+    const editInput = page.getByRole("textbox", { name: /edit todo title/i });
+    await editInput.fill("Editable Todo Updated");
+
+    const highPriorityBtn = page.getByRole("group", { name: /edit priority/i }).getByRole("button", { name: /priority high/i });
+    await highPriorityBtn.click();
+
+    const categoryInput = page.getByRole("textbox", { name: /edit category/i });
+    await categoryInput.fill("Chores");
+
+    const saveBtn = page.getByRole("button", { name: /save changes/i });
+    await saveBtn.click();
+
+    await expect(page.getByText("Editable Todo Updated")).toBeVisible();
+    await expect(page.getByText("Chores")).toBeVisible();
+    await expect(page.getByText("high")).toBeVisible();
+
+    await page.reload();
+    await expect(page.getByText("Editable Todo Updated")).toBeVisible();
+    await expect(page.getByText("Chores")).toBeVisible();
+    await expect(page.getByText("high")).toBeVisible();
   });
 
   test("can delete a todo permanently", async ({ page }) => {

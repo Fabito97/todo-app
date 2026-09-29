@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import type { Todo, CreateTodoInput } from "@/lib/schemas";
+import type { Todo, CreateTodoInput, TodoPatchInput } from "@/lib/schemas";
 import type { TodoFilter } from "@/services";
 import { todoService, subscribeStorageNotice } from "@/services";
 
@@ -82,17 +82,25 @@ export function useTodos() {
     }
   }, []);
 
-  const editTodo = useCallback(async (id: string, title: string): Promise<Todo | undefined> => {
-    try {
-      setError(null);
-      const updated = await todoService.update(id, { title });
-      setTodos((prev) => prev.map((t) => (t.id === id ? updated : t)));
-      return updated;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update todo");
-      throw err;
-    }
-  }, []);
+  const editTodo = useCallback(
+    async (
+      id: string,
+      patch: string | TodoPatchInput
+    ): Promise<Todo | undefined> => {
+      try {
+        setError(null);
+        const payload: TodoPatchInput =
+          typeof patch === "string" ? { title: patch } : patch;
+        const updated = await todoService.update(id, payload);
+        setTodos((prev) => prev.map((t) => (t.id === id ? updated : t)));
+        return updated;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to update todo");
+        throw err;
+      }
+    },
+    []
+  );
 
   const deleteTodo = useCallback(async (id: string): Promise<void> => {
     try {

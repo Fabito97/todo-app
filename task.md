@@ -207,10 +207,10 @@ definitions, the API contract, and the data model live in
 
 ## V1.1 Slice 03: Rich item display and full-field inline edit (TodoItem)
 
-- [ ] Write tests and watch them fail
-- [ ] Update `TodoItem.tsx` to render priority badges, due date status (overdue indicator), category pill, and description
-- [ ] Support full inline edit mode for title, description, priority, due date, and category
-- [ ] Run `npm run verify && npm run e2e` and commit
+- [x] Write tests and watch them fail
+- [x] Update `TodoItem.tsx` to render priority badges, due date status (overdue indicator), category pill, and description
+- [x] Support full inline edit mode for title, description, priority, due date, and category
+- [x] Run `npm run verify && npm run e2e` and commit
 
 **Acceptance criteria**
 

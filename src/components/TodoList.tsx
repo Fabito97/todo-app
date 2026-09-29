@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import type { Todo } from "@/lib/schemas";
+import type { Todo, TodoPatchInput } from "@/lib/schemas";
 import type { TodoFilter } from "@/services";
 import { TodoItem } from "./TodoItem";
 
@@ -10,7 +10,7 @@ interface TodoListProps {
   loading: boolean;
   filter?: TodoFilter;
   onToggle?: (id: string, completed: boolean) => void;
-  onEdit?: (id: string, title: string) => Promise<unknown> | void;
+  onEdit?: (id: string, patch: TodoPatchInput | string) => Promise<unknown> | void;
   onDelete?: (id: string) => void;
 }
 
