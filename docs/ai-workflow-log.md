@@ -108,3 +108,12 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Review**: In-session review by autopilot; verified `src/services/theme-storage.ts` boundary compliance, `.dark` class toggling, `theme:v1` persistence, and softer slate dark surfaces.
 - **Bug or issue caught**: ESLint `react-hooks/set-state-in-effect` caught redundant `setThemeState` call inside `useEffect` in `use-theme.ts`; resolved by relying on lazy `useState(() => getStoredTheme())` initialization and syncing only the DOM in `useEffect`.
 - **Rule or prompt improvement**: None.
+
+## 2026-09-30 - V1.2 Slice 03: Intuitive dashboard UI redesign (progress bar, stats, priority accents, filter reset)
+- **Commit**: `04d1510 feat(ui): add dashboard progress bar, stat pills, priority accent borders, and filter reset`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (58 pass across 9 test files in `test/`), e2e (11 pass).
+- **Review**: In-session review by autopilot; verified accessible progressbar (`role="progressbar"`), Total/Active/Completed stat pills, priority left-accent borders (`border-l-4`), and one-click "Reset filters" button.
+- **Bug or issue caught**: In `test/app/page.test.tsx`, `beforeEach` previously only cleared `localStorage` and did not clear `todoService` in-memory fallback items from the quota-exceeded test; updated `beforeEach` to clear `todoService.list()` items before each test.
+- **Rule or prompt improvement**: None.
