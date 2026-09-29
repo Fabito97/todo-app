@@ -1,7 +1,26 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useEffect, useCallback, useSyncExternalStore } from "react";
 import { getStoredTheme, setStoredTheme, type ThemePreference } from "@/services";
+
+const listeners = new Set<() => void>();
+
+function subscribeTheme(callback: () => void) {
+  listeners.add(callback);
+  return () => {
+    listeners.delete(callback);
+  };
+}
+
+function notifyThemeListeners() {
+  for (const listener of listeners) {
+    listener();
+  }
+}
+
+function getServerThemeSnapshot(): ThemePreference {
+  return "system";
+}
 
 function applyThemeToDocument(preference: ThemePreference) {
   if (typeof document === "undefined") return;
@@ -25,7 +44,11 @@ function applyThemeToDocument(preference: ThemePreference) {
 }
 
 export function useTheme() {
-  const [theme, setThemeState] = useState<ThemePreference>(() => getStoredTheme());
+  const theme = useSyncExternalStore(
+    subscribeTheme,
+    getStoredTheme,
+    getServerThemeSnapshot
+  );
 
   useEffect(() => {
     applyThemeToDocument(theme);
@@ -48,9 +71,9 @@ export function useTheme() {
   }, [theme]);
 
   const setTheme = useCallback((nextTheme: ThemePreference) => {
-    setThemeState(nextTheme);
     setStoredTheme(nextTheme);
     applyThemeToDocument(nextTheme);
+    notifyThemeListeners();
   }, []);
 
   return { theme, setTheme };
