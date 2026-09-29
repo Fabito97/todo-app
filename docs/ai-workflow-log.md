@@ -19,3 +19,12 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Review**: In-session review by autopilot; all contract criteria, validation rules, and error handling met.
 - **Bug or issue caught**: None.
 - **Rule or prompt improvement**: None.
+
+## 2026-09-29 - V1 Slice 02: Add and list todos
+- **Commit**: `89f0558 feat: add AddTodoForm, TodoList, useTodos hook, and wire up home page`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (24 pass across 5 test files), e2e (2 pass).
+- **Review**: In-session review by autopilot; all acceptance criteria met.
+- **Bug or issue caught**: React 19 / Next 16 eslint rule `react-hooks/set-state-in-effect` caught calling setState synchronously in effect body; resolved by moving state updates to promise resolution with unmount cancellation flag.
+- **Rule or prompt improvement**: None.
