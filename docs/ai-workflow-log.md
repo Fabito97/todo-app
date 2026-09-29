@@ -65,4 +65,14 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Bug or issue caught**: TypeScript caught missing required properties on static mock fixtures in TodoItem and TodoList component tests; resolved by adding default metadata.
 - **Rule or prompt improvement**: None.
 
+## 2026-09-29 - V1.1 Slice 02: Rich creation form (AddTodoForm)
+- **Commit**: `eea57ae feat(v1.1): add expandable rich details panel to AddTodoForm with validation`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (45 pass across 8 test files), e2e (8 pass).
+- **Review**: In-session review by autopilot; expandable form, validation, and resets verified.
+- **Bug or issue caught**: Playwright uses `page.getByLabel` rather than `page.getByLabelText`; test paste used for 1001-character string to avoid jsdom keystroke simulation timeout.
+- **Rule or prompt improvement**: None.
+
+
 
