@@ -24,10 +24,10 @@ For the next unchecked slice in `task.md`, follow this loop exactly.
 1. **Pre-flight**
    - Confirm the working tree is clean (`git status`). If not, stop and ask.
    - Read `requirements.md`, `implementation_plan.md`, `task.md`, and the rules file.
-   - Pick the first unchecked slice. Do not skip ahead.
+   - Pick the first unchecked slice of the current version (the lowest-numbered version with unchecked slices). Do not skip ahead.
 
 2. **Branch**
-   - Local mode: create `slice/<nn>-<short-name>` off `main`.
+   - Local mode: create `slice/v<version>-<nn>-<short-name>` off `main`.
    - GitHub mode: create or reuse the epic branch (for example `feature/epic-2`).
 
 3. **Slice Plan (approval gate)**
@@ -50,13 +50,13 @@ For the next unchecked slice in `task.md`, follow this loop exactly.
 7. **Self-Review**
    - Read your own diff (`git diff`). Compare it line by line against the acceptance criteria and the rules file. Remove anything the slice did not need. Note anything you are unsure about.
 
-8. **Commit (snapshot)**
+8. **Update State and Commit (snapshot)**
+   - Check off the completed tasks in `task.md` first, so the tick is part of the commit.
    - One commit per completed task. Use Conventional Commits. In GitHub mode, reference the issue (for example `feat: add todo creation (fixes #12)`).
    - Do NOT push to `main`. Do NOT merge.
 
-9. **Update State**
-   - Check off the completed tasks in `task.md`.
-   - Run the `/log` workflow to record the decision, prompts, and any bug caught.
+9. **Log**
+   - Run the `/log` workflow to record what was done, which checks passed, the review result, and any bug caught. It commits its own entry, leaving the tree clean.
 
 10. **Hand Off (human gate)**
     - Summarize: what changed, tests added, gate results, open questions. Suggest the human run `/review` in a fresh conversation.

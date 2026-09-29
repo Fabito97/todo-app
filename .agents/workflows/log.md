@@ -1,5 +1,5 @@
 ---
-description: Append a dated entry to docs/ai-workflow-log.md recording prompts, decisions, and bugs caught
+description: Append a dated entry to docs/ai-workflow-log.md recording what was done, what was verified, decisions, and bugs caught, then commit it
 ---
 1. If `docs/ai-workflow-log.md` does not exist, create it with the title `# AI Workflow Log` and a one-paragraph description of the workflow used.
 // turbo
@@ -9,6 +9,9 @@ description: Append a dated entry to docs/ai-workflow-log.md recording prompts, 
    - **Commit** (hash and subject)
    - **Key prompt or instruction** given to the agent, quoted or summarized in one or two lines
    - **Human decision or correction** (what the human changed in the plan, contract, or code)
+   - **Checks run**: lint, typecheck, tests (with the count), and e2e (with the count), each marked pass or fail
+   - **Review**: the verdict and each finding with how it was resolved, or `not reviewed yet`
    - **Bug or issue caught** and how it was found (review, test, or debug), or `none`
    - **Rule or prompt improvement** learned, and whether `.agents/rules/nextjs-todo.md` was updated
 4. If a new rule was learned, propose the exact line to add to `.agents/rules/nextjs-todo.md` and ask the human to approve it. Do not edit the rules file on your own.
+5. Commit only the log file: `git add docs/ai-workflow-log.md` and `git commit -m "docs: log <slice or fix>"`. Then run `git status --short` and confirm it prints nothing.

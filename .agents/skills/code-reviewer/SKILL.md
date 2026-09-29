@@ -45,9 +45,14 @@ Check every item. Mark each as PASS, FAIL, or N/A with evidence (file and line).
 8. **Over-engineering and scope**
    - New dependencies, abstractions, or files the slice did not need?
 9. **Correctness and edge cases**
-   - Race conditions in optimistic UI, double submits, stale state after mutation, empty and loading states, 404 handling.
+   - Race conditions in optimistic UI, double submits, stale state after mutation, empty and loading states, 404 handling. Version 1: is `localStorage` touched only after mount, inside `try/catch`, with stored data validated by Zod?
 10. **Maintainability**
    - Dead code, leftover TODO or FIXME, unclear names, duplicated logic.
+11. **Service boundary and upgrade path**
+   - Do components and hooks import `localStorage`, `fetch`, `src/server`, or a concrete service? They must only use `TodoService`.
+   - Are business rules (trim, length) in `schemas.ts` rather than only in a form?
+   - Is every `TodoService` method async, and does each implementation pass the shared contract suite?
+   - Could the next version swap the implementation by adding files and changing `src/services/index.ts` only? Name anything that would force a component or hook change.
 
 ## Output: `review.md`
 
@@ -66,7 +71,7 @@ APPROVE | APPROVE WITH NITS | REQUEST CHANGES
 - [N1] ...
 
 ## Checklist results
-<the 10 items with PASS / FAIL / N/A and one line of evidence each>
+<every checklist item with PASS / FAIL / N/A and one line of evidence each>
 
 ## Things I could not verify
 - <claims you could not confirm and how the human can check them>
