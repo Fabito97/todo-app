@@ -83,6 +83,94 @@ export function runContractTests(createService: () => TodoService | Promise<Todo
         expect(completed).toHaveLength(1);
         expect(completed[0].id).toBe(t2.id);
       });
+
+      it("supports filtering by priority and category", async () => {
+        const service = await createService();
+        await service.create({ title: "Work High", priority: "high", category: "work" });
+        await service.create({ title: "Personal Low", priority: "low", category: "personal" });
+
+        const highOnly = await service.list({ priority: "high" });
+        expect(highOnly).toHaveLength(1);
+        expect(highOnly[0].title).toBe("Work High");
+
+        const workOnly = await service.list({ category: "work" });
+        expect(workOnly).toHaveLength(1);
+        expect(workOnly[0].title).toBe("Work High");
+      });
+
+      it("sorts by dueDate (earliest first with nulls last) and priority (high to low)", async () => {
+        const service = await createService();
+        await service.create({ title: "Medium Later", priority: "medium", dueDate: "2026-10-15" });
+        await service.create({ title: "High Sooner", priority: "high", dueDate: "2026-10-01" });
+        await service.create({ title: "Low No Date", priority: "low" });
+
+        const byDue = await service.list({ sortBy: "dueDate" });
+        expect(byDue[0].title).toBe("High Sooner");
+        expect(byDue[1].title).toBe("Medium Later");
+        expect(byDue[2].title).toBe("Low No Date");
+
+        const byPriority = await service.list({ sortBy: "priority" });
+        expect(byPriority[0].priority).toBe("high");
+        expect(byPriority[1].priority).toBe("medium");
+        expect(byPriority[2].priority).toBe("low");
+      });
+    });
+
+    describe("create with V1.1 metadata", () => {
+      it("creates a todo with description, priority, dueDate, and category", async () => {
+        const service = await createService();
+        const todo = await service.create({
+          title: "Rich Todo",
+          description: "Detailed notes about this task",
+          priority: "high",
+          dueDate: "2026-12-31",
+          category: "Work",
+        });
+
+        expect(todo.description).toBe("Detailed notes about this task");
+        expect(todo.priority).toBe("high");
+        expect(todo.dueDate).toBe("2026-12-31");
+        expect(todo.category).toBe("Work");
+      });
+
+      it("defaults priority to 'medium' and description to empty string if omitted", async () => {
+        const service = await createService();
+        const todo = await service.create({ title: "Default Meta" });
+        expect(todo.priority).toBe("medium");
+        expect(todo.description).toBe("");
+      });
+
+      it("rejects description longer than 1000 characters", async () => {
+        const service = await createService();
+        await expect(
+          service.create({ title: "Too long note", description: "a".repeat(1001) })
+        ).rejects.toThrow(ZodError);
+      });
+
+      it("rejects category longer than 50 characters", async () => {
+        const service = await createService();
+        await expect(
+          service.create({ title: "Too long cat", category: "c".repeat(51) })
+        ).rejects.toThrow(ZodError);
+      });
+    });
+
+    describe("update with V1.1 metadata", () => {
+      it("updates description, priority, dueDate, and category", async () => {
+        const service = await createService();
+        const todo = await service.create({ title: "Original" });
+        const updated = await service.update(todo.id, {
+          priority: "high",
+          dueDate: "2026-11-20",
+          category: "Urgent",
+          description: "Updated description",
+        });
+
+        expect(updated.priority).toBe("high");
+        expect(updated.dueDate).toBe("2026-11-20");
+        expect(updated.category).toBe("Urgent");
+        expect(updated.description).toBe("Updated description");
+      });
     });
 
     describe("update", () => {

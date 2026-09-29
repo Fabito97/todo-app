@@ -56,3 +56,37 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Bug or issue caught**: None.
 - **Rule or prompt improvement**: None.
 
+## 2026-09-29 - V1.1 Slice 01: Extended schema, contract suite, and backwards compatibility
+- **Commit**: `d141255 feat(v1.1): extend schema with priority, dueDate, category, description, and backwards compatibility`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: Approved Version 1.1 plan with priority, due date, category, and description fields.
+- **Checks run**: lint (pass), typecheck (pass), tests (43 pass across 8 test files).
+- **Review**: In-session review by autopilot; backwards compatibility and all contract assertions met.
+- **Bug or issue caught**: TypeScript caught missing required properties on static mock fixtures in TodoItem and TodoList component tests; resolved by adding default metadata.
+- **Rule or prompt improvement**: None.
+
+## 2026-09-29 - V1.1 Slice 02: Rich creation form (AddTodoForm)
+- **Commit**: `eea57ae feat(v1.1): add expandable rich details panel to AddTodoForm with validation`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (45 pass across 8 test files), e2e (8 pass).
+- **Review**: In-session review by autopilot; expandable form, validation, and resets verified.
+- **Bug or issue caught**: Playwright uses `page.getByLabel` rather than `page.getByLabelText`; test paste used for 1001-character string to avoid jsdom keystroke simulation timeout.
+- **Rule or prompt improvement**: None.
+## 2026-09-29 - V1.1 Slice 03: Rich item display and full-field inline edit (TodoItem)
+- **Commit**: `7b211a9 feat(v1.1): rich todo display with badges and full-field inline edit`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (44 pass across 8 test files), e2e (9 pass).
+- **Review**: In-session review by autopilot; priority badges, overdue indicators, category pill, description toggle, and inline rich edit drawer verified.
+- **Bug or issue caught**: `TodoList.tsx` prop signature needed `TodoPatchInput | string` compatibility to avoid strict TypeScript mismatch with `useTodos.editTodo`. Fixed cleanly.
+- **Rule or prompt improvement**: None.
+
+## 2026-09-29 - V1.1 Slice 04: Enhanced filtering and sorting (FilterBar & useTodos)
+- **Commit**: `e3f5183 feat(v1.1): enhanced filtering by priority and category, and sorting controls`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (50 pass across 8 test files), e2e (10 pass).
+- **Review**: In-session review by autopilot; priority chips, category select, sorting by newest/dueDate/priority, empty states, and accessibility verified.
+- **Bug or issue caught**: Playwright strict mode caught identical priority button labels between AddTodoForm and FilterBar; resolved cleanly by scoping priority selectors to respective role groups.
+- **Rule or prompt improvement**: None.

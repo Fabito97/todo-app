@@ -10,6 +10,8 @@ const sampleTodos: Todo[] = [
     completed: false,
     createdAt: "2026-09-29T10:00:00.000Z",
     updatedAt: "2026-09-29T10:00:00.000Z",
+    description: "",
+    priority: "medium",
   },
   {
     id: "22222222-2222-2222-2222-222222222222",
@@ -17,6 +19,8 @@ const sampleTodos: Todo[] = [
     completed: true,
     createdAt: "2026-09-29T09:00:00.000Z",
     updatedAt: "2026-09-29T09:00:00.000Z",
+    description: "",
+    priority: "high",
   },
 ];
 
@@ -41,5 +45,10 @@ describe("TodoList", () => {
     render(<TodoList todos={sampleTodos} loading={false} />);
     expect(screen.getByText("First task")).toBeInTheDocument();
     expect(screen.getByText("Second task")).toBeInTheDocument();
+  });
+
+  it("renders contextual empty message when active filters return no results", () => {
+    render(<TodoList todos={[]} loading={false} hasActiveFilters={true} />);
+    expect(screen.getByText(/no matching todos/i)).toBeInTheDocument();
   });
 });

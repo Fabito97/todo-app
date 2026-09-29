@@ -56,4 +56,71 @@ describe("FilterBar", () => {
     await user.click(completedBtn);
     expect(onFilterChange).toHaveBeenCalledWith("completed");
   });
+
+  it("renders priority filter chips and calls onPriorityFilterChange", async () => {
+    const onPriorityFilterChange = vi.fn();
+    const user = userEvent.setup();
+
+    render(
+      <FilterBar
+        activeCount={3}
+        currentFilter="all"
+        priorityFilter="high"
+        onFilterChange={vi.fn()}
+        onPriorityFilterChange={onPriorityFilterChange}
+      />
+    );
+
+    const highPriorityChip = screen.getByRole("button", { name: /priority high/i });
+    expect(highPriorityChip).toHaveAttribute("aria-pressed", "true");
+
+    const lowPriorityChip = screen.getByRole("button", { name: /priority low/i });
+    expect(lowPriorityChip).toHaveAttribute("aria-pressed", "false");
+
+    await user.click(lowPriorityChip);
+    expect(onPriorityFilterChange).toHaveBeenCalledWith("low");
+  });
+
+  it("renders category selector and calls onCategoryFilterChange", async () => {
+    const onCategoryFilterChange = vi.fn();
+    const user = userEvent.setup();
+
+    render(
+      <FilterBar
+        activeCount={3}
+        currentFilter="all"
+        categoryFilter="Work"
+        categories={["Work", "Personal", "Health"]}
+        onFilterChange={vi.fn()}
+        onCategoryFilterChange={onCategoryFilterChange}
+      />
+    );
+
+    const categorySelect = screen.getByRole("combobox", { name: /filter by category/i });
+    expect(categorySelect).toHaveValue("Work");
+
+    await user.selectOptions(categorySelect, "Health");
+    expect(onCategoryFilterChange).toHaveBeenCalledWith("Health");
+  });
+
+  it("renders sort selector and calls onSortChange", async () => {
+    const onSortChange = vi.fn();
+    const user = userEvent.setup();
+
+    render(
+      <FilterBar
+        activeCount={3}
+        currentFilter="all"
+        sortBy="newest"
+        onFilterChange={vi.fn()}
+        onSortChange={onSortChange}
+      />
+    );
+
+    const sortSelect = screen.getByRole("combobox", { name: /sort todos by/i });
+    expect(sortSelect).toHaveValue("newest");
+
+    await user.selectOptions(sortSelect, "dueDate");
+    expect(onSortChange).toHaveBeenCalledWith("dueDate");
+  });
 });

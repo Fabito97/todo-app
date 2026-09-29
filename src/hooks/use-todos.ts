@@ -1,13 +1,16 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import type { Todo } from "@/lib/schemas";
-import type { TodoFilter } from "@/services";
+import type { Todo, CreateTodoInput, TodoPatchInput, Priority } from "@/lib/schemas";
+import type { TodoFilter, SortOption } from "@/services";
 import { todoService, subscribeStorageNotice } from "@/services";
 
 export function useTodos() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<TodoFilter>("all");
+  const [priorityFilter, setPriorityFilter] = useState<Priority | "all">("all");
+  const [categoryFilter, setCategoryFilter] = useState<string | "all">("all");
+  const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [storageNotice, setStorageNotice] = useState<string | null>(null);
@@ -54,17 +57,21 @@ export function useTodos() {
     };
   }, []);
 
-  const addTodo = useCallback(async (title: string): Promise<Todo | undefined> => {
-    try {
-      setError(null);
-      const created = await todoService.create({ title });
-      setTodos((prev) => [created, ...prev]);
-      return created;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to add todo");
-      throw err;
-    }
-  }, []);
+  const addTodo = useCallback(
+    async (data: string | CreateTodoInput): Promise<Todo | undefined> => {
+      try {
+        setError(null);
+        const payload = typeof data === "string" ? { title: data } : data;
+        const created = await todoService.create(payload);
+        setTodos((prev) => [created, ...prev]);
+        return created;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to add todo");
+        throw err;
+      }
+    },
+    []
+  );
 
   const toggleTodo = useCallback(async (id: string, completed: boolean): Promise<Todo | undefined> => {
     try {
@@ -78,17 +85,25 @@ export function useTodos() {
     }
   }, []);
 
-  const editTodo = useCallback(async (id: string, title: string): Promise<Todo | undefined> => {
-    try {
-      setError(null);
-      const updated = await todoService.update(id, { title });
-      setTodos((prev) => prev.map((t) => (t.id === id ? updated : t)));
-      return updated;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update todo");
-      throw err;
-    }
-  }, []);
+  const editTodo = useCallback(
+    async (
+      id: string,
+      patch: string | TodoPatchInput
+    ): Promise<Todo | undefined> => {
+      try {
+        setError(null);
+        const payload: TodoPatchInput =
+          typeof patch === "string" ? { title: patch } : patch;
+        const updated = await todoService.update(id, payload);
+        setTodos((prev) => prev.map((t) => (t.id === id ? updated : t)));
+        return updated;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to update todo");
+        throw err;
+      }
+    },
+    []
+  );
 
   const deleteTodo = useCallback(async (id: string): Promise<void> => {
     try {
@@ -101,15 +116,64 @@ export function useTodos() {
     }
   }, []);
 
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    for (const t of todos) {
+      if (t.category && t.category.trim()) {
+        set.add(t.category.trim());
+      }
+    }
+    return Array.from(set).sort();
+  }, [todos]);
+
   const filteredTodos = useMemo(() => {
+    let result = todos;
+
+    // Filter by completion status
     if (filter === "active") {
-      return todos.filter((t) => !t.completed);
+      result = result.filter((t) => !t.completed);
+    } else if (filter === "completed") {
+      result = result.filter((t) => t.completed);
     }
-    if (filter === "completed") {
-      return todos.filter((t) => t.completed);
+
+    // Filter by priority
+    if (priorityFilter !== "all") {
+      result = result.filter((t) => (t.priority || "medium") === priorityFilter);
     }
-    return todos;
-  }, [todos, filter]);
+
+    // Filter by category
+    if (categoryFilter !== "all") {
+      result = result.filter((t) => t.category === categoryFilter);
+    }
+
+    // Sort
+    const priorityWeights: Record<Priority, number> = {
+      high: 3,
+      medium: 2,
+      low: 1,
+    };
+
+    return [...result].sort((a, b) => {
+      if (sortBy === "dueDate") {
+        if (a.dueDate && b.dueDate) {
+          const cmp = a.dueDate.localeCompare(b.dueDate);
+          if (cmp !== 0) return cmp;
+        } else if (a.dueDate && !b.dueDate) {
+          return -1;
+        } else if (!a.dueDate && b.dueDate) {
+          return 1;
+        }
+      } else if (sortBy === "priority") {
+        const weightA = priorityWeights[a.priority || "medium"] ?? 2;
+        const weightB = priorityWeights[b.priority || "medium"] ?? 2;
+        if (weightA !== weightB) {
+          return weightB - weightA;
+        }
+      }
+      // Default / fallback to newest (createdAt descending)
+      return b.createdAt.localeCompare(a.createdAt);
+    });
+  }, [todos, filter, priorityFilter, categoryFilter, sortBy]);
 
   const activeCount = useMemo(() => {
     return todos.filter((t) => !t.completed).length;
@@ -120,6 +184,13 @@ export function useTodos() {
     allTodos: todos,
     filter,
     setFilter,
+    priorityFilter,
+    setPriorityFilter,
+    categoryFilter,
+    setCategoryFilter,
+    sortBy,
+    setSortBy,
+    categories,
     activeCount,
     loading,
     error,

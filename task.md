@@ -161,12 +161,12 @@ definitions, the API contract, and the data model live in
 
 ## V1.1 Slice 01: Extended schema, contract suite, and backwards compatibility
 
-- [ ] Write tests (contract suite + legacy data tests) and watch them fail
-- [ ] Update `src/lib/schemas.ts`: `PrioritySchema`, updated `TodoSchema`, `CreateTodoSchema`, `TodoPatchSchema`
-- [ ] Update `src/services/todo-service.ts`: `ListOptions`, `SortOption`, and updated signatures
-- [ ] Update `src/services/local-todo-service.ts`: handle new fields, filtering, sorting, and backwards compatibility with legacy V1 data
-- [ ] Update `src/services/todo-service.contract.ts` and `local-todo-service.test.ts`
-- [ ] Run `npm run verify` and commit
+- [x] Write tests (contract suite + legacy data tests) and watch them fail
+- [x] Update `src/lib/schemas.ts`: `PrioritySchema`, updated `TodoSchema`, `CreateTodoSchema`, `TodoPatchSchema`
+- [x] Update `src/services/todo-service.ts`: `ListOptions`, `SortOption`, and updated signatures
+- [x] Update `src/services/local-todo-service.ts`: handle new fields, filtering, sorting, and backwards compatibility with legacy V1 data
+- [x] Update `src/services/todo-service.contract.ts` and `local-todo-service.test.ts`
+- [x] Run `npm run verify` and commit
 
 **Acceptance criteria**
 
@@ -185,11 +185,11 @@ definitions, the API contract, and the data model live in
 
 ## V1.1 Slice 02: Rich creation form (AddTodoForm)
 
-- [ ] Write tests and watch them fail
-- [ ] Expand `AddTodoForm.tsx` with expandable details panel: description textarea, priority selector, due date picker, category input
-- [ ] Validate character limits inline (description <=1000, category <=50)
-- [ ] Wire up with `useTodos`
-- [ ] Run `npm run verify && npm run e2e` and commit
+- [x] Write tests and watch them fail
+- [x] Expand `AddTodoForm.tsx` with expandable details panel: description textarea, priority selector, due date picker, category input
+- [x] Validate character limits inline (description <=1000, category <=50)
+- [x] Wire up with `useTodos`
+- [x] Run `npm run verify && npm run e2e` and commit
 
 **Acceptance criteria**
 
@@ -207,10 +207,10 @@ definitions, the API contract, and the data model live in
 
 ## V1.1 Slice 03: Rich item display and full-field inline edit (TodoItem)
 
-- [ ] Write tests and watch them fail
-- [ ] Update `TodoItem.tsx` to render priority badges, due date status (overdue indicator), category pill, and description
-- [ ] Support full inline edit mode for title, description, priority, due date, and category
-- [ ] Run `npm run verify && npm run e2e` and commit
+- [x] Write tests and watch them fail
+- [x] Update `TodoItem.tsx` to render priority badges, due date status (overdue indicator), category pill, and description
+- [x] Support full inline edit mode for title, description, priority, due date, and category
+- [x] Run `npm run verify && npm run e2e` and commit
 
 **Acceptance criteria**
 
@@ -229,11 +229,11 @@ definitions, the API contract, and the data model live in
 
 ## V1.1 Slice 04: Enhanced filtering and sorting (FilterBar & useTodos)
 
-- [ ] Write tests and watch them fail
-- [ ] Extend `useTodos.ts` with priority filter, category filter, and sort options
-- [ ] Extend `FilterBar.tsx` with priority filter chips, category dropdown/filter, and sort selector
-- [ ] Contextual empty messages in `TodoList.tsx` reflect active filters
-- [ ] Run `npm run verify && npm run e2e` and commit
+- [x] Write tests and watch them fail
+- [x] Extend `useTodos.ts` with priority filter, category filter, and sort options
+- [x] Extend `FilterBar.tsx` with priority filter chips, category dropdown/filter, and sort selector
+- [x] Contextual empty messages in `TodoList.tsx` reflect active filters
+- [x] Run `npm run verify && npm run e2e` and commit
 
 **Acceptance criteria**
 
@@ -251,7 +251,7 @@ definitions, the API contract, and the data model live in
 
 ## V1.1 Slice 05: Finish version 1.1
 
-- [ ] Run `/finish 1.1` — audit, README update, and release notes
+- [x] Run `/finish 1.1` — audit, README update, and release notes
 - [ ] Human reviews output, merges branch to `main`, and tags `v1.1`
 
 ---

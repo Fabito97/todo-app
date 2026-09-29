@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Todo App", () => {
+test.describe.serial("Todo App", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => localStorage.clear());
@@ -19,6 +19,32 @@ test.describe("Todo App", () => {
 
     await page.reload();
     await expect(page.getByText("Playwright Test Todo")).toBeVisible();
+  });
+
+  test("can add rich todo with details and it persists after reload", async ({ page }) => {
+    const input = page.getByRole("textbox", { name: /todo title/i });
+    const toggleDetails = page.getByRole("button", { name: /toggle details/i });
+    const addButton = page.getByRole("button", { name: /add todo/i });
+
+    await input.fill("Rich Todo Item");
+    await toggleDetails.click();
+
+    const descInput = page.getByRole("textbox", { name: /description/i });
+    const priorityGroup = page.getByRole("group", { name: "Priority", exact: true });
+    const highPriorityBtn = priorityGroup.getByRole("button", { name: /priority high/i });
+    const dueDateInput = page.getByLabel(/due date/i);
+    const categoryInput = page.getByRole("textbox", { name: /category/i });
+
+    await descInput.fill("Important deployment checklist");
+    await highPriorityBtn.click();
+    await dueDateInput.fill("2026-11-15");
+    await categoryInput.fill("DevOps");
+
+    await addButton.click();
+
+    await expect(page.getByText("Rich Todo Item")).toBeVisible();
+    await page.reload();
+    await expect(page.getByText("Rich Todo Item")).toBeVisible();
   });
 
   test("can toggle todo completion and it persists after reload", async ({ page }) => {
@@ -53,6 +79,38 @@ test.describe("Todo App", () => {
 
     await page.reload();
     await expect(page.getByText("Edited Title")).toBeVisible();
+  });
+
+  test("can edit rich todo details and it persists after reload", async ({ page }) => {
+    const input = page.getByRole("textbox", { name: /todo title/i });
+    await input.fill("Editable Todo");
+    await page.getByRole("button", { name: /add todo/i }).click();
+
+    const editBtn = page.getByRole("button", { name: /edit editable todo/i });
+    await editBtn.click();
+
+    const editInput = page.getByRole("textbox", { name: /edit todo title/i });
+    await editInput.fill("Editable Todo Updated");
+
+    const highPriorityBtn = page.getByRole("group", { name: /edit priority/i }).getByRole("button", { name: /priority high/i });
+    await highPriorityBtn.click();
+
+    const categoryInput = page.getByRole("textbox", { name: /edit category/i });
+    await categoryInput.fill("Chores");
+
+    const saveBtn = page.getByRole("button", { name: /save changes/i });
+    await saveBtn.click();
+
+    const item = page.getByRole("listitem");
+    await expect(item.getByText("Editable Todo Updated")).toBeVisible();
+    await expect(item.getByText("Chores")).toBeVisible();
+    await expect(item.getByText("high")).toBeVisible();
+
+    await page.reload();
+    const reloadedItem = page.getByRole("listitem");
+    await expect(reloadedItem.getByText("Editable Todo Updated")).toBeVisible();
+    await expect(reloadedItem.getByText("Chores")).toBeVisible();
+    await expect(reloadedItem.getByText("high")).toBeVisible();
   });
 
   test("can delete a todo permanently", async ({ page }) => {
@@ -164,6 +222,77 @@ test.describe("Todo App", () => {
 
     // 6. Assert zero unhandled console errors
     expect(consoleErrors).toEqual([]);
+  });
+
+  test("filters by priority, category, and sorts by dueDate and priority", async ({ page }) => {
+    const titleInput = page.getByRole("textbox", { name: /todo title/i });
+    const toggleDetails = page.getByRole("button", { name: /toggle details/i });
+    const addButton = page.getByRole("button", { name: /add todo/i });
+    const formPriorityGroup = page.getByRole("group", { name: "Priority", exact: true });
+
+    // Item 1: Work Urgent
+    await titleInput.fill("Work Urgent Item");
+    await toggleDetails.click();
+    await formPriorityGroup.getByRole("button", { name: /priority high/i }).click();
+    await page.getByLabel(/due date/i).fill("2026-12-01");
+    await page.getByRole("textbox", { name: /category/i }).fill("Work");
+    await addButton.click();
+
+    // Item 2: Personal Low
+    await titleInput.fill("Personal Low Item");
+    await formPriorityGroup.getByRole("button", { name: /priority low/i }).click();
+    await page.getByLabel(/due date/i).fill("2026-10-15");
+    await page.getByRole("textbox", { name: /category/i }).fill("Personal");
+    await addButton.click();
+
+    // Item 3: Work Standard
+    await titleInput.fill("Work Standard Item");
+    await formPriorityGroup.getByRole("button", { name: /priority med/i }).click();
+    await page.getByLabel(/due date/i).fill("2026-11-20");
+    await page.getByRole("textbox", { name: /category/i }).fill("Work");
+    await addButton.click();
+
+    await expect(page.getByText("Work Urgent Item")).toBeVisible();
+    await expect(page.getByText("Personal Low Item")).toBeVisible();
+    await expect(page.getByText("Work Standard Item")).toBeVisible();
+
+    // Filter by priority high
+    const priorityGroup = page.getByRole("group", { name: /filter by priority/i });
+    await priorityGroup.getByRole("button", { name: /priority high/i }).click();
+
+    await expect(page.getByText("Work Urgent Item")).toBeVisible();
+    await expect(page.getByText("Personal Low Item")).not.toBeVisible();
+    await expect(page.getByText("Work Standard Item")).not.toBeVisible();
+
+    // Reset priority to All
+    await priorityGroup.getByRole("button", { name: /priority all/i }).click();
+    await expect(page.getByText("Personal Low Item")).toBeVisible();
+
+    // Filter by category Work
+    const categorySelect = page.getByRole("combobox", { name: /filter by category/i });
+    await categorySelect.selectOption("Work");
+    await expect(page.getByText("Work Urgent Item")).toBeVisible();
+    await expect(page.getByText("Work Standard Item")).toBeVisible();
+    await expect(page.getByText("Personal Low Item")).not.toBeVisible();
+
+    // Reset category to All
+    await categorySelect.selectOption("all");
+    await expect(page.getByText("Personal Low Item")).toBeVisible();
+
+    // Sort by Due Date: 2026-10-15 (Personal Low Item) should appear first
+    const sortSelect = page.getByRole("combobox", { name: /sort todos by/i });
+    await sortSelect.selectOption("dueDate");
+
+    const items = page.getByRole("listitem");
+    await expect(items.nth(0)).toContainText("Personal Low Item");
+    await expect(items.nth(1)).toContainText("Work Standard Item");
+    await expect(items.nth(2)).toContainText("Work Urgent Item");
+
+    // Sort by Priority: high (Work Urgent) -> medium (Work Standard) -> low (Personal Low)
+    await sortSelect.selectOption("priority");
+    await expect(items.nth(0)).toContainText("Work Urgent Item");
+    await expect(items.nth(1)).toContainText("Work Standard Item");
+    await expect(items.nth(2)).toContainText("Personal Low Item");
   });
 });
 

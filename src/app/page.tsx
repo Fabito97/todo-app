@@ -10,6 +10,13 @@ export default function Home() {
     todos,
     filter,
     setFilter,
+    priorityFilter,
+    setPriorityFilter,
+    categoryFilter,
+    setCategoryFilter,
+    sortBy,
+    setSortBy,
+    categories,
     activeCount,
     loading,
     error,
@@ -19,6 +26,9 @@ export default function Home() {
     editTodo,
     deleteTodo,
   } = useTodos();
+
+  const hasActiveFilters =
+    priorityFilter !== "all" || categoryFilter !== "all";
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-zinc-50 via-zinc-100 to-indigo-50/30 dark:from-zinc-950 dark:via-zinc-900 dark:to-indigo-950/20 py-16 px-4 sm:px-6 lg:px-8">
@@ -70,6 +80,7 @@ export default function Home() {
               todos={todos}
               loading={loading}
               filter={filter}
+              hasActiveFilters={hasActiveFilters}
               onToggle={toggleTodo}
               onEdit={editTodo}
               onDelete={deleteTodo}
@@ -81,6 +92,13 @@ export default function Home() {
               activeCount={activeCount}
               currentFilter={filter}
               onFilterChange={setFilter}
+              priorityFilter={priorityFilter}
+              onPriorityFilterChange={setPriorityFilter}
+              categoryFilter={categoryFilter}
+              onCategoryFilterChange={setCategoryFilter}
+              categories={categories}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
             />
           )}
         </section>

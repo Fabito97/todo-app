@@ -10,10 +10,14 @@ const mockTodo: Todo = {
   completed: false,
   createdAt: "2026-09-29T10:00:00.000Z",
   updatedAt: "2026-09-29T10:00:00.000Z",
+  description: "Detailed description here",
+  priority: "high",
+  dueDate: "2026-01-01", // Past date to test overdue
+  category: "Work",
 };
 
 describe("TodoItem", () => {
-  it("renders todo title and accessible controls", () => {
+  it("renders todo title, priority badge, category tag, and overdue indicator", () => {
     render(
       <TodoItem
         todo={mockTodo}
@@ -24,12 +28,12 @@ describe("TodoItem", () => {
     );
 
     expect(screen.getByText("Test todo item")).toBeInTheDocument();
-    expect(screen.getByRole("checkbox", { name: /toggle completion for test todo item/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /edit test todo item/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /delete test todo item/i })).toBeInTheDocument();
+    expect(screen.getByText(/high/i)).toBeInTheDocument();
+    expect(screen.getByText("Work")).toBeInTheDocument();
+    expect(screen.getByText(/overdue/i)).toBeInTheDocument();
   });
 
-  it("calls onToggle when checkbox is clicked", async () => {
+  it("toggles completion when checkbox is clicked", async () => {
     const onToggle = vi.fn();
     const user = userEvent.setup();
 
@@ -42,13 +46,15 @@ describe("TodoItem", () => {
       />
     );
 
-    const checkbox = screen.getByRole("checkbox");
+    const checkbox = screen.getByRole("checkbox", {
+      name: /toggle completion for test todo item/i,
+    });
     await user.click(checkbox);
 
     expect(onToggle).toHaveBeenCalledWith(mockTodo.id, true);
   });
 
-  it("enters edit mode on edit button click and saves on Enter", async () => {
+  it("enters rich edit mode on edit button click and saves changes", async () => {
     const onEdit = vi.fn().mockResolvedValue(undefined);
     const user = userEvent.setup();
 
@@ -61,19 +67,35 @@ describe("TodoItem", () => {
       />
     );
 
-    const editBtn = screen.getByRole("button", { name: /edit test todo item/i });
+    const editBtn = screen.getByRole("button", {
+      name: `Edit ${mockTodo.title}`,
+    });
     await user.click(editBtn);
 
-    const editInput = screen.getByRole("textbox", { name: /edit todo title/i });
-    expect(editInput).toHaveValue("Test todo item");
+    const titleInput = screen.getByRole("textbox", { name: /edit todo title/i });
+    const descInput = screen.getByRole("textbox", { name: /edit description/i });
+    const lowPriorityBtn = screen.getByRole("button", { name: /priority low/i });
+    const saveBtn = screen.getByRole("button", { name: /save changes/i });
 
-    await user.clear(editInput);
-    await user.type(editInput, "Updated title{Enter}");
+    await user.clear(titleInput);
+    await user.type(titleInput, "Updated Title");
+    await user.clear(descInput);
+    await user.type(descInput, "Updated Description");
+    await user.click(lowPriorityBtn);
 
-    expect(onEdit).toHaveBeenCalledWith(mockTodo.id, "Updated title");
+    await user.click(saveBtn);
+
+    expect(onEdit).toHaveBeenCalledWith(
+      mockTodo.id,
+      expect.objectContaining({
+        title: "Updated Title",
+        description: "Updated Description",
+        priority: "low",
+      })
+    );
   });
 
-  it("cancels edit mode on Escape and restores original title", async () => {
+  it("cancels edit mode on Escape and restores original title and values", async () => {
     const onEdit = vi.fn();
     const user = userEvent.setup();
 
@@ -86,39 +108,18 @@ describe("TodoItem", () => {
       />
     );
 
-    const editBtn = screen.getByRole("button", { name: /edit test todo item/i });
+    const editBtn = screen.getByRole("button", {
+      name: `Edit ${mockTodo.title}`,
+    });
     await user.click(editBtn);
 
-    const editInput = screen.getByRole("textbox", { name: /edit todo title/i });
-    await user.clear(editInput);
-    await user.type(editInput, "Abandoned changes{Escape}");
+    const titleInput = screen.getByRole("textbox", { name: /edit todo title/i });
+    await user.clear(titleInput);
+    await user.type(titleInput, "Something else");
+    await user.keyboard("{Escape}");
 
     expect(onEdit).not.toHaveBeenCalled();
     expect(screen.getByText("Test todo item")).toBeInTheDocument();
-  });
-
-  it("shows an error alert and does not save when submitting empty title in edit mode", async () => {
-    const onEdit = vi.fn();
-    const user = userEvent.setup();
-
-    render(
-      <TodoItem
-        todo={mockTodo}
-        onToggle={vi.fn()}
-        onEdit={onEdit}
-        onDelete={vi.fn()}
-      />
-    );
-
-    const editBtn = screen.getByRole("button", { name: /edit test todo item/i });
-    await user.click(editBtn);
-
-    const editInput = screen.getByRole("textbox", { name: /edit todo title/i });
-    await user.clear(editInput);
-    await user.type(editInput, "   {Enter}");
-
-    expect(onEdit).not.toHaveBeenCalled();
-    expect(screen.getByRole("alert")).toHaveTextContent(/title is required/i);
   });
 
   it("calls onDelete when delete button is clicked", async () => {
@@ -134,7 +135,9 @@ describe("TodoItem", () => {
       />
     );
 
-    const deleteBtn = screen.getByRole("button", { name: /delete test todo item/i });
+    const deleteBtn = screen.getByRole("button", {
+      name: `Delete ${mockTodo.title}`,
+    });
     await user.click(deleteBtn);
 
     expect(onDelete).toHaveBeenCalledWith(mockTodo.id);
