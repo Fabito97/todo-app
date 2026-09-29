@@ -152,7 +152,7 @@ definitions, the API contract, and the data model live in
 
 ## V1 Slice 06: Finish version 1
 
-- [ ] Run `/finish 1` — audit, README update, and release notes
+- [x] Run `/finish 1` — audit, README update, and release notes
 - [ ] Human reviews output, merges branch to `main`, and tags `v1`
 
 ---
