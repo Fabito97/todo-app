@@ -49,4 +49,17 @@ describe("Home page resilience", () => {
       /changes will only persist in memory/i
     );
   });
+
+  it("renders theme switcher in header and switches to dark mode on click", async () => {
+    document.documentElement.classList.remove("dark");
+    const user = userEvent.setup();
+    render(<Home />);
+
+    const darkBtn = screen.getByRole("button", { name: /dark theme/i });
+    await user.click(darkBtn);
+
+    expect(document.documentElement.classList.contains("dark")).toBe(true);
+    expect(localStorage.getItem("theme:v1")).toBe("dark");
+  });
 });
+

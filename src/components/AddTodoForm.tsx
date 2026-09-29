@@ -71,7 +71,7 @@ export function AddTodoForm({ onAdd }: AddTodoFormProps) {
           aria-label="Todo title"
           aria-invalid={!!error}
           aria-describedby={error ? "todo-input-error" : undefined}
-          className="flex-1 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/70 px-4 py-3 text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 backdrop-blur-sm transition-all shadow-sm"
+          className="flex-1 rounded-xl border border-slate-200 dark:border-slate-600/80 bg-white dark:bg-slate-700/60 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 backdrop-blur-sm transition-all shadow-xs"
           disabled={isSubmitting}
         />
 
@@ -83,8 +83,8 @@ export function AddTodoForm({ onAdd }: AddTodoFormProps) {
           title={showDetails ? "Hide extra details" : "Add details (priority, due date, category)"}
           className={`px-3 py-3 rounded-xl border text-sm font-medium transition-all cursor-pointer flex items-center justify-center ${
             showDetails
-              ? "bg-indigo-50 dark:bg-indigo-950/40 border-indigo-300 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300"
-              : "bg-white/70 dark:bg-zinc-900/70 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+              ? "bg-indigo-50 dark:bg-indigo-950/60 border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300"
+              : "bg-white dark:bg-slate-700/60 border-slate-200 dark:border-slate-600/80 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
           }`}
         >
           <svg
@@ -112,7 +112,7 @@ export function AddTodoForm({ onAdd }: AddTodoFormProps) {
       </div>
 
       {showDetails && (
-        <div className="p-4 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-50/60 dark:bg-zinc-900/40 space-y-3 transition-all animate-in fade-in duration-150">
+        <div className="p-4 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/80 dark:bg-slate-900/50 space-y-3 transition-all animate-in fade-in duration-150">
           <div>
             <textarea
               value={description}
@@ -123,24 +123,24 @@ export function AddTodoForm({ onAdd }: AddTodoFormProps) {
               placeholder="Notes / description (optional)"
               aria-label="Description"
               rows={2}
-              className="w-full rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 resize-none"
+              className="w-full rounded-lg border border-slate-200 dark:border-slate-600/80 bg-white dark:bg-slate-800/80 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 resize-none"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
             {/* Priority selection */}
             <div className="space-y-1">
-              <label className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+              <label className="text-[11px] font-medium text-slate-500 dark:text-slate-300">
                 Priority
               </label>
               <div className="flex gap-1.5" role="group" aria-label="Priority">
                 {(["low", "medium", "high"] as const).map((p) => {
                   const isSelected = priority === p;
                   const activeColors = {
-                    low: "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800",
+                    low: "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-950/70 dark:text-blue-300 dark:border-blue-700",
                     medium:
-                      "bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800",
-                    high: "bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800",
+                      "bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-700",
+                    high: "bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950/70 dark:text-rose-300 dark:border-rose-700",
                   }[p];
 
                   return (
@@ -152,7 +152,7 @@ export function AddTodoForm({ onAdd }: AddTodoFormProps) {
                       className={`flex-1 capitalize py-1.5 px-2 rounded-lg border text-[11px] font-semibold transition-all cursor-pointer ${
                         isSelected
                           ? activeColors
-                          : "bg-white/60 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                          : "bg-white dark:bg-slate-800/70 border-slate-200 dark:border-slate-600/80 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/70"
                       }`}
                     >
                       {p}
@@ -166,7 +166,7 @@ export function AddTodoForm({ onAdd }: AddTodoFormProps) {
             <div className="space-y-1">
               <label
                 htmlFor="todo-due-date"
-                className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400"
+                className="text-[11px] font-medium text-slate-500 dark:text-slate-300"
               >
                 Due date
               </label>
@@ -176,7 +176,7 @@ export function AddTodoForm({ onAdd }: AddTodoFormProps) {
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
                 aria-label="Due date"
-                className="w-full rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 px-3 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                className="w-full rounded-lg border border-slate-200 dark:border-slate-600/80 bg-white dark:bg-slate-800/80 px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
               />
             </div>
 
@@ -184,7 +184,7 @@ export function AddTodoForm({ onAdd }: AddTodoFormProps) {
             <div className="space-y-1">
               <label
                 htmlFor="todo-category"
-                className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400"
+                className="text-[11px] font-medium text-slate-500 dark:text-slate-300"
               >
                 Category
               </label>
@@ -198,14 +198,14 @@ export function AddTodoForm({ onAdd }: AddTodoFormProps) {
                 }}
                 placeholder="e.g. Work, Personal"
                 aria-label="Category"
-                className="w-full rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 px-3 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                className="w-full rounded-lg border border-slate-200 dark:border-slate-600/80 bg-white dark:bg-slate-800/80 px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
               />
             </div>
           </div>
 
           {/* Quick preset chips */}
           <div className="flex items-center gap-1.5 pt-1">
-            <span className="text-[10px] text-zinc-400">Presets:</span>
+            <span className="text-[10px] text-slate-400 dark:text-slate-400">Presets:</span>
             {CATEGORY_PRESETS.map((preset) => (
               <button
                 key={preset}
@@ -213,8 +213,8 @@ export function AddTodoForm({ onAdd }: AddTodoFormProps) {
                 onClick={() => setCategory(preset)}
                 className={`text-[10px] px-2 py-0.5 rounded-full border transition-all cursor-pointer ${
                   category.toLowerCase() === preset.toLowerCase()
-                    ? "bg-indigo-100 text-indigo-700 border-indigo-300 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800 font-medium"
-                    : "bg-white/50 dark:bg-zinc-800/50 border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+                    ? "bg-indigo-100 text-indigo-700 border-indigo-300 dark:bg-indigo-950/70 dark:text-indigo-300 dark:border-indigo-700 font-medium"
+                    : "bg-white dark:bg-slate-800/70 border-slate-200 dark:border-slate-600/80 text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white"
                 }`}
               >
                 {preset}

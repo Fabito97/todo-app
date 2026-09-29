@@ -8,3 +8,6 @@ import type { TodoService } from "./todo-service";
 export const todoService: TodoService = new LocalTodoService();
 export { LocalTodoService, subscribeStorageNotice, setStorageNotice };
 export type { TodoService, TodoFilter, SortOption, ListOptions } from "./todo-service";
+export { getStoredTheme, setStoredTheme } from "./theme-storage";
+export type { ThemePreference } from "./theme-storage";
+

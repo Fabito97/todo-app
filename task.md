@@ -279,12 +279,12 @@ definitions, the API contract, and the data model live in
 
 ## V1.2 Slice 02: Softer dark mode palette and interactive Theme Toggle
 
-- [ ] Write tests in `test/components/ThemeToggle.test.tsx` and `test/app/page.test.tsx` and watch them fail
-- [ ] Implement `src/services/theme-storage.ts` (`getStoredTheme`, `setStoredTheme` using key `theme:v1`) and re-export from `src/services/index.ts`
-- [ ] Implement `src/hooks/use-theme.ts` and `src/components/ThemeToggle.tsx` with accessible `Light`, `Dark`, and `System` options (`aria-pressed`) that toggle `.dark` on `document.documentElement`
-- [ ] Update `src/app/globals.css` with class-based dark variant (`@custom-variant dark (&:where(.dark, .dark *));`) and softer slate dark mode tokens (`#0f172a` background, `#f1f5f9` foreground)
-- [ ] Update `src/app/layout.tsx`, `src/app/page.tsx`, `src/components/TodoForm.tsx`, `src/components/TodoItem.tsx`, `src/components/TodoList.tsx`, and `src/components/FilterBar.tsx` to replace harsh `zinc-950` / `zinc-900` dark surfaces with layered `slate-900` / `slate-800/90` / `slate-700/60` surfaces and render `<ThemeToggle />` in the header
-- [ ] Run `npm run verify` and commit
+- [x] Write tests in `test/components/ThemeToggle.test.tsx` and `test/app/page.test.tsx` and watch them fail
+- [x] Implement `src/services/theme-storage.ts` (`getStoredTheme`, `setStoredTheme` using key `theme:v1`) and re-export from `src/services/index.ts`
+- [x] Implement `src/hooks/use-theme.ts` and `src/components/ThemeToggle.tsx` with accessible `Light`, `Dark`, and `System` options (`aria-pressed`) that toggle `.dark` on `document.documentElement`
+- [x] Update `src/app/globals.css` with class-based dark variant (`@custom-variant dark (&:where(.dark, .dark *));`) and softer slate dark mode tokens (`#0f172a` background, `#f1f5f9` foreground)
+- [x] Update `src/app/layout.tsx`, `src/app/page.tsx`, `src/components/TodoForm.tsx`, `src/components/TodoItem.tsx`, `src/components/TodoList.tsx`, and `src/components/FilterBar.tsx` to replace harsh `zinc-950` / `zinc-900` dark surfaces with layered `slate-900` / `slate-800/90` / `slate-700/60` surfaces and render `<ThemeToggle />` in the header
+- [x] Run `npm run verify` and commit
 
 **Acceptance criteria**
 

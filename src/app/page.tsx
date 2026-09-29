@@ -4,6 +4,7 @@ import { useTodos } from "@/hooks/use-todos";
 import { AddTodoForm } from "@/components/AddTodoForm";
 import { TodoList } from "@/components/TodoList";
 import { FilterBar } from "@/components/FilterBar";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function Home() {
   const {
@@ -31,21 +32,26 @@ export default function Home() {
     priorityFilter !== "all" || categoryFilter !== "all";
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-zinc-50 via-zinc-100 to-indigo-50/30 dark:from-zinc-950 dark:via-zinc-900 dark:to-indigo-950/20 py-16 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-xl mx-auto space-y-8">
-        <header className="text-center space-y-2">
-          <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-zinc-900 via-zinc-800 to-indigo-600 dark:from-white dark:via-zinc-200 dark:to-indigo-400 bg-clip-text text-transparent">
-            Todo List
-          </h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Organize your day with local storage simplicity
-          </p>
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-indigo-50/40 dark:from-slate-900 dark:via-slate-800/95 dark:to-indigo-950/40 py-12 px-4 sm:px-6 lg:px-8 transition-colors">
+      <div className="max-w-2xl mx-auto space-y-6">
+        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="space-y-1 text-center sm:text-left">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-600 dark:from-white dark:via-slate-100 dark:to-indigo-400 bg-clip-text text-transparent">
+              Todo List
+            </h1>
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              Organize your day with local storage simplicity
+            </p>
+          </div>
+          <div className="flex justify-center sm:justify-end">
+            <ThemeToggle />
+          </div>
         </header>
 
         {storageNotice && (
           <div
             role="status"
-            className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300/80 dark:border-amber-800/80 text-xs font-medium text-amber-900 dark:text-amber-200 shadow-sm flex items-start gap-3"
+            className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300/80 dark:border-amber-700/80 text-xs font-medium text-amber-900 dark:text-amber-200 shadow-sm flex items-start gap-3"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -63,13 +69,13 @@ export default function Home() {
           </div>
         )}
 
-        <section className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl p-6 shadow-xl shadow-zinc-200/50 dark:shadow-none space-y-6">
+        <section className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-6 shadow-xl shadow-slate-200/50 dark:shadow-slate-950/50 space-y-6">
           <AddTodoForm onAdd={addTodo} />
 
           {error && (
             <div
               role="alert"
-              className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 text-xs text-rose-600 dark:text-rose-400"
+              className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-xs text-rose-600 dark:text-rose-300"
             >
               {error}
             </div>
