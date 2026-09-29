@@ -1,5 +1,6 @@
 Status V1: APPROVED by human on 2026-09-29
 Status V1.1: APPROVED by human on 2026-09-29
+Status V1.2: APPROVED by human on 2026-09-29
 Status V2: DRAFT
 
 ---
@@ -8,10 +9,11 @@ Status V2: DRAFT
 
 ## Architecture Summary
 
-The app is a Next.js App Router project with a strict `src/` layout. All business logic lives behind a single `TodoService` interface.
+The app is a Next.js App Router project with a strict `src/` layout for production code and a dedicated `test/` directory for Vitest unit, component, and contract tests. All business logic and browser persistence live behind the `src/services/` boundary.
 
 - In **Version 1** and **Version 1.1**, the UI runs entirely in the browser and delegates storage to `LocalTodoService`, which is the only module allowed to touch `localStorage`.
 - In **Version 1.1**, the data model and UI are enriched with `description`, `priority`, `dueDate`, and `category`, along with rich filtering/sorting and backwards compatibility with existing stored V1 data.
+- In **Version 1.2**, all Vitest test suites are relocated out of `src/` into a dedicated root-level `test/` folder, the dark mode palette is softened from harsh pitch-black (`#0a0a0a` / `zinc-950`) to a layered slate surface hierarchy (`#0f172a` / `slate-900` & `slate-800`) with an interactive **Theme Toggle** (**Light** / **Dark** / **System**), and the dashboard UI is redesigned with a completion progress bar, stat pills, a one-click **Reset Filters** control, and priority-accented todo cards.
 - In **Version 2**, the UI calls `HttpTodoService`, which calls Route Handlers that in turn call a `TodoRepository` backed by Neon (PostgreSQL) via Drizzle ORM. Swapping versions is a one-file change (`src/services/index.ts`) plus new server-side files; no component or hook changes.
 
 ESLint rules enforce the service boundary: components and hooks may not import `localStorage`, `sessionStorage`, `fetch`, or concrete service classes.
@@ -115,6 +117,7 @@ export interface TodoService {
 ```
 src/
   app/                   # Next.js App Router pages and layouts
+    globals.css
     layout.tsx
     page.tsx
     api/todos/           # V2 only: route handlers
@@ -123,15 +126,36 @@ src/
     errors.ts            # NotFoundError
   services/
     todo-service.ts      # Interface + TodoFilter, ListOptions, SortOption types
-    local-todo-service.ts  # V1/V1.1 localStorage implementation
-    todo-service.contract.ts  # Shared contract test suite
-    index.ts             # Active service export + storage notice subscriber
+    local-todo-service.ts  # V1/V1.x localStorage implementation
+    theme-storage.ts     # V1.2 theme preference storage helper (theme:v1)
+    index.ts             # Active service export + storage/theme helpers
     http-todo-service.ts # V2 HTTP implementation
   hooks/
     use-todos.ts         # React hook; depends only on TodoService
-  components/            # UI components; no storage or fetch
+    use-theme.ts         # V1.2 React hook for Light/Dark/System theme mode
+  components/            # UI components; no direct storage or fetch
+    AddTodoForm.tsx
+    FilterBar.tsx
+    ThemeToggle.tsx      # V1.2 Light / Dark / System switcher
+    TodoItem.tsx
+    TodoList.tsx
   server/                # V2 only: DB client, Drizzle schema, repository
-e2e/                     # Playwright tests
+test/                    # V1.2+: All Vitest unit, component, and contract tests
+  sanity.test.ts
+  app/
+    page.test.tsx
+  components/
+    AddTodoForm.test.tsx
+    FilterBar.test.tsx
+    ThemeToggle.test.tsx
+    TodoItem.test.tsx
+    TodoList.test.tsx
+  hooks/
+    use-todos.test.ts
+  services/
+    local-todo-service.test.ts
+    todo-service.contract.ts
+e2e/                     # Playwright end-to-end tests
 ```
 
 ---
@@ -142,39 +166,56 @@ Completed and verified on branch `auto/v1`. Full baseline CRUD and client-side r
 
 ---
 
-## Version 1.1 Plan — Rich Metadata & Enhanced Controls
+## Version 1.1 Plan — Rich Metadata & Enhanced Controls (Completed)
+
+Completed and verified on branch `auto/v1.1` (merged to `main`). Added `description`, `priority`, `dueDate`, `category`, rich inline edit, and advanced filtering/sorting.
+
+---
+
+## Version 1.2 Plan — `/test` Directory Reorganization, Softer Dark Mode, & Intuitive UI Redesign
 
 ### What is new
-- Extended todo data shape: `description`, `priority`, `dueDate`, `category`.
-- Backwards compatibility: Existing V1 items stored in `todos:v1` seamlessly parse with default priority (`medium`) and null/empty metadata without throwing or wiping data.
-- Creation form (`AddTodoForm`): Collapsible details panel to enter description, select priority badges, pick due date, and choose/type category.
-- Item rendering (`TodoItem`): Visual badges for priority (colored pills), due date with overdue warning indicator, category pill, and inline expansion for description and editing all fields.
-- Filtering & Sorting (`FilterBar` + `useTodos`): Filter by priority and category in addition to status; sort by newest, due date, or priority.
+1. **Dedicated `/test` Directory**:
+   - Move all unit, component, and contract test files from `src/` into `test/` mirroring the `src/` folder hierarchy.
+   - Update `vitest.config.ts` so `include` targets `test/**/*.{test,spec}.{ts,tsx}`.
+   - Keep `src/` strictly for production application code.
+2. **Softer Dark Mode Palette & Interactive Theme Switcher**:
+   - Configure Tailwind CSS v4 class-based dark mode in `src/app/globals.css` (`@custom-variant dark (&:where(.dark, .dark *));`) alongside softer dark mode CSS variables (`--background: #0f172a`, `--foreground: #f1f5f9`).
+   - Add `src/services/theme-storage.ts` (`getStoredTheme`, `setStoredTheme` using key `theme:v1`) and export via `src/services/index.ts` so components and hooks continue to obey the ESLint `no-restricted-globals` rule for `localStorage`.
+   - Add `src/hooks/use-theme.ts` and `src/components/ThemeToggle.tsx` allowing the user to toggle between **Light**, **Dark**, and **System** modes, applying or removing `.dark` on `document.documentElement`.
+   - Replace pitch-black `dark:from-zinc-950` / `dark:bg-zinc-900` backgrounds across `page.tsx`, `AddTodoForm.tsx`, `TodoItem.tsx`, `TodoList.tsx`, and `FilterBar.tsx` with a balanced, eye-friendly slate palette (`dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/40`, elevated `dark:bg-slate-800/90` cards, and `dark:bg-slate-700/60` inputs).
+3. **Intuitive Dashboard UI Redesign**:
+   - **Dashboard Header & Progress Summary (`page.tsx`)**: Header bar pairing the title and `ThemeToggle` with a completion progress card (`role="progressbar"`, percentage indicator, and stat pills for **Total**, **Active**, and **Completed** tasks).
+   - **Streamlined Filter & Sort Toolbar (`FilterBar.tsx`)**: Clean two-tier filter bar with a one-click **Reset filters** button (`aria-label="Reset filters"`) visible whenever status, priority, or category filters are active.
+   - **Priority-Accented Todo Cards (`TodoItem.tsx`)**: Left accent border (`border-l-4`) color-coded by priority (`high` rose, `medium` amber, `low` blue) for instant visual scanning, plus refined spacing and badge contrast.
 
-### Backwards Compatibility Strategy
-`LocalTodoService.readStorage()` validates stored JSON through `TodoSchema.array()`. Because `priority` has `.default('medium')` and optional fields have safe fallbacks, legacy V1 items `{ id, title, completed, createdAt, updatedAt }` automatically parse into valid V1.1 items without manual data migration.
-
-### Files to Modify in Version 1.1
+### Files to Add or Modify in Version 1.2
 
 | File | Change |
-|------|--------|
-| `src/lib/schemas.ts` | Add `PrioritySchema`, update `TodoSchema`, `CreateTodoSchema`, `TodoPatchSchema` |
-| `src/services/todo-service.ts` | Add `ListOptions`, `SortOption`, update method signatures |
-| `src/services/local-todo-service.ts` | Support new fields, sorting, and backwards compatibility |
-| `src/services/todo-service.contract.ts` | Add contract assertions for metadata, defaults, sorting, and legacy V1 data parsing |
-| `src/hooks/use-todos.ts` | Expose priority/category filter states and sorting options |
-| `src/components/AddTodoForm.tsx` | Add expandable inputs for description, priority, due date, and category |
-| `src/components/TodoItem.tsx` | Render priority badge, due date status, category tag, and full-field inline edit |
-| `src/components/FilterBar.tsx` | Add category/priority filters and sort dropdown selector |
-| `e2e/todos.spec.ts` | Add e2e tests for rich todo creation, filtering by priority/category, and sorting |
+| :--- | :--- |
+| `vitest.config.ts` | Update `test.include` to `["test/**/*.{test,spec}.{ts,tsx}"]` |
+| `test/**/*` (moved from `src/**/*`) | Relocate `sanity.test.ts`, `app/page.test.tsx`, `components/*.test.tsx`, `hooks/use-todos.test.ts`, `services/local-todo-service.test.ts`, and `services/todo-service.contract.ts` into `test/` |
+| `src/services/theme-storage.ts` | New helper to read/write `theme:v1` (`light` \| `dark` \| `system`) safely in `try/catch` |
+| `src/services/index.ts` | Re-export `getStoredTheme`, `setStoredTheme`, and `ThemeMode` |
+| `src/hooks/use-theme.ts` | Hook managing `ThemeMode` state and syncing `.dark` class on `document.documentElement` |
+| `src/components/ThemeToggle.tsx` | Accessible segmented control for Light / Dark / System theme selection |
+| `test/components/ThemeToggle.test.tsx` | Component tests for theme switching and persistence |
+| `src/app/globals.css` | Add `@custom-variant dark` and softer slate dark mode palette variables (`#0f172a`) |
+| `src/app/page.tsx` | Redesign dashboard header with `ThemeToggle`, completion progress bar, stat pills, and softer dark mode surfaces |
+| `src/components/AddTodoForm.tsx` | Update surface colors and focus styling for softer dark mode and intuitive layout |
+| `src/components/FilterBar.tsx` | Streamlined toolbar layout, softer dark mode styling, and **Reset filters** button |
+| `src/components/TodoItem.tsx` | Left priority accent bar, softer dark mode card surfaces, and polished badge contrast |
+| `src/components/TodoList.tsx` | Softer dark mode empty state and list spacing |
+| `test/components/FilterBar.test.tsx` | Add test for **Reset filters** button |
+| `test/app/page.test.tsx` | Add tests for progress bar / stats summary and theme toggle integration |
+| `e2e/todos.spec.ts` | Add e2e test verifying theme toggle (`.dark` class & softer background) and filter reset |
 
-### Open Decisions for V1.1
-- **DECISION 1 (Category values)**: Provide standard predefined category suggestions (`Work`, `Personal`, `Shopping`, `Other`) with free-text custom entry option.
-- **DECISION 2 (Sort controls)**: Implement sort selection as a compact dropdown inside the filter toolbar.
+### Open Decisions for V1.2
+- None (`OPEN` count: 0). All requirements (moving tests to `/test`, softer slate dark mode palette with Light/Dark/System toggle, and intuitive dashboard redesign) were confirmed during `/spec`.
 
 ---
 
 ## Version 2 Plan — Neon + Vercel (Outline; detail with `/plan 2`)
 
 ### Goal
-Move persistence from browser `localStorage` to Neon PostgreSQL via Drizzle ORM and Next.js Route Handlers. The database schema will directly reflect the enriched V1.1 `Todo` shape. Components and hooks remain completely unchanged.
+Move persistence from browser `localStorage` to Neon PostgreSQL via Drizzle ORM and Next.js Route Handlers. The database schema will directly reflect the enriched `Todo` shape. Components and hooks remain completely unchanged.

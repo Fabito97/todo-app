@@ -252,7 +252,82 @@ definitions, the API contract, and the data model live in
 ## V1.1 Slice 05: Finish version 1.1
 
 - [x] Run `/finish 1.1` — audit, README update, and release notes
-- [ ] Human reviews output, merges branch to `main`, and tags `v1.1`
+- [x] Human reviews output, merges branch to `main`, and tags `v1.1`
+
+---
+
+# Version 1.2: Repository Cleanup, Softer Dark Mode, and Intuitive UI Redesign
+
+## V1.2 Slice 01: Relocate unit, component, and contract tests to `/test` directory
+
+- [ ] Move all unit, component, and contract test files from `src/` (`src/sanity.test.ts`, `src/app/page.test.tsx`, `src/components/TodoForm.test.tsx`, `src/components/TodoItem.test.tsx`, `src/components/TodoList.test.tsx`, `src/components/FilterBar.test.tsx`, `src/hooks/use-todos.test.ts`, `src/services/local-todo-service.test.ts`, `src/services/todo-service.contract.ts`) into `test/` (`test/sanity.test.ts`, `test/app/page.test.tsx`, `test/components/TodoForm.test.tsx`, `test/components/TodoItem.test.tsx`, `test/components/TodoList.test.tsx`, `test/components/FilterBar.test.tsx`, `test/hooks/use-todos.test.ts`, `test/services/local-todo-service.test.ts`, `test/services/todo-service.contract.ts`) using `git mv`
+- [ ] Update relative imports in moved test files to use `@/...` path aliases
+- [ ] Update `vitest.config.ts` so `test.include` points to `["test/**/*.{test,spec}.{ts,tsx}"]`
+- [ ] Run `npm run verify` and commit
+
+**Acceptance criteria**
+
+- Zero `*.test.ts`, `*.test.tsx`, or `*.contract.ts` files remain inside `src/`.
+- All unit, component, and contract suites reside under `test/` mirroring the `src/` folder layout.
+- `npm run verify` (lint, typecheck, and Vitest) passes with all existing tests discovered and green.
+
+**Tests**
+
+- unit & component (`test/**/*.test.{ts,tsx}`): all 46 existing unit, hook, service, and component tests execute from `test/` and pass.
+
+---
+
+## V1.2 Slice 02: Softer dark mode palette and interactive Theme Toggle
+
+- [ ] Write tests in `test/components/ThemeToggle.test.tsx` and `test/app/page.test.tsx` and watch them fail
+- [ ] Implement `src/services/theme-storage.ts` (`getStoredTheme`, `setStoredTheme` using key `theme:v1`) and re-export from `src/services/index.ts`
+- [ ] Implement `src/hooks/use-theme.ts` and `src/components/ThemeToggle.tsx` with accessible `Light`, `Dark`, and `System` options (`aria-pressed`) that toggle `.dark` on `document.documentElement`
+- [ ] Update `src/app/globals.css` with class-based dark variant (`@custom-variant dark (&:where(.dark, .dark *));`) and softer slate dark mode tokens (`#0f172a` background, `#f1f5f9` foreground)
+- [ ] Update `src/app/layout.tsx`, `src/app/page.tsx`, `src/components/TodoForm.tsx`, `src/components/TodoItem.tsx`, `src/components/TodoList.tsx`, and `src/components/FilterBar.tsx` to replace harsh `zinc-950` / `zinc-900` dark surfaces with layered `slate-900` / `slate-800/90` / `slate-700/60` surfaces and render `<ThemeToggle />` in the header
+- [ ] Run `npm run verify` and commit
+
+**Acceptance criteria**
+
+- Dark mode uses a softer, layered slate/charcoal palette (`slate-900` page background, `slate-800/90` elevated cards, `slate-700/60` inputs, `slate-700/80` borders) instead of pitch-black (`#0a0a0a` / `zinc-950`).
+- Header includes an interactive Theme Toggle (`Light`, `Dark`, `System`) with accessible button labels and `aria-pressed` state.
+- Selecting `Dark` adds `.dark` to `<html>` and persists `"dark"` under `theme:v1`; selecting `Light` removes `.dark` and persists `"light"` under `theme:v1`.
+- UI components and hooks do not access `localStorage` directly; theme persistence flows through `src/services/theme-storage.ts`.
+
+**Tests**
+
+- component (`test/components/ThemeToggle.test.tsx`): renders Light/Dark/System buttons, clicking Dark adds `.dark` class to `document.documentElement` and saves to storage, clicking Light removes `.dark` class, initializes from stored preference.
+- component (`test/app/page.test.tsx`): renders ThemeToggle in the page header and switches theme state on click.
+
+---
+
+## V1.2 Slice 03: Intuitive dashboard UI redesign (progress bar, stats, priority accents, filter reset)
+
+- [ ] Write tests in `test/app/page.test.tsx`, `test/components/FilterBar.test.tsx`, `test/components/TodoItem.test.tsx`, and `e2e/todo.spec.ts` and watch them fail
+- [ ] Update `src/app/page.tsx` to display a completion progress bar (`role="progressbar"`, `aria-valuenow`, `aria-valuemin={0}`, `aria-valuemax={100}`) with percentage and quick-glance stat pills (**Total**, **Active**, **Completed**)
+- [ ] Update `src/components/FilterBar.tsx` into a cohesive two-tier toolbar with a one-click **Reset filters** button (`aria-label="Reset filters"`) visible whenever status, priority, or category filter is non-default
+- [ ] Update `src/components/TodoItem.tsx` with priority-colored left accent borders (`border-l-4`, `high` rose, `medium` amber, `low` blue) and refined metadata pills
+- [ ] Run `npm run verify && npm run e2e` and commit
+
+**Acceptance criteria**
+
+- Dashboard header displays Total, Active, and Completed counts alongside a progress bar (`role="progressbar"`) reflecting completion percentage (`0%` when empty or none completed, `100%` when all completed).
+- Each `TodoItem` card renders a color-coded left accent border corresponding to its priority (`high` rose, `medium` amber, `low` blue).
+- `FilterBar` displays a **Reset filters** button whenever any filter (`status !== "all"`, `priority !== "all"`, or `category !== "all"`) is active, and clicking it resets all filters to `"all"`.
+- End-to-end Playwright suite verifies theme switching, progress bar updates, priority accent styling, and filter reset behavior.
+
+**Tests**
+
+- component (`test/app/page.test.tsx`): displays Total/Active/Completed stats and updates `role="progressbar"` percentage when todos are completed.
+- component (`test/components/FilterBar.test.tsx`): hides "Reset filters" when all filters are default, shows "Reset filters" when any filter is active, and resets status/priority/category to `"all"` when clicked.
+- component (`test/components/TodoItem.test.tsx`): applies distinct priority accent border classes for `high`, `medium`, and `low` priority items.
+- e2e (`e2e/todo.spec.ts`): verifies theme toggle persists dark/light class across reload, completion progress bar updates on toggle, and "Reset filters" restores all items.
+
+---
+
+## V1.2 Slice 04: Finish version 1.2
+
+- [ ] Run `/finish 1.2` — audit, README update, and release notes
+- [ ] Human reviews output, merges branch to `main`, and tags `v1.2`
 
 ---
 

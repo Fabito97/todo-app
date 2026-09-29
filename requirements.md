@@ -2,14 +2,15 @@
 
 ## Goal
 
-A fast, resilient, single-user todo application where a user can create, view, edit, complete, categorize, and delete todos with rich metadata, with data that persists across reloads. It doubles as a showcase of an AI-assisted, spec-first, test-gated engineering workflow.
+A fast, resilient, single-user todo application where a user can create, view, edit, complete, categorize, and delete todos with rich metadata, an intuitive dashboard UI, and a comfortable theme experience (Light / Dark / System), with data that persists across reloads. It doubles as a showcase of an AI-assisted, spec-first, test-gated engineering workflow.
 
 ## Versions
 
 | Version | Storage & Backend | Core Scope | Status |
 | :--- | :--- | :--- | :--- |
-| **Version 1** | Browser `localStorage` (`todos:v1`) | Core CRUD: title, completed, basic filters, counter, resilience | **Complete** on `auto/v1` |
-| **Version 1.1** | Browser `localStorage` (`todos:v1`) | Rich metadata: description, priority, due date, category, sorting | **Approved** (current target) |
+| **Version 1** | Browser `localStorage` (`todos:v1`) | Core CRUD: title, completed, basic filters, counter, resilience | **Complete** (`v1`) |
+| **Version 1.1** | Browser `localStorage` (`todos:v1`) | Rich metadata: description, priority, due date, category, sorting | **Complete** (`v1.1`) |
+| **Version 1.2** | Browser `localStorage` (`todos:v1`, `theme:v1`) | `/test` folder reorganization, softer dark mode + theme toggle, intuitive dashboard UI redesign | **Approved** (current target) |
 | **Version 2** | Route Handlers + Neon PostgreSQL | REST API routes, Drizzle ORM, server validation, Vercel deployment | Planned |
 | **Version 3+** | Multi-user / Cloud sync | Authentication, multi-tenant todo lists, team sharing | Postponed |
 
@@ -25,13 +26,25 @@ A fast, resilient, single-user todo application where a user can create, view, e
 - Storage resilience: visible notices on corrupt storage or storage write failures.
 - Keyboard accessible (<kbd>Tab</kbd>, <kbd>Enter</kbd>, <kbd>Space</kbd>, <kbd>Escape</kbd>) and responsive down to 375px mobile screens.
 
-### Version 1.1 (Current Scope)
+### Version 1.1 (Completed)
 - **Description / Notes**: Optional multiline text field (up to 1,000 characters).
 - **Priority**: Categorized as `low`, `medium`, or `high` (defaults to `medium`). Visual badges in list items.
 - **Due Date**: Optional date picker/field with ISO format; visual indicator for overdue vs upcoming items.
-- **Category / Tags**: Optional category identifier (e.g. Work, Personal, Shopping, General).
+- **Category / Tags**: Optional category identifier (e.g. Work, Personal, Shopping, Other).
 - **Enhanced Filtering & Sorting**: Filter by category or priority; sort by due date or priority in addition to newest-first.
 - **Schema Migration**: Seamless backwards compatibility with existing Version 1 `localStorage` todos (missing fields receive default values upon read).
+
+### Version 1.2 (Current Scope)
+- **Dedicated `/test` Directory Structure**:
+  - Relocate all Vitest unit, component, and service contract test files out of `src/` into a top-level `test/` directory mirroring `src/` (`test/app/`, `test/components/`, `test/hooks/`, `test/services/`, `test/sanity.test.ts`).
+  - Keep `src/` strictly for production application source code and update `vitest.config.ts` accordingly.
+- **Softer Dark Mode Palette & Interactive Theme Switcher**:
+  - Replace the pitch-black (`#0a0a0a` / `zinc-950`) dark mode with a softer, layered slate/charcoal surface hierarchy (`slate-900` `#0f172a` page canvas, `slate-800/90` elevated cards, `slate-700/60` inputs, and subtle ambient header glow).
+  - Add an accessible **Theme Toggle** (**Light**, **Dark**, **System**) in the header, persisted under `theme:v1` via the service layer and applied via a `.dark` class on `<html>`.
+- **Intuitive Dashboard UI Redesign**:
+  - **Progress & Stats Overview**: Visual completion progress bar and quick-glance stat pills (Total, Active, Completed) in the header area.
+  - **Streamlined Filter & Sort Toolbar**: Intuitive layout for status tabs, priority chips, category selector, and sort selector, plus a one-click **Reset Filters** button when any non-default filter is active.
+  - **Scannable Todo Cards**: Left priority accent border/indicator on each todo item, refined badge contrast in both light and dark modes, and polished inline editing and notes expansion.
 
 ### Version 2 (Upcoming Backend)
 - Neon (PostgreSQL) database backing with Drizzle ORM.
@@ -42,6 +55,7 @@ A fast, resilient, single-user todo application where a user can create, view, e
 
 ```ts
 export type Priority = "low" | "medium" | "high";
+export type ThemeMode = "light" | "dark" | "system";
 
 export interface Todo {
   id: string;               // UUID
@@ -61,15 +75,15 @@ export interface Todo {
 ### All Versions
 - Next.js (current stable App Router) with **`src/` directory** (`src/app`, never root `app`).
 - TypeScript strict mode.
-- Tailwind CSS v4.
+- Tailwind CSS v4 (class-based `.dark` variant + CSS custom properties for theme tokens).
 - Zod for runtime schema validation.
-- Vitest with React Testing Library (jsdom) for unit, component, and contract tests.
+- Vitest with React Testing Library (jsdom) for unit, component, and contract tests in `test/`.
 - Playwright for end-to-end tests in `e2e/`.
 - Package manager: npm.
 
-### Version 1 & 1.1 — Local
-- Client-side storage in browser `localStorage` (`todos:v1`).
-- Asynchronous `TodoService` interface (`LocalTodoService`).
+### Version 1, 1.1 & 1.2 — Local
+- Client-side storage in browser `localStorage` (`todos:v1`, `theme:v1`).
+- Asynchronous `TodoService` interface (`LocalTodoService`) and theme storage helper in `src/services/`.
 - ESLint boundary banning `localStorage`, `sessionStorage`, and `fetch` from `src/components/` and `src/hooks/`.
 
 ### Version 2 — Server & Database
@@ -80,17 +94,18 @@ export interface Todo {
 
 ## Architecture Principle
 
-The UI never directly accesses `localStorage` or `fetch`. All reads and writes must pass through the `TodoService` interface:
+The UI never directly accesses `localStorage` or `fetch`. All reads and writes must pass through `src/services/`:
 - `src/lib/schemas.ts`: Defines `Todo` types and Zod schemas (the single source of truth).
-- `src/services/`: Defines the async `TodoService` interface and implementations.
-- `src/hooks/` & `src/components/`: Consume `TodoService` via hooks.
+- `src/services/`: Defines the async `TodoService` interface, `LocalTodoService`, and theme persistence helpers.
+- `src/hooks/` & `src/components/`: Consume `src/services/` via hooks.
+- `test/`: Houses all unit, component, and contract tests cleanly separated from `src/`.
 
 Upgrading between versions modifies schema definitions and service implementations, leaving UI components cleanly decoupled.
 
 ## Constraints
 
 - Every mutation and creation must validate through Zod schemas.
-- Full backwards compatibility with existing Version 1 items stored in `localStorage`.
+- Full backwards compatibility with existing Version 1 and Version 1.1 items stored in `localStorage`.
 - No new dependencies without prior approval.
 - Every acceptance criterion in `task.md` maps to at least one passing test.
 - Keyboard accessibility and zero unhandled console errors during test execution.
