@@ -21,6 +21,31 @@ test.describe("Todo App", () => {
     await expect(page.getByText("Playwright Test Todo")).toBeVisible();
   });
 
+  test("can add rich todo with details and it persists after reload", async ({ page }) => {
+    const input = page.getByRole("textbox", { name: /todo title/i });
+    const toggleDetails = page.getByRole("button", { name: /toggle details/i });
+    const addButton = page.getByRole("button", { name: /add todo/i });
+
+    await input.fill("Rich Todo Item");
+    await toggleDetails.click();
+
+    const descInput = page.getByRole("textbox", { name: /description/i });
+    const highPriorityBtn = page.getByRole("button", { name: /priority high/i });
+    const dueDateInput = page.getByLabel(/due date/i);
+    const categoryInput = page.getByRole("textbox", { name: /category/i });
+
+    await descInput.fill("Important deployment checklist");
+    await highPriorityBtn.click();
+    await dueDateInput.fill("2026-11-15");
+    await categoryInput.fill("DevOps");
+
+    await addButton.click();
+
+    await expect(page.getByText("Rich Todo Item")).toBeVisible();
+    await page.reload();
+    await expect(page.getByText("Rich Todo Item")).toBeVisible();
+  });
+
   test("can toggle todo completion and it persists after reload", async ({ page }) => {
     const input = page.getByRole("textbox", { name: /todo title/i });
     await input.fill("Toggle Me");

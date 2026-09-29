@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import type { Todo } from "@/lib/schemas";
+import type { Todo, CreateTodoInput } from "@/lib/schemas";
 import type { TodoFilter } from "@/services";
 import { todoService, subscribeStorageNotice } from "@/services";
 
@@ -54,17 +54,21 @@ export function useTodos() {
     };
   }, []);
 
-  const addTodo = useCallback(async (title: string): Promise<Todo | undefined> => {
-    try {
-      setError(null);
-      const created = await todoService.create({ title });
-      setTodos((prev) => [created, ...prev]);
-      return created;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to add todo");
-      throw err;
-    }
-  }, []);
+  const addTodo = useCallback(
+    async (data: string | CreateTodoInput): Promise<Todo | undefined> => {
+      try {
+        setError(null);
+        const payload = typeof data === "string" ? { title: data } : data;
+        const created = await todoService.create(payload);
+        setTodos((prev) => [created, ...prev]);
+        return created;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to add todo");
+        throw err;
+      }
+    },
+    []
+  );
 
   const toggleTodo = useCallback(async (id: string, completed: boolean): Promise<Todo | undefined> => {
     try {

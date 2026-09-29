@@ -185,11 +185,11 @@ definitions, the API contract, and the data model live in
 
 ## V1.1 Slice 02: Rich creation form (AddTodoForm)
 
-- [ ] Write tests and watch them fail
-- [ ] Expand `AddTodoForm.tsx` with expandable details panel: description textarea, priority selector, due date picker, category input
-- [ ] Validate character limits inline (description <=1000, category <=50)
-- [ ] Wire up with `useTodos`
-- [ ] Run `npm run verify && npm run e2e` and commit
+- [x] Write tests and watch them fail
+- [x] Expand `AddTodoForm.tsx` with expandable details panel: description textarea, priority selector, due date picker, category input
+- [x] Validate character limits inline (description <=1000, category <=50)
+- [x] Wire up with `useTodos`
+- [x] Run `npm run verify && npm run e2e` and commit
 
 **Acceptance criteria**
 
