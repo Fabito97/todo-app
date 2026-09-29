@@ -3,10 +3,21 @@
 import { useTodos } from "@/hooks/use-todos";
 import { AddTodoForm } from "@/components/AddTodoForm";
 import { TodoList } from "@/components/TodoList";
+import { FilterBar } from "@/components/FilterBar";
 
 export default function Home() {
-  const { todos, loading, error, addTodo, toggleTodo, editTodo, deleteTodo } =
-    useTodos();
+  const {
+    todos,
+    filter,
+    setFilter,
+    activeCount,
+    loading,
+    error,
+    addTodo,
+    toggleTodo,
+    editTodo,
+    deleteTodo,
+  } = useTodos();
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-zinc-50 via-zinc-100 to-indigo-50/30 dark:from-zinc-950 dark:via-zinc-900 dark:to-indigo-950/20 py-16 px-4 sm:px-6 lg:px-8">
@@ -36,11 +47,20 @@ export default function Home() {
             <TodoList
               todos={todos}
               loading={loading}
+              filter={filter}
               onToggle={toggleTodo}
               onEdit={editTodo}
               onDelete={deleteTodo}
             />
           </div>
+
+          {!loading && (
+            <FilterBar
+              activeCount={activeCount}
+              currentFilter={filter}
+              onFilterChange={setFilter}
+            />
+          )}
         </section>
       </div>
     </main>

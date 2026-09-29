@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import type { Todo } from "@/lib/schemas";
+import type { TodoFilter } from "@/services";
 import { todoService } from "@/services";
 
 export function useTodos() {
   const [todos, setTodos] = useState<Todo[]>([]);
+  const [filter, setFilter] = useState<TodoFilter>("all");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -91,8 +93,26 @@ export function useTodos() {
     }
   }, []);
 
+  const filteredTodos = useMemo(() => {
+    if (filter === "active") {
+      return todos.filter((t) => !t.completed);
+    }
+    if (filter === "completed") {
+      return todos.filter((t) => t.completed);
+    }
+    return todos;
+  }, [todos, filter]);
+
+  const activeCount = useMemo(() => {
+    return todos.filter((t) => !t.completed).length;
+  }, [todos]);
+
   return {
-    todos,
+    todos: filteredTodos,
+    allTodos: todos,
+    filter,
+    setFilter,
+    activeCount,
     loading,
     error,
     addTodo,

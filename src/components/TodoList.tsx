@@ -2,11 +2,13 @@
 
 import React from "react";
 import type { Todo } from "@/lib/schemas";
+import type { TodoFilter } from "@/services";
 import { TodoItem } from "./TodoItem";
 
 interface TodoListProps {
   todos: Todo[];
   loading: boolean;
+  filter?: TodoFilter;
   onToggle?: (id: string, completed: boolean) => void;
   onEdit?: (id: string, title: string) => Promise<unknown> | void;
   onDelete?: (id: string) => void;
@@ -15,6 +17,7 @@ interface TodoListProps {
 export function TodoList({
   todos,
   loading,
+  filter = "all",
   onToggle = () => {},
   onEdit = () => {},
   onDelete = () => {},
@@ -29,11 +32,28 @@ export function TodoList({
   }
 
   if (todos.length === 0) {
+    const emptyMessages: Record<TodoFilter, { title: string; subtitle: string }> = {
+      all: {
+        title: "No todos yet",
+        subtitle: "Add your first task above to get started",
+      },
+      active: {
+        title: "No active todos",
+        subtitle: "All tasks are completed!",
+      },
+      completed: {
+        title: "No completed todos",
+        subtitle: "Complete a task to see it here",
+      },
+    };
+
+    const currentMsg = emptyMessages[filter] || emptyMessages.all;
+
     return (
       <div className="py-12 flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl">
-        <p className="text-sm font-medium">No todos yet</p>
+        <p className="text-sm font-medium">{currentMsg.title}</p>
         <p className="text-xs text-zinc-400 dark:text-zinc-600 mt-1">
-          Add your first task above to get started
+          {currentMsg.subtitle}
         </p>
       </div>
     );

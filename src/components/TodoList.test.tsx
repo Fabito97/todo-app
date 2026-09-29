@@ -26,9 +26,15 @@ describe("TodoList", () => {
     expect(screen.getByText(/loading todos/i)).toBeInTheDocument();
   });
 
-  it("renders empty state when todos is empty and not loading", () => {
-    render(<TodoList todos={[]} loading={false} />);
+  it("renders contextual empty messages for each filter when todos is empty and not loading", () => {
+    const { rerender } = render(<TodoList todos={[]} loading={false} filter="all" />);
     expect(screen.getByText(/no todos yet/i)).toBeInTheDocument();
+
+    rerender(<TodoList todos={[]} loading={false} filter="active" />);
+    expect(screen.getByText(/no active todos/i)).toBeInTheDocument();
+
+    rerender(<TodoList todos={[]} loading={false} filter="completed" />);
+    expect(screen.getByText(/no completed todos/i)).toBeInTheDocument();
   });
 
   it("renders list items when todos are provided", () => {

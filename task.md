@@ -107,10 +107,10 @@ definitions, the API contract, and the data model live in
 
 ## V1 Slice 04: Filters and active-item counter
 
-- [ ] Write tests and watch them fail
-- [ ] Implement `src/components/FilterBar.tsx` (All / Active / Completed tabs + counter)
-- [ ] Wire filter state through `use-todos` hook
-- [ ] Run `npm run verify && npm run e2e` and commit
+- [x] Write tests and watch them fail
+- [x] Implement `src/components/FilterBar.tsx` (All / Active / Completed tabs + counter)
+- [x] Wire filter state through `use-todos` hook
+- [x] Run `npm run verify && npm run e2e` and commit
 
 **Acceptance criteria**
 

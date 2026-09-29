@@ -70,4 +70,43 @@ test.describe("Todo App", () => {
     await page.reload();
     await expect(page.getByText("Delete Me Soon")).not.toBeVisible();
   });
+
+  test("filters list by all, active, and completed and updates active counter", async ({ page }) => {
+    const input = page.getByRole("textbox", { name: /todo title/i });
+    const addButton = page.getByRole("button", { name: /add todo/i });
+
+    await input.fill("Task 1 Active");
+    await addButton.click();
+
+    await input.fill("Task 2 Completed");
+    await addButton.click();
+
+    // Toggle Task 2 to completed
+    const task2Checkbox = page.getByRole("checkbox", { name: /toggle completion for task 2 completed/i });
+    await task2Checkbox.click();
+
+    // Check counter
+    await expect(page.getByText("1 item left")).toBeVisible();
+
+    // Switch to Active filter
+    const activeFilterBtn = page.getByRole("button", { name: /^active/i });
+    await activeFilterBtn.click();
+
+    await expect(page.getByText("Task 1 Active")).toBeVisible();
+    await expect(page.getByText("Task 2 Completed")).not.toBeVisible();
+
+    // Switch to Completed filter
+    const completedFilterBtn = page.getByRole("button", { name: /^completed/i });
+    await completedFilterBtn.click();
+
+    await expect(page.getByText("Task 1 Active")).not.toBeVisible();
+    await expect(page.getByText("Task 2 Completed")).toBeVisible();
+
+    // Switch back to All filter
+    const allFilterBtn = page.getByRole("button", { name: /^all/i });
+    await allFilterBtn.click();
+
+    await expect(page.getByText("Task 1 Active")).toBeVisible();
+    await expect(page.getByText("Task 2 Completed")).toBeVisible();
+  });
 });
