@@ -1,11 +1,19 @@
-import type { Todo } from "@/lib/schemas";
+import type {
+  Todo,
+  CreateTodoInput,
+  TodoPatchInput,
+} from "@/lib/schemas";
 import {
   TodoSchema,
   CreateTodoSchema,
   TodoPatchSchema,
 } from "@/lib/schemas";
 import { NotFoundError } from "@/lib/errors";
-import type { TodoFilter, TodoService } from "./todo-service";
+import type {
+  ListOptions,
+  TodoFilter,
+  TodoService,
+} from "./todo-service";
 
 const STORAGE_KEY = "todos:v1";
 
@@ -25,6 +33,12 @@ export function subscribeStorageNotice(listener: NoticeListener): () => void {
     noticeListeners.delete(listener);
   };
 }
+
+const PRIORITY_WEIGHT = {
+  high: 3,
+  medium: 2,
+  low: 1,
+} as const;
 
 export class LocalTodoService implements TodoService {
   private inMemoryFallback: Todo[] = [];
@@ -67,22 +81,64 @@ export class LocalTodoService implements TodoService {
     }
   }
 
-  async list(filter?: TodoFilter): Promise<Todo[]> {
+  async list(options?: ListOptions | TodoFilter): Promise<Todo[]> {
     const todos = this.readStorage();
-    const sorted = [...todos].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    let filter: TodoFilter | undefined;
+    let priorityFilter: string | undefined;
+    let categoryFilter: string | undefined;
+    let sortBy: "newest" | "dueDate" | "priority" = "newest";
+
+    if (typeof options === "string") {
+      filter = options;
+    } else if (options) {
+      filter = options.filter;
+      priorityFilter = options.priority;
+      categoryFilter = options.category;
+      if (options.sortBy) {
+        sortBy = options.sortBy;
+      }
+    }
+
+    let filtered = [...todos];
 
     if (filter === "active") {
-      return sorted.filter((t) => !t.completed);
+      filtered = filtered.filter((t) => !t.completed);
+    } else if (filter === "completed") {
+      filtered = filtered.filter((t) => t.completed);
     }
-    if (filter === "completed") {
-      return sorted.filter((t) => t.completed);
+
+    if (priorityFilter && priorityFilter !== "all") {
+      filtered = filtered.filter((t) => t.priority === priorityFilter);
     }
-    return sorted;
+
+    if (categoryFilter && categoryFilter !== "all") {
+      filtered = filtered.filter(
+        (t) => t.category?.toLowerCase() === categoryFilter?.toLowerCase()
+      );
+    }
+
+    filtered.sort((a, b) => {
+      if (sortBy === "dueDate") {
+        if (!a.dueDate && !b.dueDate) return 0;
+        if (!a.dueDate) return 1;
+        if (!b.dueDate) return -1;
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      }
+
+      if (sortBy === "priority") {
+        const weightA = PRIORITY_WEIGHT[a.priority ?? "medium"];
+        const weightB = PRIORITY_WEIGHT[b.priority ?? "medium"];
+        return weightB - weightA;
+      }
+
+      // Default: newest first by createdAt
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+
+    return filtered;
   }
 
-  async create(data: { title: string }): Promise<Todo> {
+  async create(data: CreateTodoInput | { title: string }): Promise<Todo> {
     const validated = CreateTodoSchema.parse(data);
     const now = new Date().toISOString();
 
@@ -92,6 +148,10 @@ export class LocalTodoService implements TodoService {
       completed: false,
       createdAt: now,
       updatedAt: now,
+      description: validated.description ?? "",
+      priority: validated.priority ?? "medium",
+      dueDate: validated.dueDate ?? null,
+      category: validated.category ?? null,
     });
 
     const current = this.readStorage();
@@ -101,10 +161,7 @@ export class LocalTodoService implements TodoService {
     return newTodo;
   }
 
-  async update(
-    id: string,
-    patch: { title?: string; completed?: boolean }
-  ): Promise<Todo> {
+  async update(id: string, patch: TodoPatchInput): Promise<Todo> {
     const validatedPatch = TodoPatchSchema.parse(patch);
     const current = this.readStorage();
     const index = current.findIndex((t) => t.id === id);
@@ -121,6 +178,18 @@ export class LocalTodoService implements TodoService {
       ...(validatedPatch.title !== undefined ? { title: validatedPatch.title } : {}),
       ...(validatedPatch.completed !== undefined
         ? { completed: validatedPatch.completed }
+        : {}),
+      ...(validatedPatch.description !== undefined
+        ? { description: validatedPatch.description }
+        : {}),
+      ...(validatedPatch.priority !== undefined
+        ? { priority: validatedPatch.priority }
+        : {}),
+      ...(validatedPatch.dueDate !== undefined
+        ? { dueDate: validatedPatch.dueDate }
+        : {}),
+      ...(validatedPatch.category !== undefined
+        ? { category: validatedPatch.category }
         : {}),
       updatedAt: now,
     });

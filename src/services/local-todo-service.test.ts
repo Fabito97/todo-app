@@ -62,5 +62,28 @@ describe("LocalTodoService", () => {
       const todo = await service.create({ title: "Memory fallback" });
       expect(todo.title).toBe("Memory fallback");
     });
+
+    it("parses legacy V1 items without loss, assigning default priority 'medium'", async () => {
+      // Stored data without description, priority, dueDate, or category (pure V1 shape)
+      const legacyV1Todos = [
+        {
+          id: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+          title: "Legacy Todo Item",
+          completed: false,
+          createdAt: "2026-09-29T10:00:00.000Z",
+          updatedAt: "2026-09-29T10:00:00.000Z",
+        },
+      ];
+      localStorage.setItem("todos:v1", JSON.stringify(legacyV1Todos));
+
+      const service = new LocalTodoService();
+      const list = await service.list();
+      expect(list).toHaveLength(1);
+      expect(list[0].id).toBe("3fa85f64-5717-4562-b3fc-2c963f66afa6");
+      expect(list[0].title).toBe("Legacy Todo Item");
+      expect(list[0].priority).toBe("medium");
+      expect(list[0].completed).toBe(false);
+      expect(list[0].description).toBe("");
+    });
   });
 });

@@ -161,12 +161,12 @@ definitions, the API contract, and the data model live in
 
 ## V1.1 Slice 01: Extended schema, contract suite, and backwards compatibility
 
-- [ ] Write tests (contract suite + legacy data tests) and watch them fail
-- [ ] Update `src/lib/schemas.ts`: `PrioritySchema`, updated `TodoSchema`, `CreateTodoSchema`, `TodoPatchSchema`
-- [ ] Update `src/services/todo-service.ts`: `ListOptions`, `SortOption`, and updated signatures
-- [ ] Update `src/services/local-todo-service.ts`: handle new fields, filtering, sorting, and backwards compatibility with legacy V1 data
-- [ ] Update `src/services/todo-service.contract.ts` and `local-todo-service.test.ts`
-- [ ] Run `npm run verify` and commit
+- [x] Write tests (contract suite + legacy data tests) and watch them fail
+- [x] Update `src/lib/schemas.ts`: `PrioritySchema`, updated `TodoSchema`, `CreateTodoSchema`, `TodoPatchSchema`
+- [x] Update `src/services/todo-service.ts`: `ListOptions`, `SortOption`, and updated signatures
+- [x] Update `src/services/local-todo-service.ts`: handle new fields, filtering, sorting, and backwards compatibility with legacy V1 data
+- [x] Update `src/services/todo-service.contract.ts` and `local-todo-service.test.ts`
+- [x] Run `npm run verify` and commit
 
 **Acceptance criteria**
 

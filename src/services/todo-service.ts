@@ -1,22 +1,32 @@
-import type { Todo } from "@/lib/schemas";
+import type {
+  Todo,
+  Priority,
+  CreateTodoInput,
+  TodoPatchInput,
+} from "@/lib/schemas";
 
 export type TodoFilter = "all" | "active" | "completed";
+export type SortOption = "newest" | "dueDate" | "priority";
+
+export interface ListOptions {
+  filter?: TodoFilter;
+  priority?: Priority | "all";
+  category?: string | "all";
+  sortBy?: SortOption;
+}
 
 export interface TodoService {
-  /** Returns todos sorted by createdAt descending. */
-  list(filter?: TodoFilter): Promise<Todo[]>;
+  /** Returns todos sorted and filtered according to options or filter string. */
+  list(options?: ListOptions | TodoFilter): Promise<Todo[]>;
 
-  /** Trims the title; rejects blank or >200-char titles (throws ZodError). */
-  create(data: { title: string }): Promise<Todo>;
+  /** Creates a todo validating against CreateTodoSchema. */
+  create(data: CreateTodoInput | { title: string }): Promise<Todo>;
 
   /**
    * Applies the patch to the matching todo and updates updatedAt.
    * Throws NotFoundError if the id does not exist.
    */
-  update(
-    id: string,
-    patch: { title?: string; completed?: boolean }
-  ): Promise<Todo>;
+  update(id: string, patch: TodoPatchInput): Promise<Todo>;
 
   /**
    * Removes the matching todo.
