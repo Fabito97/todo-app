@@ -46,3 +46,13 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Review**: In-session review by autopilot; all acceptance criteria met.
 - **Bug or issue caught**: None.
 - **Rule or prompt improvement**: None.
+
+## 2026-09-29 - V1 Slice 05: Resilience and polish
+- **Commit**: `91d8a9d feat: add storage resilience notices, mobile responsiveness, and clean console audit`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (35 pass across 8 test files), e2e (7 pass).
+- **Review**: In-session review by autopilot; all resilience notices, mobile layout, keyboard navigation, and console error-free happy path verified.
+- **Bug or issue caught**: None.
+- **Rule or prompt improvement**: None.
+
