@@ -46,4 +46,9 @@ describe("TodoList", () => {
     expect(screen.getByText("First task")).toBeInTheDocument();
     expect(screen.getByText("Second task")).toBeInTheDocument();
   });
+
+  it("renders contextual empty message when active filters return no results", () => {
+    render(<TodoList todos={[]} loading={false} hasActiveFilters={true} />);
+    expect(screen.getByText(/no matching todos/i)).toBeInTheDocument();
+  });
 });

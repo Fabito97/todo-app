@@ -9,6 +9,7 @@ interface TodoListProps {
   todos: Todo[];
   loading: boolean;
   filter?: TodoFilter;
+  hasActiveFilters?: boolean;
   onToggle?: (id: string, completed: boolean) => void;
   onEdit?: (id: string, patch: TodoPatchInput | string) => Promise<unknown> | void;
   onDelete?: (id: string) => void;
@@ -18,6 +19,7 @@ export function TodoList({
   todos,
   loading,
   filter = "all",
+  hasActiveFilters = false,
   onToggle = () => {},
   onEdit = () => {},
   onDelete = () => {},
@@ -47,7 +49,12 @@ export function TodoList({
       },
     };
 
-    const currentMsg = emptyMessages[filter] || emptyMessages.all;
+    const currentMsg = hasActiveFilters
+      ? {
+          title: "No matching todos",
+          subtitle: "Try adjusting your filters to see more tasks",
+        }
+      : emptyMessages[filter] || emptyMessages.all;
 
     return (
       <div className="py-12 flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl">

@@ -229,11 +229,11 @@ definitions, the API contract, and the data model live in
 
 ## V1.1 Slice 04: Enhanced filtering and sorting (FilterBar & useTodos)
 
-- [ ] Write tests and watch them fail
-- [ ] Extend `useTodos.ts` with priority filter, category filter, and sort options
-- [ ] Extend `FilterBar.tsx` with priority filter chips, category dropdown/filter, and sort selector
-- [ ] Contextual empty messages in `TodoList.tsx` reflect active filters
-- [ ] Run `npm run verify && npm run e2e` and commit
+- [x] Write tests and watch them fail
+- [x] Extend `useTodos.ts` with priority filter, category filter, and sort options
+- [x] Extend `FilterBar.tsx` with priority filter chips, category dropdown/filter, and sort selector
+- [x] Contextual empty messages in `TodoList.tsx` reflect active filters
+- [x] Run `npm run verify && npm run e2e` and commit
 
 **Acceptance criteria**
 
