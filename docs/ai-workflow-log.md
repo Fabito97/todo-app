@@ -37,3 +37,12 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Review**: In-session review by autopilot; all acceptance criteria met.
 - **Bug or issue caught**: None.
 - **Rule or prompt improvement**: None.
+
+## 2026-09-29 - V1 Slice 04: Filters and active-item counter
+- **Commit**: `a6b1318 feat: implement FilterBar with All/Active/Completed tabs and active item counter`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (33 pass across 7 test files), e2e (6 pass).
+- **Review**: In-session review by autopilot; all acceptance criteria met.
+- **Bug or issue caught**: None.
+- **Rule or prompt improvement**: None.
