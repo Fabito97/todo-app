@@ -28,3 +28,12 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Review**: In-session review by autopilot; all acceptance criteria met.
 - **Bug or issue caught**: React 19 / Next 16 eslint rule `react-hooks/set-state-in-effect` caught calling setState synchronously in effect body; resolved by moving state updates to promise resolution with unmount cancellation flag.
 - **Rule or prompt improvement**: None.
+
+## 2026-09-29 - V1 Slice 03: Complete, edit, and delete
+- **Commit**: `43769cb feat: implement toggle complete, inline editing, and deletion in TodoItem`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (30 pass across 6 test files), e2e (5 pass).
+- **Review**: In-session review by autopilot; all acceptance criteria met.
+- **Bug or issue caught**: None.
+- **Rule or prompt improvement**: None.
