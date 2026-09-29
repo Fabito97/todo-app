@@ -56,3 +56,13 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Bug or issue caught**: None.
 - **Rule or prompt improvement**: None.
 
+## 2026-09-29 - V1.1 Slice 01: Extended schema, contract suite, and backwards compatibility
+- **Commit**: `d141255 feat(v1.1): extend schema with priority, dueDate, category, description, and backwards compatibility`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: Approved Version 1.1 plan with priority, due date, category, and description fields.
+- **Checks run**: lint (pass), typecheck (pass), tests (43 pass across 8 test files).
+- **Review**: In-session review by autopilot; backwards compatibility and all contract assertions met.
+- **Bug or issue caught**: TypeScript caught missing required properties on static mock fixtures in TodoItem and TodoList component tests; resolved by adding default metadata.
+- **Rule or prompt improvement**: None.
+
+
