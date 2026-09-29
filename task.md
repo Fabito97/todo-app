@@ -28,13 +28,13 @@ definitions, the API contract, and the data model live in
 
 ## V1 Slice 01: Schemas, service interface, and local service
 
-- [ ] Write tests (contract suite) and watch them fail
-- [ ] Implement `src/lib/schemas.ts`, `src/lib/errors.ts`
-- [ ] Implement `src/services/todo-service.ts` (interface only)
-- [ ] Implement `src/services/local-todo-service.ts`
-- [ ] Implement `src/services/todo-service.contract.ts` (shared contract suite)
-- [ ] Implement `src/services/index.ts` (exports `LocalTodoService`)
-- [ ] Run `npm run verify` and commit
+- [x] Write tests (contract suite) and watch them fail
+- [x] Implement `src/lib/schemas.ts`, `src/lib/errors.ts`
+- [x] Implement `src/services/todo-service.ts` (interface only)
+- [x] Implement `src/services/local-todo-service.ts`
+- [x] Implement `src/services/todo-service.contract.ts` (shared contract suite)
+- [x] Implement `src/services/index.ts` (exports `LocalTodoService`)
+- [x] Run `npm run verify` and commit
 
 **Acceptance criteria**
 
