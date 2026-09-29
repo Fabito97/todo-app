@@ -153,7 +153,106 @@ definitions, the API contract, and the data model live in
 ## V1 Slice 06: Finish version 1
 
 - [x] Run `/finish 1` — audit, README update, and release notes
-- [ ] Human reviews output, merges branch to `main`, and tags `v1`
+- [x] Human reviews output, merges branch to `main`, and tags `v1`
+
+---
+
+# Version 1.1: Rich Metadata and Controls
+
+## V1.1 Slice 01: Extended schema, contract suite, and backwards compatibility
+
+- [ ] Write tests (contract suite + legacy data tests) and watch them fail
+- [ ] Update `src/lib/schemas.ts`: `PrioritySchema`, updated `TodoSchema`, `CreateTodoSchema`, `TodoPatchSchema`
+- [ ] Update `src/services/todo-service.ts`: `ListOptions`, `SortOption`, and updated signatures
+- [ ] Update `src/services/local-todo-service.ts`: handle new fields, filtering, sorting, and backwards compatibility with legacy V1 data
+- [ ] Update `src/services/todo-service.contract.ts` and `local-todo-service.test.ts`
+- [ ] Run `npm run verify` and commit
+
+**Acceptance criteria**
+
+- `CreateTodoSchema` and `TodoService.create` accept optional `description` (<=1000 chars), `priority` (`low` | `medium` | `high`, default `medium`), `dueDate` (ISO string/null), and `category` (<=50 chars).
+- `TodoPatchSchema` and `TodoService.update` allow partial updates of any metadata fields while updating `updatedAt`.
+- `list({ sortBy: 'dueDate' })` sorts todos with due dates earliest first; `list({ sortBy: 'priority' })` sorts `high` -> `medium` -> `low`; `list({ sortBy: 'newest' })` sorts by `createdAt` descending.
+- Existing legacy Version 1 items in `localStorage` `{ id, title, completed, createdAt, updatedAt }` parse cleanly with `priority: 'medium'` and empty/null metadata without errors.
+- ESLint rules continue to prevent direct storage/fetch access in components and hooks.
+
+**Tests**
+
+- Contract suite: creation with metadata, defaults, patch updates, sorting by dueDate/priority/newest.
+- Unit test: legacy V1 stored JSON parses into valid V1.1 todos without loss.
+
+---
+
+## V1.1 Slice 02: Rich creation form (AddTodoForm)
+
+- [ ] Write tests and watch them fail
+- [ ] Expand `AddTodoForm.tsx` with expandable details panel: description textarea, priority selector, due date picker, category input
+- [ ] Validate character limits inline (description <=1000, category <=50)
+- [ ] Wire up with `useTodos`
+- [ ] Run `npm run verify && npm run e2e` and commit
+
+**Acceptance criteria**
+
+- Adding a todo with only a title works as before (defaults `priority` to `medium`).
+- Expanding details allows entering optional description, selecting priority (`low`/`medium`/`high`), picking a due date, and entering a category.
+- Submitting resets both the main title and detail fields.
+- Validation errors for too-long description or category display inline without submitting.
+
+**Tests**
+
+- component (`AddTodoForm`): submit with all fields, default priority, inline errors for invalid details, reset on submit.
+- e2e: add rich todo with priority, due date, category → persists after reload.
+
+---
+
+## V1.1 Slice 03: Rich item display and full-field inline edit (TodoItem)
+
+- [ ] Write tests and watch them fail
+- [ ] Update `TodoItem.tsx` to render priority badges, due date status (overdue indicator), category pill, and description
+- [ ] Support full inline edit mode for title, description, priority, due date, and category
+- [ ] Run `npm run verify && npm run e2e` and commit
+
+**Acceptance criteria**
+
+- Priority badge renders with distinct styling for `high` (e.g. red/rose), `medium` (amber), and `low` (blue/slate).
+- Overdue dates (due date in past and uncompleted) show a visible warning badge or text color.
+- Category tag renders when present.
+- Inline edit mode allows modifying title, description, priority, due date, and category; Enter or Save button saves; Escape cancels.
+- All controls have accessible labels and keyboard accessibility.
+
+**Tests**
+
+- component (`TodoItem`): renders badges, renders overdue status, inline edit modifies all fields, cancel restores original state.
+- e2e: edit todo priority and due date → verify persistence across reload.
+
+---
+
+## V1.1 Slice 04: Enhanced filtering and sorting (FilterBar & useTodos)
+
+- [ ] Write tests and watch them fail
+- [ ] Extend `useTodos.ts` with priority filter, category filter, and sort options
+- [ ] Extend `FilterBar.tsx` with priority filter chips, category dropdown/filter, and sort selector
+- [ ] Contextual empty messages in `TodoList.tsx` reflect active filters
+- [ ] Run `npm run verify && npm run e2e` and commit
+
+**Acceptance criteria**
+
+- Users can filter by priority (`all`, `high`, `medium`, `low`) and category alongside status (`all`, `active`, `completed`).
+- Users can sort the list by Newest, Due Date (earliest first), or Priority (highest first).
+- Active counter and empty state messages adapt to current filter criteria.
+- Screen readers receive appropriate accessibility announcements for active filters.
+
+**Tests**
+
+- component (`FilterBar`): priority filter selection, category filter selection, sort dropdown change.
+- e2e: filter by high priority, sort by due date, verify item order.
+
+---
+
+## V1.1 Slice 05: Finish version 1.1
+
+- [ ] Run `/finish 1.1` — audit, README update, and release notes
+- [ ] Human reviews output, merges branch to `main`, and tags `v1.1`
 
 ---
 
