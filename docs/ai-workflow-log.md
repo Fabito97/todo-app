@@ -82,3 +82,11 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Bug or issue caught**: `TodoList.tsx` prop signature needed `TodoPatchInput | string` compatibility to avoid strict TypeScript mismatch with `useTodos.editTodo`. Fixed cleanly.
 - **Rule or prompt improvement**: None.
 
+## 2026-09-29 - V1.1 Slice 04: Enhanced filtering and sorting (FilterBar & useTodos)
+- **Commit**: `e3f5183 feat(v1.1): enhanced filtering by priority and category, and sorting controls`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (50 pass across 8 test files), e2e (10 pass).
+- **Review**: In-session review by autopilot; priority chips, category select, sorting by newest/dueDate/priority, empty states, and accessibility verified.
+- **Bug or issue caught**: Playwright strict mode caught identical priority button labels between AddTodoForm and FilterBar; resolved cleanly by scoping priority selectors to respective role groups.
+- **Rule or prompt improvement**: None.
