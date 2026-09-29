@@ -71,7 +71,7 @@ export function AddTodoForm({ onAdd }: AddTodoFormProps) {
           aria-label="Todo title"
           aria-invalid={!!error}
           aria-describedby={error ? "todo-input-error" : undefined}
-          className="flex-1 rounded-xl border border-slate-200 dark:border-slate-600/80 bg-white dark:bg-slate-700/60 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 backdrop-blur-sm transition-all shadow-xs"
+          className="flex-1 min-w-0 rounded-xl border border-slate-200 dark:border-slate-600/80 bg-white dark:bg-slate-700/60 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 backdrop-blur-sm transition-all shadow-xs"
           disabled={isSubmitting}
         />
 
