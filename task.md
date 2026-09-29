@@ -58,12 +58,12 @@ definitions, the API contract, and the data model live in
 
 ## V1 Slice 02: Add and list todos
 
-- [ ] Write tests and watch them fail
-- [ ] Implement `src/hooks/use-todos.ts`
-- [ ] Implement `src/components/AddTodoForm.tsx`
-- [ ] Implement `src/components/TodoList.tsx` (with empty and loading states)
-- [ ] Wire up `src/app/page.tsx`
-- [ ] Run `npm run verify && npm run e2e` and commit
+- [x] Write tests and watch them fail
+- [x] Implement `src/hooks/use-todos.ts`
+- [x] Implement `src/components/AddTodoForm.tsx`
+- [x] Implement `src/components/TodoList.tsx` (with empty and loading states)
+- [x] Wire up `src/app/page.tsx`
+- [x] Run `npm run verify && npm run e2e` and commit
 
 **Acceptance criteria**
 
