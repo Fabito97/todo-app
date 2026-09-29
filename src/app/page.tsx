@@ -5,7 +5,8 @@ import { AddTodoForm } from "@/components/AddTodoForm";
 import { TodoList } from "@/components/TodoList";
 
 export default function Home() {
-  const { todos, loading, error, addTodo } = useTodos();
+  const { todos, loading, error, addTodo, toggleTodo, editTodo, deleteTodo } =
+    useTodos();
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-zinc-50 via-zinc-100 to-indigo-50/30 dark:from-zinc-950 dark:via-zinc-900 dark:to-indigo-950/20 py-16 px-4 sm:px-6 lg:px-8">
@@ -32,7 +33,13 @@ export default function Home() {
           )}
 
           <div className="pt-2">
-            <TodoList todos={todos} loading={loading} />
+            <TodoList
+              todos={todos}
+              loading={loading}
+              onToggle={toggleTodo}
+              onEdit={editTodo}
+              onDelete={deleteTodo}
+            />
           </div>
         </section>
       </div>

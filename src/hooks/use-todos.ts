@@ -56,11 +56,49 @@ export function useTodos() {
     }
   }, []);
 
+  const toggleTodo = useCallback(async (id: string, completed: boolean): Promise<Todo | undefined> => {
+    try {
+      setError(null);
+      const updated = await todoService.update(id, { completed });
+      setTodos((prev) => prev.map((t) => (t.id === id ? updated : t)));
+      return updated;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update todo");
+      throw err;
+    }
+  }, []);
+
+  const editTodo = useCallback(async (id: string, title: string): Promise<Todo | undefined> => {
+    try {
+      setError(null);
+      const updated = await todoService.update(id, { title });
+      setTodos((prev) => prev.map((t) => (t.id === id ? updated : t)));
+      return updated;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update todo");
+      throw err;
+    }
+  }, []);
+
+  const deleteTodo = useCallback(async (id: string): Promise<void> => {
+    try {
+      setError(null);
+      await todoService.remove(id);
+      setTodos((prev) => prev.filter((t) => t.id !== id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete todo");
+      throw err;
+    }
+  }, []);
+
   return {
     todos,
     loading,
     error,
     addTodo,
+    toggleTodo,
+    editTodo,
+    deleteTodo,
     refresh: fetchTodos,
   };
 }

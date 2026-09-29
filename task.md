@@ -85,9 +85,9 @@ definitions, the API contract, and the data model live in
 
 ## V1 Slice 03: Complete, edit, and delete
 
-- [ ] Write tests and watch them fail
-- [ ] Implement `src/components/TodoItem.tsx` (checkbox, inline edit, delete button)
-- [ ] Run `npm run verify && npm run e2e` and commit
+- [x] Write tests and watch them fail
+- [x] Implement `src/components/TodoItem.tsx` (checkbox, inline edit, delete button)
+- [x] Run `npm run verify && npm run e2e` and commit
 
 **Acceptance criteria**
 

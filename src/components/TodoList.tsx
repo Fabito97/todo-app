@@ -2,13 +2,23 @@
 
 import React from "react";
 import type { Todo } from "@/lib/schemas";
+import { TodoItem } from "./TodoItem";
 
 interface TodoListProps {
   todos: Todo[];
   loading: boolean;
+  onToggle?: (id: string, completed: boolean) => void;
+  onEdit?: (id: string, title: string) => Promise<unknown> | void;
+  onDelete?: (id: string) => void;
 }
 
-export function TodoList({ todos, loading }: TodoListProps) {
+export function TodoList({
+  todos,
+  loading,
+  onToggle = () => {},
+  onEdit = () => {},
+  onDelete = () => {},
+}: TodoListProps) {
   if (loading) {
     return (
       <div className="py-12 flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500">
@@ -32,21 +42,13 @@ export function TodoList({ todos, loading }: TodoListProps) {
   return (
     <ul role="list" className="space-y-2">
       {todos.map((todo) => (
-        <li
+        <TodoItem
           key={todo.id}
-          role="listitem"
-          className="flex items-center justify-between p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/80 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm transition-all hover:border-zinc-300 dark:hover:border-zinc-700 shadow-xs"
-        >
-          <span
-            className={`text-sm select-none ${
-              todo.completed
-                ? "line-through text-zinc-400 dark:text-zinc-600"
-                : "text-zinc-800 dark:text-zinc-200 font-medium"
-            }`}
-          >
-            {todo.title}
-          </span>
-        </li>
+          todo={todo}
+          onToggle={onToggle}
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
       ))}
     </ul>
   );
