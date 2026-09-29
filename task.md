@@ -260,10 +260,10 @@ definitions, the API contract, and the data model live in
 
 ## V1.2 Slice 01: Relocate unit, component, and contract tests to `/test` directory
 
-- [ ] Move all unit, component, and contract test files from `src/` (`src/sanity.test.ts`, `src/app/page.test.tsx`, `src/components/TodoForm.test.tsx`, `src/components/TodoItem.test.tsx`, `src/components/TodoList.test.tsx`, `src/components/FilterBar.test.tsx`, `src/hooks/use-todos.test.ts`, `src/services/local-todo-service.test.ts`, `src/services/todo-service.contract.ts`) into `test/` (`test/sanity.test.ts`, `test/app/page.test.tsx`, `test/components/TodoForm.test.tsx`, `test/components/TodoItem.test.tsx`, `test/components/TodoList.test.tsx`, `test/components/FilterBar.test.tsx`, `test/hooks/use-todos.test.ts`, `test/services/local-todo-service.test.ts`, `test/services/todo-service.contract.ts`) using `git mv`
-- [ ] Update relative imports in moved test files to use `@/...` path aliases
-- [ ] Update `vitest.config.ts` so `test.include` points to `["test/**/*.{test,spec}.{ts,tsx}"]`
-- [ ] Run `npm run verify` and commit
+- [x] Move all unit, component, and contract test files from `src/` (`src/sanity.test.ts`, `src/app/page.test.tsx`, `src/components/TodoForm.test.tsx`, `src/components/TodoItem.test.tsx`, `src/components/TodoList.test.tsx`, `src/components/FilterBar.test.tsx`, `src/hooks/use-todos.test.ts`, `src/services/local-todo-service.test.ts`, `src/services/todo-service.contract.ts`) into `test/` (`test/sanity.test.ts`, `test/app/page.test.tsx`, `test/components/TodoForm.test.tsx`, `test/components/TodoItem.test.tsx`, `test/components/TodoList.test.tsx`, `test/components/FilterBar.test.tsx`, `test/hooks/use-todos.test.ts`, `test/services/local-todo-service.test.ts`, `test/services/todo-service.contract.ts`) using `git mv`
+- [x] Update relative imports in moved test files to use `@/...` path aliases
+- [x] Update `vitest.config.ts` so `test.include` points to `["test/**/*.{test,spec}.{ts,tsx}"]`
+- [x] Run `npm run verify` and commit
 
 **Acceptance criteria**
 

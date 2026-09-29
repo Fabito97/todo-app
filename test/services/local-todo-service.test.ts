@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { runContractTests } from "./todo-service.contract";
-import { LocalTodoService } from "./local-todo-service";
+import { LocalTodoService } from "@/services/local-todo-service";
 
 describe("LocalTodoService", () => {
   beforeEach(() => {

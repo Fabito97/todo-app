@@ -1,6 +1,6 @@
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { useTodos } from "./use-todos";
+import { useTodos } from "@/hooks/use-todos";
 import { todoService } from "@/services";
 
 describe("useTodos", () => {

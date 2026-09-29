@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
-import { FilterBar } from "./FilterBar";
+import { FilterBar } from "@/components/FilterBar";
 
 describe("FilterBar", () => {
   it("renders active item count correctly with singular and plural forms", () => {
