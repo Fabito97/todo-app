@@ -73,6 +73,12 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Review**: In-session review by autopilot; expandable form, validation, and resets verified.
 - **Bug or issue caught**: Playwright uses `page.getByLabel` rather than `page.getByLabelText`; test paste used for 1001-character string to avoid jsdom keystroke simulation timeout.
 - **Rule or prompt improvement**: None.
-
-
+## 2026-09-29 - V1.1 Slice 03: Rich item display and full-field inline edit (TodoItem)
+- **Commit**: `7b211a9 feat(v1.1): rich todo display with badges and full-field inline edit`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (44 pass across 8 test files), e2e (9 pass).
+- **Review**: In-session review by autopilot; priority badges, overdue indicators, category pill, description toggle, and inline rich edit drawer verified.
+- **Bug or issue caught**: `TodoList.tsx` prop signature needed `TodoPatchInput | string` compatibility to avoid strict TypeScript mismatch with `useTodos.editTodo`. Fixed cleanly.
+- **Rule or prompt improvement**: None.
 
