@@ -3,13 +3,14 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import type { Todo } from "@/lib/schemas";
 import type { TodoFilter } from "@/services";
-import { todoService } from "@/services";
+import { todoService, subscribeStorageNotice } from "@/services";
 
 export function useTodos() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<TodoFilter>("all");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [storageNotice, setStorageNotice] = useState<string | null>(null);
 
   const fetchTodos = useCallback(async () => {
     try {
@@ -41,8 +42,15 @@ export function useTodos() {
         }
       });
 
+    const unsubscribe = subscribeStorageNotice((notice) => {
+      if (!ignore) {
+        setStorageNotice(notice);
+      }
+    });
+
     return () => {
       ignore = true;
+      unsubscribe();
     };
   }, []);
 
@@ -115,6 +123,7 @@ export function useTodos() {
     activeCount,
     loading,
     error,
+    storageNotice,
     addTodo,
     toggleTodo,
     editTodo,

@@ -9,6 +9,23 @@ import type { TodoFilter, TodoService } from "./todo-service";
 
 const STORAGE_KEY = "todos:v1";
 
+type NoticeListener = (notice: string | null) => void;
+const noticeListeners = new Set<NoticeListener>();
+let currentNotice: string | null = null;
+
+export function setStorageNotice(notice: string | null) {
+  currentNotice = notice;
+  noticeListeners.forEach((listener) => listener(notice));
+}
+
+export function subscribeStorageNotice(listener: NoticeListener): () => void {
+  noticeListeners.add(listener);
+  listener(currentNotice);
+  return () => {
+    noticeListeners.delete(listener);
+  };
+}
+
 export class LocalTodoService implements TodoService {
   private inMemoryFallback: Todo[] = [];
 
@@ -21,12 +38,18 @@ export class LocalTodoService implements TodoService {
       if (!raw) {
         return this.inMemoryFallback.length > 0 ? this.inMemoryFallback : [];
       }
-      const parsed = JSON.parse(raw);
-      const result = TodoSchema.array().safeParse(parsed);
-      if (!result.success) {
+      try {
+        const parsed = JSON.parse(raw);
+        const result = TodoSchema.array().safeParse(parsed);
+        if (!result.success) {
+          setStorageNotice("Stored data was corrupt or invalid and could not be loaded.");
+          return [];
+        }
+        return result.data;
+      } catch {
+        setStorageNotice("Stored data was corrupt or invalid and could not be loaded.");
         return [];
       }
-      return result.data;
     } catch {
       return this.inMemoryFallback;
     }
@@ -39,7 +62,7 @@ export class LocalTodoService implements TodoService {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
       }
     } catch (err) {
-      // QuotaExceeded or AccessDenied in private mode - keep in memory fallback
+      setStorageNotice("Storage write failed. Changes will only persist in memory for this session.");
       console.warn("Failed to persist todos to localStorage:", err);
     }
   }

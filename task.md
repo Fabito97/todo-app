@@ -128,11 +128,11 @@ definitions, the API contract, and the data model live in
 
 ## V1 Slice 05: Resilience and polish
 
-- [ ] Write tests and watch them fail
-- [ ] Add visible notice for blocked storage and for corrupt stored data
-- [ ] Responsive layout (min usable at 375 px width)
-- [ ] Keyboard navigation check (Tab, Enter, Escape reach all actions)
-- [ ] Run `npm run verify && npm run e2e` and commit
+- [x] Write tests and watch them fail
+- [x] Add visible notice for blocked storage and for corrupt stored data
+- [x] Responsive layout (min usable at 375 px width)
+- [x] Keyboard navigation check (Tab, Enter, Escape reach all actions)
+- [x] Run `npm run verify && npm run e2e` and commit
 
 **Acceptance criteria**
 

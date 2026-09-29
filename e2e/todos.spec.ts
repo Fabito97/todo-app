@@ -109,4 +109,61 @@ test.describe("Todo App", () => {
     await expect(page.getByText("Task 1 Active")).toBeVisible();
     await expect(page.getByText("Task 2 Completed")).toBeVisible();
   });
+
+  test("full happy path with zero console errors and mobile usability at 375px", async ({ page }) => {
+    const consoleErrors: string[] = [];
+    page.on("console", (msg) => {
+      if (msg.type() === "error") {
+        consoleErrors.push(msg.text());
+      }
+    });
+
+    // Set mobile viewport 375px
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto("/");
+
+    // Check no horizontal scrollbar
+    const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+    const clientWidth = await page.evaluate(() => document.documentElement.clientWidth);
+    expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 1);
+
+    const input = page.getByRole("textbox", { name: /todo title/i });
+    const addButton = page.getByRole("button", { name: /add todo/i });
+
+    // 1. Add
+    await input.fill("Master Full Flow");
+    await addButton.click();
+    await expect(page.getByText("Master Full Flow")).toBeVisible();
+
+    // 2. Edit
+    const editBtn = page.getByRole("button", { name: /edit master full flow/i });
+    await editBtn.click();
+    const editInput = page.getByRole("textbox", { name: /edit todo title/i });
+    await editInput.fill("Master Full Flow Updated");
+    await editInput.press("Enter");
+    await expect(page.getByText("Master Full Flow Updated")).toBeVisible();
+
+    // 3. Toggle
+    const checkbox = page.getByRole("checkbox", { name: /toggle completion for master full flow updated/i });
+    await checkbox.click();
+    await expect(checkbox).toBeChecked();
+
+    // 4. Filter
+    const activeFilterBtn = page.getByRole("button", { name: /^active/i });
+    await activeFilterBtn.click();
+    await expect(page.getByText("No active todos")).toBeVisible();
+
+    const completedFilterBtn = page.getByRole("button", { name: /^completed/i });
+    await completedFilterBtn.click();
+    await expect(page.getByText("Master Full Flow Updated")).toBeVisible();
+
+    // 5. Delete
+    const deleteBtn = page.getByRole("button", { name: /delete master full flow updated/i });
+    await deleteBtn.click();
+    await expect(page.getByText("No completed todos")).toBeVisible();
+
+    // 6. Assert zero unhandled console errors
+    expect(consoleErrors).toEqual([]);
+  });
 });
+
