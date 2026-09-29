@@ -10,3 +10,12 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Review**: Auto-approved bootstrap scaffold and harness per autopilot workflow.
 - **Bug or issue caught**: Playwright chromium headless shell was initially missing and required installation via `npx playwright install chromium`; Windows default `bash` routed to WSL so Git Bash was used for post_task hook.
 - **Rule or prompt improvement**: None.
+
+## 2026-09-29 - V1 Slice 01: Schemas, service interface, and local service
+- **Commit**: `b9e8f1a feat: implement schemas, service interface, and LocalTodoService with contract tests`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (16 pass).
+- **Review**: In-session review by autopilot; all contract criteria, validation rules, and error handling met.
+- **Bug or issue caught**: None.
+- **Rule or prompt improvement**: None.
