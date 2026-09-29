@@ -12,11 +12,11 @@ definitions, the API contract, and the data model live in
 
 ## V1 Slice 00: Bootstrap and verification harness
 
-- [ ] Scaffold Next.js with `src/` folder, TypeScript strict, Tailwind CSS
-- [ ] Add Zod, Vitest, React Testing Library, Playwright
-- [ ] Add ESLint rule banning `localStorage`, `sessionStorage`, and `fetch` in `src/components` and `src/hooks`
-- [ ] Add npm scripts: `lint`, `typecheck`, `test`, `verify`, `e2e`
-- [ ] Confirm all scripts pass on a clean install
+- [x] Scaffold Next.js with `src/` folder, TypeScript strict, Tailwind CSS
+- [x] Add Zod, Vitest, React Testing Library, Playwright
+- [x] Add ESLint rule banning `localStorage`, `sessionStorage`, and `fetch` in `src/components` and `src/hooks`
+- [x] Add npm scripts: `lint`, `typecheck`, `test`, `verify`, `e2e`
+- [x] Confirm all scripts pass on a clean install
 
 **Acceptance criteria**
 
