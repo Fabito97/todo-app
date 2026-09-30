@@ -509,11 +509,11 @@ definitions, the API contract, and the data model live in
 
 ## V1.4 Slice 04: Interactive full month calendar grid and daily schedule view
 
-- [ ] Write tests in `test/components/CalendarView.test.tsx` and watch them fail
-- [ ] Implement `src/components/CalendarView.tsx` (`design.md` §4.13): 7-column month grid (Sun–Sat) with month/year heading, previous/next month buttons, `Today` jump button, native month picker, today date highlight, selected date ring, and task count dots (rose for high priority, indigo for default)
-- [ ] Implement side-by-side Daily Schedule panel in `CalendarView.tsx` with independent panel scrolling (`overflow-y-auto`) showing Time-Blocked Schedule slots and All-Day / Unscheduled tasks for the selected date
-- [ ] Integrate `CalendarView` into `src/app/page.tsx` for `activeView === "calendar"`
-- [ ] Run `npm run verify` and commit
+- [x] Write tests in `test/components/CalendarView.test.tsx` and watch them fail
+- [x] Implement `src/components/CalendarView.tsx` (`design.md` §4.13): 7-column month grid (Sun–Sat) with month/year heading, previous/next month buttons, `Today` jump button, native month picker, today date highlight, selected date ring, and task count dots (rose for high priority, indigo for default)
+- [x] Implement side-by-side Daily Schedule panel in `CalendarView.tsx` with independent panel scrolling (`overflow-y-auto`) showing Time-Blocked Schedule slots and All-Day / Unscheduled tasks for the selected date
+- [x] Integrate `CalendarView` into `src/app/page.tsx` for `activeView === "calendar"`
+- [x] Run `npm run verify` and commit
 
 **Acceptance criteria**
 

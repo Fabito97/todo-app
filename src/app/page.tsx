@@ -6,7 +6,7 @@ import { SidebarNav, WorkspaceView } from "@/components/SidebarNav";
 import { ContentHeader } from "@/components/ContentHeader";
 import { DashboardView } from "@/components/DashboardView";
 import { TasksView } from "@/components/TasksView";
-import { CalendarScheduleView } from "@/components/CalendarScheduleView";
+import { CalendarView } from "@/components/CalendarView";
 import { Toast, ToastMessage } from "@/components/Toast";
 import { AddTaskModal } from "@/components/AddTaskModal";
 import { TaskDetailsModal } from "@/components/TaskDetailsModal";
@@ -147,9 +147,13 @@ export default function Home() {
           )}
 
           {activeView === "calendar" && (
-            <div className="max-w-5xl mx-auto">
-              <CalendarScheduleView todos={allTodos} onToggle={toggleTodo} />
-            </div>
+            <CalendarView
+              todos={allTodos}
+              onToggle={toggleTodo}
+              onOpenEdit={handleOpenEdit}
+              onOpenDetails={handleOpenDetails}
+              onDelete={handleDelete}
+            />
           )}
         </div>
 

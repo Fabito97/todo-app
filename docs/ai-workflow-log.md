@@ -189,3 +189,12 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Review**: In-session review by autopilot; verified accessible modal dialogs for `AddTaskModal`, `TaskDetailsModal`, and `EditTaskModal` with backdrop blur, focus trapping/timing, and `Escape` key handling. Verified `TodoItem` is simplified to view-only rows with modal triggers on title and edit actions. Verified `TasksView` renders board header with task counter, quick modal trigger, `FilterBar`, and `TodoList`.
 - **Bug or issue caught**: Fixed ESLint `react-hooks/set-state-in-effect` by extracting inner modal content components keyed by `todo.id` to guarantee clean state initialization without effects. Disambiguated `/confirm delete/i` query in `TodoItem.test.tsx`.
 - **Rule or prompt improvement**: None.
+
+## 2026-09-30 - V1.4 Slice 04: Interactive full month calendar grid and daily schedule view
+- **Commit**: `feat(v1.4): add interactive full month calendar grid and daily schedule view`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (103 pass across 22 test files in `test/`).
+- **Review**: In-session review by autopilot; verified 7-column month grid (`Sun–Sat`) with month/year heading, previous/next month navigation buttons, `Today` jump button, today date highlight in indigo, selected date ring, and task count indicator dots (rose for high priority, indigo for default). Verified side-by-side Daily Schedule panel with independent panel scrolling (`overflow-y-auto`) showing time-blocked schedule slots and all-day / unscheduled tasks with toggle and details actions.
+- **Bug or issue caught**: In `CalendarView.test.tsx`, querying `getByText("30")` was ambiguous because August 30 was present in leading days of September 2026; resolved by asserting text within the button matching `todayStr`.
+- **Rule or prompt improvement**: None.

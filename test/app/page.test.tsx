@@ -95,7 +95,7 @@ describe("Home page workspace layout and resilience", () => {
 
     // View switches to Calendar
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Calendar");
-    expect(screen.getByRole("region", { name: /calendar and schedule/i })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: /monthly calendar/i })).toBeInTheDocument();
   });
 
   it("renders '+ New Task' primary action button in the content header", () => {
