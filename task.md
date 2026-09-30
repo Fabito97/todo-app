@@ -425,7 +425,119 @@ definitions, the API contract, and the data model live in
 ## V1.3 Slice 05: Finish version 1.3
 
 - [x] Run `/finish 1.3` — audit, README update, and release notes
-- [ ] Human reviews output, merges branch to `main`, and tags `v1.3`
+- [x] Human reviews output, merges branch to `main`, and tags `v1.3`
+
+---
+
+# Version 1.4: Full-Viewport Sidebar Workspace, Dedicated Metric Cards, Month-by-Month Calendar Grid & True Modal System
+
+## V1.4 Slice 01: Workspace shell, sidebar navigation, and content header
+
+- [ ] Write tests in `test/components/SidebarNav.test.tsx`, `test/components/ContentHeader.test.tsx`, and `test/app/page.test.tsx` and watch them fail
+- [ ] Implement `src/components/SidebarNav.tsx` (`design.md` §4.8): desktop left sidebar (`w-60 flex-none bg-slate-100 dark:bg-[#161920] border-r border-slate-200 dark:border-[#2e3340]`) with brand logo/name, three navigation buttons (`Dashboard`, `Tasks`, `Calendar`) using `aria-current="page"` when active, and desktop `<ThemeToggle>` anchored at the bottom
+- [ ] Implement `src/components/ContentHeader.tsx` (`design.md` §4.9): view title/subtitle on the left, and persistent `+ New Task` CTA button (`aria-label="Open new task modal"`) beside the `<NotificationCenter>` trigger (and mobile theme toggle) on the right
+- [ ] Refactor `src/app/page.tsx` (`design.md` §4.7) into full-viewport container (`flex h-screen overflow-hidden bg-slate-50 dark:bg-[#121316]`) with client-side SPA view state (`activeView: "dashboard" | "tasks" | "calendar"`) and mobile bottom nav bar (`<nav aria-label="Mobile navigation">`)
+- [ ] Run `npm run verify` and commit
+
+**Acceptance criteria**
+
+- Root workspace fills the browser viewport (`h-screen overflow-hidden`) with persistent left sidebar on desktop (`lg:flex`) and responsive bottom navigation bar on mobile (`lg:hidden`).
+- Sidebar renders `Dashboard`, `Tasks`, and `Calendar` navigation items; clicking any item switches `activeView` and marks the active item with `aria-current="page"`.
+- Header renders current view title and subtitle, the primary `+ New Task` action button, and the `NotificationCenter` trigger.
+- Theme toggle switches between Light, Dark, and System seamlessly in both desktop sidebar and mobile header.
+
+**Tests**
+
+- component (`test/components/SidebarNav.test.tsx`): renders brand, 3 navigation items, active `aria-current="page"`, and theme toggle.
+- component (`test/components/ContentHeader.test.tsx`): renders view title, subtitle, `+ New Task` button with `aria-label="Open new task modal"`, and Notification Center.
+- component (`test/app/page.test.tsx`): switches active view between Dashboard, Tasks, and Calendar on nav click.
+
+---
+
+## V1.4 Slice 02: Executive Dashboard view, metric cards grid, and toast notifications
+
+- [ ] Write tests in `test/components/MetricCard.test.tsx`, `test/components/Toast.test.tsx`, and `test/components/DashboardView.test.tsx` and watch them fail
+- [ ] Implement `src/components/MetricCard.tsx` (`design.md` §4.10): responsive grid card with uppercase label, large numeral, and optional progress bar / accent
+- [ ] Implement `src/components/Toast.tsx` (`design.md` §4.18): auto-dismissing toast feedback container (`role="status"`, `aria-live="polite"`)
+- [ ] Implement `src/components/DashboardView.tsx` (`design.md` §4.11): composes the 4 Metric Cards grid (Total, Active, Completed with progress bar, Critical with active high-priority count), single-line Quick Add task bar, Today's Tasks panel, Important/Critical Tasks panel, and Recent Tasks panel
+- [ ] Integrate `DashboardView` into `src/app/page.tsx`
+- [ ] Run `npm run verify` and commit
+
+**Acceptance criteria**
+
+- 4 dedicated metric cards render in a responsive grid showing accurate live counts for Total Tasks, Active Tasks, Completed Tasks (with visual progress bar), and Critical Tasks (`high` priority active count).
+- Quick Add task bar allows creating a task with title-only by typing and pressing Enter or clicking `Add`, clearing the input and showing a transient `Toast` notification.
+- Today's Tasks panel displays tasks where `dueDate === today` ordered by `startTime`, with time-block badges and quick completion toggles.
+- Important/Critical Tasks panel lists active `high` priority tasks requiring immediate attention, with an `Edit` action button.
+- Recent Tasks panel lists the 5 most recently created tasks with relative date tags.
+
+**Tests**
+
+- component (`test/components/MetricCard.test.tsx`): renders label, numeral, progress bar, and accent colors.
+- component (`test/components/Toast.test.tsx`): renders status message with accessible `role="status"` and auto-dismisses after duration.
+- component (`test/components/DashboardView.test.tsx`): quick add submits title-only todo, today's tasks lists same-day items, critical panel filters high priority, recent panel shows newest creations.
+
+---
+
+## V1.4 Slice 03: True centered modal system (Add, Details, Edit) and dedicated tasks board
+
+- [ ] Write tests in `test/components/AddTaskModal.test.tsx`, `test/components/TaskDetailsModal.test.tsx`, `test/components/EditTaskModal.test.tsx`, `test/components/TasksView.test.tsx`, and updated `test/components/TodoItem.test.tsx` and watch them fail
+- [ ] Implement `src/components/AddTaskModal.tsx` (`design.md` §4.14): centered modal dialog (`role="dialog"`, `aria-modal="true"`, `aria-label="New Task"`) for full metadata creation, supporting Title, Description, Priority, Due Date, Start Time, End Time, and Category, with `Escape` dismissal and focus management
+- [ ] Implement `src/components/TaskDetailsModal.tsx` (`design.md` §4.15): inspection dialog (`role="dialog"`, `aria-modal="true"`, `aria-label="Task details"`) showing complete metadata, time block, notes, and actions to Toggle Complete, Edit, or Delete (with inline confirmation)
+- [ ] Implement `src/components/EditTaskModal.tsx` (`design.md` §4.16): pre-populated modal dialog (`role="dialog"`, `aria-modal="true"`, `aria-label="Edit task"`) for modifying all task fields
+- [ ] Refactor `src/components/TodoItem.tsx` (`design.md` §4.17): simplified to clean view-only row without inline form expansion; clicking title opens Task Details Modal, clicking Edit button opens Edit Task Modal, clicking checkbox toggles complete, clicking Delete confirms deletion
+- [ ] Implement `src/components/TasksView.tsx` (`design.md` §4.12): full-width dedicated task board with `FilterBar`, task counter, and `TodoList`
+- [ ] Wire all `+ New Task` triggers (header, Tasks view) to `AddTaskModal` in `src/app/page.tsx`
+- [ ] Run `npm run verify` and commit
+
+**Acceptance criteria**
+
+- Clicking `+ New Task` in the header or in the Tasks view opens `AddTaskModal` centered with a backdrop; submitting creates the task and closes the modal; `Escape` cancels.
+- Clicking a task title opens `TaskDetailsModal` displaying all details, notes, and time block, allowing the user to Toggle Complete, Edit, or Delete.
+- Clicking `Edit` on a task card or inside `TaskDetailsModal` opens `EditTaskModal` pre-filled with existing values; saving updates the task and closes the dialog.
+- No inline edit expansion distorts the task list rows.
+
+**Tests**
+
+- component (`test/components/AddTaskModal.test.tsx`): opens dialog, validates required title, submits full metadata, closes on Escape.
+- component (`test/components/TaskDetailsModal.test.tsx`): displays full details, toggles completion, confirms deletion, opens edit modal.
+- component (`test/components/EditTaskModal.test.tsx`): pre-populates existing values, updates fields, displays validation error on invalid time range.
+- component (`test/components/TodoItem.test.tsx`): renders view-only row, triggers details modal on title click, triggers edit modal on Edit click.
+- component (`test/components/TasksView.test.tsx`): renders filter bar, sort options, and task list items.
+
+---
+
+## V1.4 Slice 04: Interactive full month calendar grid and daily schedule view
+
+- [ ] Write tests in `test/components/CalendarView.test.tsx` and watch them fail
+- [ ] Implement `src/components/CalendarView.tsx` (`design.md` §4.13): 7-column month grid (Sun–Sat) with month/year heading, previous/next month buttons, `Today` jump button, native month picker, today date highlight, selected date ring, and task count dots (rose for high priority, indigo for default)
+- [ ] Implement side-by-side Daily Schedule panel in `CalendarView.tsx` with independent panel scrolling (`overflow-y-auto`) showing Time-Blocked Schedule slots and All-Day / Unscheduled tasks for the selected date
+- [ ] Integrate `CalendarView` into `src/app/page.tsx` for `activeView === "calendar"`
+- [ ] Run `npm run verify` and commit
+
+**Acceptance criteria**
+
+- Month grid renders full 7-column layout with accurate day numerals for the active month and faded leading/trailing days from adjacent months.
+- Today's date is prominently highlighted in indigo; clicking any day selects that date with an active ring and updates the adjacent daily schedule.
+- Day cells display colored task indicator dots reflecting scheduled tasks on that date (rose if any high priority task is present, else indigo).
+- Daily Schedule panel lists that date's time-blocked tasks in chronological order and all-day tasks, scrolling independently on desktop.
+
+**Tests**
+
+- component (`test/components/CalendarView.test.tsx`): renders 7-column month grid, navigates previous/next month, highlights today, switches selected date schedule, displays task indicator dots.
+
+---
+
+## V1.4 Slice 05: Finish version 1.4
+
+- [ ] Run `npm run verify && npm run e2e`
+- [ ] Run `/finish 1.4` — audit, documentation updates, and release notes
+- [ ] Human reviews output, merges branch to `main`, and tags `v1.4`
+
+**Acceptance criteria**
+
+- All unit, component, contract, and end-to-end tests pass cleanly.
+- Release notes and audit logs written to `docs/` and committed.
 
 ---
 
