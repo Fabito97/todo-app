@@ -5,12 +5,15 @@ import { ClipboardList, Zap, CheckCircle2, Flame, Clock, Plus } from "lucide-rea
 import { Todo } from "@/lib/schemas";
 import { formatShortDate, isOverdue, formatOverdueLabel } from "@/lib/date-utils";
 import { MetricCard } from "./MetricCard";
+import { TodoItem } from "./TodoItem";
 
 interface DashboardViewProps {
   todos: Todo[];
   onQuickAdd: (title: string) => Promise<void>;
   onToggle: (id: string, completed: boolean) => Promise<unknown>;
   onEditTask?: (todo: Todo) => void;
+  onOpenDetails?: (todo: Todo) => void;
+  onDelete?: (id: string) => void;
 }
 
 export function DashboardView({
@@ -18,6 +21,8 @@ export function DashboardView({
   onQuickAdd,
   onToggle,
   onEditTask,
+  onOpenDetails,
+  onDelete,
 }: DashboardViewProps) {
   const [quickTitle, setQuickTitle] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,6 +39,13 @@ export function DashboardView({
   const yesterdayDate = new Date(today);
   yesterdayDate.setDate(yesterdayDate.getDate() - 1);
   const yesterdayStr = yesterdayDate.toISOString().slice(0, 10);
+
+  const todayFormatted = today.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 
   // Today's tasks: dueDate === today, ordered by startTime ascending (nulls last)
   const todayTasks = todos
@@ -56,10 +68,11 @@ export function DashboardView({
     .slice(0, 5);
 
   const formatRelativeDate = (isoStr: string) => {
+    if (!isoStr) return "";
     const createdDate = isoStr.slice(0, 10);
     if (createdDate === todayStr) return "Today";
     if (createdDate === yesterdayStr) return "Yesterday";
-    return createdDate;
+    return formatShortDate(createdDate);
   };
 
   const handleQuickAddSubmit = async (e: React.FormEvent) => {
@@ -77,7 +90,7 @@ export function DashboardView({
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto">
       {/* 4 Metric Cards Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
@@ -136,223 +149,174 @@ export function DashboardView({
         </button>
       </form>
 
-      {/* Today's Tasks Panel */}
-      <section
-        aria-label="Today's tasks"
-        className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-5 shadow-md space-y-3"
-      >
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">
-            Today&apos;s Tasks
-          </h3>
-          <span className="text-xs text-slate-500 dark:text-zinc-400 font-medium">
-            {todayTasks.length} {todayTasks.length === 1 ? "task" : "tasks"}
-          </span>
-        </div>
-
-        {todayTasks.length === 0 ? (
-          <p className="text-xs text-slate-500 dark:text-zinc-400 py-4 text-center">
-            No tasks due today. Plan your day by adding a due date.
-          </p>
-        ) : (
-          <ul className="divide-y divide-slate-100 dark:divide-[#2e3340]/60">
-            {todayTasks.map((task) => (
-              <li key={task.id} className="py-2.5 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <input
-                    type="checkbox"
-                    checked={task.completed}
-                    onChange={(e) => onToggle(task.id, e.target.checked)}
-                    aria-label={`Toggle completion for ${task.title}`}
-                    className="w-4 h-4 rounded border-slate-300 dark:border-zinc-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                  />
-                  <span
-                    className={`text-xs font-semibold px-2 py-0.5 rounded-md ${
-                      task.startTime
-                        ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800"
-                        : "bg-slate-100 text-slate-600 dark:bg-[#22262f] dark:text-zinc-400"
-                    }`}
-                  >
-                    {task.startTime
-                      ? `${task.startTime}${task.endTime ? ` – ${task.endTime}` : ""}`
-                      : "All day"}
-                  </span>
-                  <span
-                    className={`text-sm truncate ${
-                      task.completed
-                        ? "line-through text-slate-400 dark:text-zinc-500"
-                        : "text-slate-900 dark:text-zinc-100 font-medium"
-                    }`}
-                  >
-                    {task.title}
-                  </span>
-                </div>
-
-                <span
-                  className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full shrink-0 ${
-                    task.priority === "high"
-                      ? "bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300"
-                      : task.priority === "medium"
-                      ? "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300"
-                      : "bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300"
-                  }`}
-                >
-                  {task.priority}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      {/* Two-Column Bottom Panels: Important/Critical and Recent Tasks */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Important / Critical Tasks Panel */}
+      {/* Two Column Dashboard Layout: Today's Tasks + (Critical & Recent) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left Column (7 cols): Today's Tasks */}
         <section
-          aria-label="Important and critical tasks"
-          className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-5 shadow-md space-y-3"
+          aria-label="Today's tasks"
+          className="lg:col-span-7 bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-5 shadow-sm space-y-4"
         >
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100 flex items-center gap-1.5">
-              <Flame aria-hidden="true" className="w-4 h-4 text-rose-500 shrink-0" />
-              <span>Important / Critical</span>
-            </h3>
-            <span className="text-xs text-rose-600 dark:text-rose-400 font-semibold">
-              {criticalTasks.length} active
+            <div>
+              <h2 className="text-base font-bold text-slate-900 dark:text-zinc-100">
+                Today&apos;s Tasks
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-zinc-400">{todayFormatted}</p>
+            </div>
+            <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900">
+              {todayTasks.length} scheduled
             </span>
           </div>
 
-          {criticalTasks.length === 0 ? (
-            <p className="text-xs text-slate-500 dark:text-zinc-400 py-4 text-center">
-              No critical tasks. Great job!
+          {todayTasks.length === 0 ? (
+            <p className="text-xs text-slate-500 dark:text-zinc-400 py-8 text-center">
+              No tasks due today. Plan your day by adding a due date.
             </p>
           ) : (
-            <ul className="divide-y divide-slate-100 dark:divide-[#2e3340]/60">
-              {criticalTasks.map((task) => (
-                <li
+            <ul className="space-y-3">
+              {todayTasks.map((task) => (
+                <TodoItem
                   key={task.id}
-                  className="py-2.5 flex items-center justify-between gap-3"
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <input
-                      type="checkbox"
-                      checked={task.completed}
-                      onChange={(e) => onToggle(task.id, e.target.checked)}
-                      aria-label={`Toggle completion for ${task.title}`}
-                      className="w-4 h-4 rounded border-slate-300 dark:border-zinc-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                    />
-                    <span className="text-sm text-slate-900 dark:text-zinc-100 font-medium truncate">
-                      {task.title}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2 shrink-0">
-                    {task.dueDate && (
-                      <span
-                        className={`text-[11px] font-medium ${
-                          isOverdue(task.dueDate, task.completed)
-                            ? "text-rose-600 dark:text-rose-400 font-semibold"
-                            : "text-slate-500 dark:text-zinc-400"
-                        }`}
-                      >
-                        {isOverdue(task.dueDate, task.completed)
-                          ? formatOverdueLabel(task.dueDate)
-                          : formatShortDate(task.dueDate)}
-                      </span>
-                    )}
-                    {onEditTask && (
-                      <button
-                        type="button"
-                        onClick={() => onEditTask(task)}
-                        aria-label={`Edit ${task.title}`}
-                        className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline cursor-pointer"
-                      >
-                        Edit
-                      </button>
-                    )}
-                  </div>
-                </li>
+                  todo={task}
+                  onToggle={onToggle}
+                  onOpenEdit={onEditTask}
+                  onOpenDetails={onOpenDetails}
+                  onDelete={onDelete || (() => {})}
+                />
               ))}
             </ul>
           )}
         </section>
 
-        {/* Recent Tasks Panel */}
-        <section
-          aria-label="Recent tasks"
-          className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-5 shadow-md space-y-3"
-        >
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100 flex items-center gap-1.5">
+        {/* Right Column (5 cols): Important / Critical & Recent */}
+        <div className="lg:col-span-5 space-y-6">
+          {/* Important / Critical Tasks Panel */}
+          <section
+            aria-label="Important and critical tasks"
+            className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-5 shadow-sm space-y-3"
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100 flex items-center gap-2">
+                <Flame aria-hidden="true" className="w-4 h-4 text-rose-500 shrink-0" />
+                <span>Important / Critical</span>
+              </h3>
+              <span className="text-xs text-rose-600 dark:text-rose-400 font-semibold">
+                {criticalTasks.length} pending
+              </span>
+            </div>
+
+            {criticalTasks.length === 0 ? (
+              <p className="text-xs text-slate-500 dark:text-zinc-400 py-4 text-center">
+                No critical tasks. Great job!
+              </p>
+            ) : (
+              <ul className="space-y-2 text-xs">
+                {criticalTasks.map((task) => (
+                  <li
+                    key={task.id}
+                    onClick={() => onOpenDetails?.(task)}
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40 hover:bg-rose-100/50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                  >
+                    <div className="truncate pr-2">
+                      <p className="font-semibold text-slate-900 dark:text-zinc-100 truncate">
+                        {task.title}
+                      </p>
+                      {task.dueDate && (
+                        <p className="text-[10px] text-rose-600 dark:text-rose-400 font-medium">
+                          {isOverdue(task.dueDate, task.completed)
+                            ? formatOverdueLabel(task.dueDate)
+                            : `Due ${formatShortDate(task.dueDate)}`}
+                        </p>
+                      )}
+                    </div>
+                    {onEditTask && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEditTask(task);
+                        }}
+                        aria-label={`Edit ${task.title}`}
+                        className="px-2 py-1 rounded-lg bg-white dark:bg-[#22262f] text-slate-700 dark:text-zinc-300 hover:text-indigo-600 border border-slate-200 dark:border-[#2e3340] text-[11px] font-medium shrink-0 cursor-pointer"
+                      >
+                        Edit
+                      </button>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          {/* Recent Tasks Panel */}
+          <section
+            aria-label="Recent tasks"
+            className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-5 shadow-sm space-y-3"
+          >
+            <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100 flex items-center gap-2">
               <Clock aria-hidden="true" className="w-4 h-4 text-slate-500 dark:text-zinc-400 shrink-0" />
               <span>Recent Tasks</span>
             </h3>
-            <span className="text-xs text-slate-500 dark:text-zinc-400 font-medium">
-              Latest 5
-            </span>
-          </div>
 
-          {recentTasks.length === 0 ? (
-            <p className="text-xs text-slate-500 dark:text-zinc-400 py-4 text-center">
-              No tasks yet. Create your first task.
-            </p>
-          ) : (
-            <ul className="divide-y divide-slate-100 dark:divide-[#2e3340]/60">
-              {recentTasks.map((task) => (
-                <li
-                  key={task.id}
-                  className="py-2.5 flex items-center justify-between gap-3"
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <input
-                      type="checkbox"
-                      checked={task.completed}
-                      onChange={(e) => onToggle(task.id, e.target.checked)}
-                      aria-label={`Toggle completion for ${task.title}`}
-                      className="w-4 h-4 rounded border-slate-300 dark:border-zinc-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                    />
-                    <span
-                      className={`text-sm truncate ${
-                        task.completed
-                          ? "line-through text-slate-400 dark:text-zinc-500"
-                          : "text-slate-900 dark:text-zinc-100 font-medium"
-                      }`}
-                    >
-                      {task.title}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-[11px] text-slate-400 dark:text-zinc-500">
-                      {formatRelativeDate(task.createdAt)}
-                    </span>
-                    <span
-                      className={`text-[9px] uppercase font-bold px-1.5 py-0.5 rounded-full ${
-                        task.priority === "high"
-                          ? "bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300"
-                          : task.priority === "medium"
-                          ? "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300"
-                          : "bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300"
-                      }`}
-                    >
-                      {task.priority}
-                    </span>
-                    {onEditTask && (
-                      <button
-                        type="button"
-                        onClick={() => onEditTask(task)}
-                        aria-label={`Edit ${task.title}`}
-                        className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline cursor-pointer"
+            {recentTasks.length === 0 ? (
+              <p className="text-xs text-slate-500 dark:text-zinc-400 py-4 text-center">
+                No tasks yet. Create your first task.
+              </p>
+            ) : (
+              <ul className="space-y-2 text-xs divide-y divide-slate-100 dark:divide-[#2e3340]">
+                {recentTasks.map((task) => (
+                  <li
+                    key={task.id}
+                    onClick={() => onOpenDetails?.(task)}
+                    className="pt-2 flex items-center justify-between gap-2 hover:bg-slate-50 dark:hover:bg-[#22262f]/40 p-1.5 rounded-lg transition cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                      <input
+                        type="checkbox"
+                        checked={task.completed}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          onToggle(task.id, e.target.checked);
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        aria-label={`Toggle completion for ${task.title}`}
+                        className="w-4 h-4 rounded border-slate-300 dark:border-zinc-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer shrink-0"
+                      />
+                      <span
+                        className={`truncate font-medium ${
+                          task.completed
+                            ? "line-through text-slate-400 dark:text-zinc-500"
+                            : "text-slate-800 dark:text-zinc-200"
+                        }`}
                       >
-                        Edit
-                      </button>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+                        {task.title}
+                      </span>
+                    </div>
+
+                    <div
+                      className="flex items-center gap-2 shrink-0"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <span className="text-[10px] text-slate-400 dark:text-zinc-500 font-medium">
+                        {formatRelativeDate(task.createdAt)}
+                      </span>
+                      {onEditTask && (
+                        <button
+                          type="button"
+                          onClick={() => onEditTask(task)}
+                          aria-label={`Edit ${task.title}`}
+                          className="px-2 py-0.5 rounded bg-white dark:bg-[#22262f] text-slate-600 dark:text-zinc-300 hover:text-indigo-600 border border-slate-200 dark:border-[#2e3340] text-[10px] font-medium cursor-pointer"
+                        >
+                          Edit
+                        </button>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </div>
       </div>
     </div>
   );

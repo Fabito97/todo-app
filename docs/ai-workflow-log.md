@@ -285,3 +285,12 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Review**: `project-auditor` audit completed. All requirements in `requirements.md`, `implementation_plan.md`, and `task.md` for Version 2.1 verified. Tasks search bar, category filtering, exact mockup task card alignment (`border-l-4`, 1-line description, short dates, overdue warning badge & cancellation styling), Calendar view/edit interactivity, polished loading skeleton and empty states confirmed against Neon PostgreSQL server persistence.
 - **Bug or issue caught**: Fixed input race in Playwright test by synchronizing input clearing; added dedicated real-time search e2e test.
 - **Rule or prompt improvement**: None.
+
+## 2026-09-30 - Dashboard View exact mockup grid layout and task card alignment
+- **Commit**: `fix(dashboard): align grid layout with v1.4 mockup and use exact task card design`
+- **Key prompt or instruction**: "Remove the dummy data used on the recent tasks. Use the exact grid layout used on the v1.4 design html mockup in design/mockups. and use the exact task cards design used in the tasks section"
+- **Human decision or correction**: Use exact 12-column grid layout from `design/mockups/v1.4.html` (7-col Today's tasks + 5-col Critical and Recent panels), render `TodoItem` task cards in Today's tasks, clean up residual e2e items, and ensure recent tasks list has zero dummy data.
+- **Checks run**: lint (pass), typecheck (pass), tests (164 pass across 26 test files in `test/`), Playwright e2e (13 pass across 2 test files in `e2e/`).
+- **Review**: Verified Today's tasks renders full `TodoItem` task cards with color-coded left borders, 1-line clamped descriptions, metadata pills, details modal click triggers, and action buttons; verified 12-column split layout (`lg:grid-cols-12`); verified Recent tasks has zero dummy data and empty state fallback.
+- **Bug or issue caught**: Added `afterAll` cleanup hook in `e2e/todos.spec.ts` to prevent test-created tasks from lingering in the live dev server store.
+- **Rule or prompt improvement**: None.

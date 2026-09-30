@@ -461,4 +461,14 @@ test.describe.serial("Todo App", () => {
     await searchInput.fill("");
     await expect(page.getByText("Beta Design Sprint")).toBeVisible();
   });
+
+  test.afterAll(async ({ request }) => {
+    const res = await request.get("/api/todos");
+    if (res.ok()) {
+      const items = (await res.json()) as Array<{ id: string }>;
+      for (const item of items) {
+        await request.delete(`/api/todos/${item.id}`);
+      }
+    }
+  });
 });

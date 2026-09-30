@@ -141,6 +141,8 @@ export default function Home() {
               onQuickAdd={handleQuickAdd}
               onToggle={toggleTodo}
               onEditTask={handleOpenEdit}
+              onOpenDetails={handleOpenDetails}
+              onDelete={handleDelete}
             />
           )}
 

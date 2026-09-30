@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import { DashboardView } from "@/components/DashboardView";
@@ -119,4 +119,36 @@ describe("DashboardView component", () => {
     expect(recentPanel).toHaveTextContent("All-Day Documentation");
     expect(recentPanel).toHaveTextContent("Backlog Roadmap Review");
   });
+
+  it("renders Today's tasks with TodoItem cards and delegates details/edit/delete callbacks", async () => {
+    const handleOpenDetails = vi.fn();
+    const handleOpenEdit = vi.fn();
+    const handleDelete = vi.fn();
+    const user = userEvent.setup();
+
+    render(
+      <DashboardView
+        todos={sampleTodos}
+        onQuickAdd={vi.fn()}
+        onToggle={vi.fn()}
+        onEditTask={handleOpenEdit}
+        onOpenDetails={handleOpenDetails}
+        onDelete={handleDelete}
+      />
+    );
+
+    const todayPanel = screen.getByRole("region", { name: /today's tasks/i });
+    const viewDetailsBtn = within(todayPanel).getByRole("button", {
+      name: /view details for critical client issue/i,
+    });
+    await user.click(viewDetailsBtn);
+    expect(handleOpenDetails).toHaveBeenCalledWith(sampleTodos[0]);
+
+    const editBtn = within(todayPanel).getByRole("button", {
+      name: /edit critical client issue/i,
+    });
+    await user.click(editBtn);
+    expect(handleOpenEdit).toHaveBeenCalledWith(sampleTodos[0]);
+  });
 });
+
