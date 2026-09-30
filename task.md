@@ -545,13 +545,13 @@ definitions, the API contract, and the data model live in
 
 ## V2 Slice 00: Backend foundation (Drizzle ORM, Neon schema, and repository)
 
-- [ ] Add `drizzle-orm`, `@neondatabase/serverless` to dependencies; add `drizzle-kit`, `dotenv` to devDependencies
-- [ ] Add `"db:generate": "drizzle-kit generate"` and `"db:migrate": "drizzle-kit migrate"` to `package.json`
-- [ ] Implement `drizzle.config.ts`, `src/server/db.ts`, and `src/server/schema.ts` defining PostgreSQL `todos` table matching `Todo` shape
-- [ ] Generate initial database migration via Drizzle Kit
-- [ ] Write tests in `test/server/todo-repository.test.ts` executing the shared `todo-service.contract.ts` suite and watch them fail
-- [ ] Implement `src/server/todo-repository.ts` implementing `TodoService` using Drizzle queries
-- [ ] Run `npm run verify` and commit
+- [x] Add `drizzle-orm`, `@neondatabase/serverless` to dependencies; add `drizzle-kit`, `dotenv` to devDependencies
+- [x] Add `"db:generate": "drizzle-kit generate"` and `"db:migrate": "drizzle-kit migrate"` to `package.json`
+- [x] Implement `drizzle.config.ts`, `src/server/db.ts`, and `src/server/schema.ts` defining PostgreSQL `todos` table matching `Todo` shape
+- [x] Generate initial database migration via Drizzle Kit
+- [x] Write tests in `test/server/todo-repository.test.ts` executing the shared `todo-service.contract.ts` suite and watch them fail
+- [x] Implement `src/server/todo-repository.ts` implementing `TodoService` using Drizzle queries
+- [x] Run `npm run verify` and commit
 
 **Acceptance criteria**
 

@@ -208,3 +208,13 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Bug or issue caught**: Fixed Next.js dev overlay pointer interception on theme toggle by adding `devIndicators: false` in `next.config.ts` and bottom spacing/z-index in `SidebarNav.tsx`. Scoped `listitem` Playwright queries to `region` with name `Task list board`.
 - **Rule or prompt improvement**: None.
 
+## 2026-09-30 - V2 Slice 00: Backend foundation (Drizzle ORM, Neon schema, and repository)
+- **Commit**: `feat(v2): add Drizzle ORM schema, Neon connection, and TodoRepository`
+- **Key prompt or instruction**: "/autopilot 2"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (124 pass across 23 test files in `test/`), post-task gate (`GATE PASSED (fast)`).
+- **Review**: In-session review by autopilot; verified Drizzle PostgreSQL schema matching `Todo`, Drizzle Kit configuration and generated migration (`drizzle/0000_numerous_bloodscream.sql`), `src/server/db.ts` connection client, and `TodoRepository` implementing `TodoService` with full contract test suite coverage in `test/server/todo-repository.test.ts`. Zero UI modifications under `src/components/` or `src/hooks/`.
+- **Bug or issue caught**: Fixed `@typescript-eslint/no-explicit-any` in `TodoRepository` query builder by passing conditional where clause. Corrected case sensitivity of ORDER BY inspections in in-memory test database mock.
+- **Rule or prompt improvement**: None.
+
+
