@@ -541,73 +541,111 @@ definitions, the API contract, and the data model live in
 
 ---
 
-# Version 2: Routes and database (outline only — detail with `/plan 2`)
+# Version 2: Server Persistence via Neon PostgreSQL, Drizzle ORM & Route Handlers
 
-## V2 Slice 00: Backend foundation
+## V2 Slice 00: Backend foundation (Drizzle ORM, Neon schema, and repository)
 
-- [ ] Add Drizzle ORM + Neon (`@neondatabase/serverless`) driver
-- [ ] `src/server/db.ts`, `src/server/schema.ts`, first migration
-- [ ] `src/server/todo-repository.ts` implementing `TodoService`
-
-**Acceptance criteria**
-
-- The shared contract suite passes against `TodoRepository` using a fresh test database.
-- Migration is committed; database files and `.env.local` are gitignored.
-- `git diff` shows no changes under `src/components` or `src/hooks`.
-
----
-
-## V2 Slice 01: API routes
-
-- [ ] `GET /api/todos`, `POST /api/todos`, `PATCH /api/todos/[id]`, `DELETE /api/todos/[id]`
+- [ ] Add `drizzle-orm`, `@neondatabase/serverless` to dependencies; add `drizzle-kit`, `dotenv` to devDependencies
+- [ ] Add `"db:generate": "drizzle-kit generate"` and `"db:migrate": "drizzle-kit migrate"` to `package.json`
+- [ ] Implement `drizzle.config.ts`, `src/server/db.ts`, and `src/server/schema.ts` defining PostgreSQL `todos` table matching `Todo` shape
+- [ ] Generate initial database migration via Drizzle Kit
+- [ ] Write tests in `test/server/todo-repository.test.ts` executing the shared `todo-service.contract.ts` suite and watch them fail
+- [ ] Implement `src/server/todo-repository.ts` implementing `TodoService` using Drizzle queries
+- [ ] Run `npm run verify` and commit
 
 **Acceptance criteria**
 
-- Status codes and error shape match the API table in `implementation_plan.md`.
-- Invalid input → 400 with per-field messages. Unknown id → 404. Unexpected failure → safe 500 (no stack trace).
+- `src/server/schema.ts` defines all fields matching `Todo`: `id`, `title`, `completed`, `description`, `priority`, `dueDate`, `startTime`, `endTime`, `category`, `createdAt`, `updatedAt`.
+- `TodoRepository` implements the full `TodoService` interface and passes the contract test suite (`todo-service.contract.ts`).
+- Database migration files are generated in `drizzle/`; `.env*` files are gitignored.
+- `git diff` shows zero changes under `src/components/` or `src/hooks/`.
 
 **Tests**
 
-- api: every route, success case and each error case
+- contract (`test/server/todo-repository.test.ts`): executes `todo-service.contract.ts` against `TodoRepository`.
 
 ---
 
-## V2 Slice 02: Switch the app to the API
+## V2 Slice 01: Next.js API Route Handlers
 
-- [ ] Implement `src/services/http-todo-service.ts`
-- [ ] Change `src/services/index.ts` to export `HttpTodoService`
-- [ ] Add e2e test-database reset helper
+- [ ] Write tests in `test/api/todos.test.ts` and watch them fail
+- [ ] Implement `src/app/api/todos/route.ts` (`GET /api/todos` and `POST /api/todos`) with Zod validation
+- [ ] Implement `src/app/api/todos/[id]/route.ts` (`PATCH /api/todos/[id]` and `DELETE /api/todos/[id]`) with Zod validation
+- [ ] Run `npm run verify` and commit
 
 **Acceptance criteria**
 
-- `HttpTodoService` passes the shared contract suite.
-- All Version 1 e2e tests pass with their assertions unchanged.
-- `git diff` for this slice shows no changes under `src/components` or `src/hooks`.
+- `GET /api/todos`: returns all todos with HTTP 200.
+- `POST /api/todos`: validates request body with `CreateTodoSchema`, returns created `Todo` with HTTP 201; invalid body returns HTTP 400 with `{ error: string, details?: unknown }`.
+- `PATCH /api/todos/[id]`: validates with `TodoPatchSchema`, returns updated `Todo` with HTTP 200; unknown `id` returns HTTP 404; invalid body returns HTTP 400.
+- `DELETE /api/todos/[id]`: deletes item and returns HTTP 200/204; unknown `id` returns HTTP 404.
+- Unexpected errors return safe HTTP 500 without leaking stack traces.
+- `git diff` shows zero changes under `src/components/` or `src/hooks/`.
+
+**Tests**
+
+- api (`test/api/todos.test.ts`): tests every route handler for success status codes, validation failures (400), not found errors (404), and error response shapes.
 
 ---
 
-## V2 Slice 03 (optional): Migrate existing localStorage todos
+## V2 Slice 02: Switch client to the API via HttpTodoService
 
-- [ ] One-time import of a browser's local todos into the database
+- [ ] Write tests in `test/services/http-todo-service.test.ts` and watch them fail
+- [ ] Implement `src/services/http-todo-service.ts` implementing `TodoService` via client `fetch('/api/todos')`
+- [ ] Update `src/services/index.ts` to export `HttpTodoService` as the active service provider
+- [ ] Run `npm run verify` and commit
 
 **Acceptance criteria**
 
-- Existing local todos appear on the server exactly once; running twice does not duplicate them.
+- `HttpTodoService` implements all methods of `TodoService` (`getAll`, `getById`, `create`, `update`, `delete`, `clearCompleted`).
+- `src/services/index.ts` exports `HttpTodoService` instead of `LocalTodoService`.
+- `git diff` shows zero changes under `src/components/` or `src/hooks/` — the client UI seamlessly connects to the API routes.
+
+**Tests**
+
+- service (`test/services/http-todo-service.test.ts`): executes the contract suite against `HttpTodoService` with fetch mocks.
 
 ---
 
-## V2 Slice 04: Error handling and hardening
+## V2 Slice 03 (optional): Local storage import tool
 
-- [ ] API failures shown to the user; failed mutations reverted; loading states
+- [ ] Implement one-time import utility to upload existing `localStorage` todos to the server
+- [ ] Prevent duplicate imports if run multiple times
 
 **Acceptance criteria**
 
-- A failed request shows a visible, dismissible error and the list reverts to the last good state.
-- No console errors during the e2e happy path.
+- Existing local todos migrate to the server database without duplication.
+
+---
+
+## V2 Slice 04: Error handling and network resilience
+
+- [ ] Write tests in `test/hooks/use-todos.test.ts` for API failure scenarios and watch them fail
+- [ ] Ensure `useTodos` surfaces network and server errors to the user via toast notices
+- [ ] Ensure loading states display properly during initial server fetch
+- [ ] Run `npm run verify && npm run e2e` and commit
+
+**Acceptance criteria**
+
+- A failed network mutation or server error displays an accessible toast notice without crashing the application.
+- Initial data loading shows a clean spinner indicator until data arrives.
+- Zero unhandled console errors during normal operations.
+
+**Tests**
+
+- hook (`test/hooks/use-todos.test.ts`): tests error handling when `TodoService` rejects.
+- e2e (`e2e/todos.spec.ts`): verifies end-to-end task creation, edit, toggle, and deletion persist against the API backend.
 
 ---
 
 ## V2 Slice 05: Finish version 2
 
-- [ ] Run `/finish 2` — audit, README update, release notes
+- [ ] Run `npm run verify && npm run e2e`
+- [ ] Run `/finish 2` — audit, README update, and release notes
 - [ ] Human reviews output, merges branch to `main`, tags `v2`, and deploys to Vercel
+
+**Acceptance criteria**
+
+- All unit, component, contract, and end-to-end tests pass cleanly.
+- `README.md` documents Version 2 architecture, database setup, environment variables, and deployment instructions.
+- Release notes written and committed.

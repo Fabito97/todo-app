@@ -3,7 +3,7 @@ Status V1.1: APPROVED by human on 2026-09-29
 Status V1.2: APPROVED by human on 2026-09-29
 Status V1.3: APPROVED by human on 2026-09-30
 Status V1.4: APPROVED by human on 2026-09-30
-Status V2: DRAFT
+Status V2: APPROVED by human on 2026-09-30
 
 ---
 
@@ -391,7 +391,92 @@ Completed and verified on branch `auto/v1.2` (merged to `main`).
 
 ---
 
-## Version 2 Plan — Neon + Vercel (Outline; detail with `/plan 2`)
+## Version 2 Plan — Server Persistence via Neon PostgreSQL, Drizzle ORM & Next.js Route Handlers
 
 ### Goal
-Move persistence from browser `localStorage` to Neon PostgreSQL via Drizzle ORM and Next.js Route Handlers (`/api/todos` and `/api/todos/[id]`). The database schema will directly reflect the enriched `Todo` shape (including `startTime` and `endTime`). Components and hooks remain completely unchanged (`git diff` under `src/components/` and `src/hooks/` must be empty).
+Migrate data persistence from browser `localStorage` to a serverless PostgreSQL database (Neon) using Drizzle ORM and Next.js App Router Route Handlers (`/api/todos` and `/api/todos/[id]`). The client interacts with the backend through `HttpTodoService`, implementing the same `TodoService` interface established in Version 1. **Zero changes** will be made to UI components (`src/components/`) or client hooks (`src/hooks/`), preserving all Version 1.4 features (workspace shell, executive dashboard, metric cards, modal system, full month calendar grid, daily schedule, notifications, filters, and sorting).
+
+### Architecture & Service Boundary
+
+```
+[UI Components & Hooks]
+         │ (calls TodoService interface)
+         ▼
+[HttpTodoService (src/services/http-todo-service.ts)]
+         │ (HTTP fetch)
+         ▼
+[Next.js Route Handlers (src/app/api/todos/)]
+         │ (validates with src/lib/schemas.ts)
+         ▼
+[TodoRepository (src/server/todo-repository.ts)]
+         │ (Drizzle ORM queries)
+         ▼
+[Neon PostgreSQL Database]
+```
+
+- `src/services/index.ts` is the single switch that swaps the active client service from `LocalTodoService` to `HttpTodoService`.
+- `src/server/` contains database connection logic (`db.ts`), Drizzle relational schema (`schema.ts`), and `TodoRepository` implementing `TodoService`.
+- `src/app/api/todos/` contains Route Handlers that validate input with `CreateTodoSchema` and `TodoPatchSchema` and call `TodoRepository`.
+- `git diff` under `src/components/` and `src/hooks/` must remain completely empty throughout Version 2.
+
+### Data Model & Drizzle Schema (`src/server/schema.ts`)
+
+PostgreSQL table `todos`:
+
+| Column | Type | Constraints / Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `uuid` / `varchar(36)` | Primary Key | Unique UUID v4 string |
+| `title` | `varchar(200)` | NOT NULL | Todo title (trimmed, 1–200 chars) |
+| `completed` | `boolean` | NOT NULL, DEFAULT `false` | Completion status |
+| `description` | `text` | NULLABLE, DEFAULT `''` | Optional notes (up to 1,000 chars) |
+| `priority` | `varchar(20)` | NOT NULL, DEFAULT `'medium'` | `'low'`, `'medium'`, or `'high'` |
+| `due_date` | `varchar(50)` | NULLABLE | ISO date string (`YYYY-MM-DD`) |
+| `start_time` | `varchar(10)` | NULLABLE | 24h start time (`HH:mm`) |
+| `end_time` | `varchar(10)` | NULLABLE | 24h end time (`HH:mm`) |
+| `category` | `varchar(50)` | NULLABLE | Category preset or custom tag |
+| `created_at` | `timestamp with time zone` | NOT NULL, DEFAULT `now()` | ISO timestamp |
+| `updated_at` | `timestamp with time zone` | NOT NULL, DEFAULT `now()` | ISO timestamp |
+
+### API Contract (`src/app/api/todos`)
+
+All endpoints accept and return JSON. Errors follow a standardized shape: `{ error: string, details?: Record<string, string[]> }`.
+
+| Method | Path | Request Body | Success Status | Success Response | Error Statuses |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `GET` | `/api/todos` | None | `200 OK` | `Todo[]` (or `{ todos: Todo[] }`) | `500` (unexpected error) |
+| `POST` | `/api/todos` | `CreateTodoInput` | `201 Created` | `Todo` | `400` (Zod validation failure), `500` |
+| `PATCH` | `/api/todos/[id]` | `TodoPatchInput` | `200 OK` | `Todo` | `400` (validation failure), `404` (not found), `500` |
+| `DELETE` | `/api/todos/[id]` | None | `200 OK` / `204 No Content` | `{ success: true }` / Empty | `404` (not found), `500` |
+
+### Files Expected to be Added or Changed in Version 2
+
+| File | Change |
+| :--- | :--- |
+| `package.json` | Add `drizzle-orm`, `@neondatabase/serverless` to dependencies; add `drizzle-kit`, `dotenv` to devDependencies; add `db:generate` and `db:migrate` scripts |
+| `drizzle.config.ts` | **New file**: Drizzle Kit configuration pointing to `src/server/schema.ts` and `drizzle/` migrations folder |
+| `src/server/db.ts` | **New file**: Neon connection pool / HTTP client setup with Drizzle ORM |
+| `src/server/schema.ts` | **New file**: PostgreSQL `todos` table definition |
+| `src/server/todo-repository.ts` | **New file**: Implements `TodoService` using Drizzle queries against Neon |
+| `src/app/api/todos/route.ts` | **New file**: Route Handler for `GET` (list all) and `POST` (create todo) |
+| `src/app/api/todos/[id]/route.ts` | **New file**: Route Handler for `PATCH` (update todo) and `DELETE` (delete todo) |
+| `src/services/http-todo-service.ts` | **New file**: Implements `TodoService` via client `fetch('/api/todos')` |
+| `src/services/index.ts` | Switch active export from `localTodoService` to `httpTodoService` |
+| `test/server/todo-repository.test.ts` | **New test file**: Tests `TodoRepository` against contract suite |
+| `test/api/todos.test.ts` | **New test file**: Tests route handlers for status codes, validation errors, and happy paths |
+| `test/services/http-todo-service.test.ts` | **New test file**: Tests `HttpTodoService` against contract suite with mocked fetch responses |
+| `e2e/todos.spec.ts` | Ensure E2E tests run against the server API and verify persistence across reload |
+| `README.md` | Update architecture section to describe Neon PostgreSQL + Drizzle ORM backend and environment setup |
+
+### Testing & Quality Strategy
+
+1. **Repository Contract Tests (`test/server/todo-repository.test.ts`)**:
+   - Runs the standard `todo-service.contract.ts` suite against `TodoRepository` using an isolated test database (or in-memory mock schema).
+2. **API Route Handler Tests (`test/api/todos.test.ts`)**:
+   - Directly tests `GET`, `POST`, `PATCH`, `DELETE` handlers for proper HTTP status codes (`200`, `201`, `400`, `404`, `500`) and Zod error formatting.
+3. **HTTP Service Tests (`test/services/http-todo-service.test.ts`)**:
+   - Verifies `HttpTodoService` translates contract methods into correct HTTP requests, handles network errors, and parses server responses.
+4. **End-to-End Tests (`e2e/todos.spec.ts`)**:
+   - Validates that the full application works identically against the live server backend, persisting data across page reloads.
+
+### Open Decisions for Version 2
+- **None (`0` `OPEN` items)**: Database engine confirmed as Neon PostgreSQL via `@neondatabase/serverless` + Drizzle ORM. Service boundary and API shape adhere strictly to project rules.
