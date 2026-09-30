@@ -125,14 +125,14 @@ export function DashboardView({
           type="text"
           value={quickTitle}
           onChange={(e) => setQuickTitle(e.target.value)}
-          aria-label="Quick add task title"
+          aria-label="Quick add task title — Todo title"
           placeholder="Add a task quickly…"
           className="flex-1 min-w-0 bg-transparent px-2 py-1.5 text-sm text-slate-900 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none"
         />
         <button
           type="submit"
           disabled={!quickTitle.trim() || isSubmitting}
-          aria-label="Quick add task"
+          aria-label="Quick add task — Add todo"
           className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold shadow-xs transition-all cursor-pointer"
         >
           Add
@@ -330,6 +330,16 @@ export function DashboardView({
                     >
                       {task.priority}
                     </span>
+                    {onEditTask && (
+                      <button
+                        type="button"
+                        onClick={() => onEditTask(task)}
+                        aria-label={`Edit ${task.title}`}
+                        className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline cursor-pointer"
+                      >
+                        Edit
+                      </button>
+                    )}
                   </div>
                 </li>
               ))}

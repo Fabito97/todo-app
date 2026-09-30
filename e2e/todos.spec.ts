@@ -22,29 +22,32 @@ test.describe.serial("Todo App", () => {
   });
 
   test("can add rich todo with details and it persists after reload", async ({ page }) => {
-    const input = page.getByRole("textbox", { name: /todo title/i });
-    const toggleDetails = page.getByRole("button", { name: /toggle details/i });
-    const addButton = page.getByRole("button", { name: /add todo/i });
+    // Open New Task modal
+    const newTaskBtn = page.getByRole("button", { name: /open new task modal|\+ new task/i }).first();
+    await newTaskBtn.click();
 
-    await input.fill("Rich Todo Item");
-    await toggleDetails.click();
+    const dialog = page.getByRole("dialog", { name: /new task/i });
+    await expect(dialog).toBeVisible();
 
-    const descInput = page.getByRole("textbox", { name: /description/i });
-    const priorityGroup = page.getByRole("group", { name: "Priority", exact: true });
-    const highPriorityBtn = priorityGroup.getByRole("button", { name: /priority high/i });
-    const dueDateInput = page.getByLabel(/due date/i);
-    const categoryInput = page.getByRole("textbox", { name: /category/i });
+    const titleInput = dialog.getByRole("textbox", { name: /title/i });
+    const descInput = dialog.getByLabel(/description/i);
+    const highPriorityBtn = dialog.getByRole("radio", { name: /high priority/i });
+    const dueDateInput = dialog.getByLabel(/due date/i);
+    const categorySelect = dialog.getByLabel(/category/i);
 
+    await titleInput.fill("Rich Todo Item");
     await descInput.fill("Important deployment checklist");
     await highPriorityBtn.click();
     await dueDateInput.fill("2026-11-15");
-    await categoryInput.fill("DevOps");
+    await categorySelect.selectOption("Work");
 
-    await addButton.click();
+    const submitBtn = dialog.getByRole("button", { name: /create task/i });
+    await submitBtn.click();
+    await expect(dialog).not.toBeVisible();
 
-    await expect(page.getByText("Rich Todo Item")).toBeVisible();
+    await expect(page.getByText("Rich Todo Item").first()).toBeVisible();
     await page.reload();
-    await expect(page.getByText("Rich Todo Item")).toBeVisible();
+    await expect(page.getByText("Rich Todo Item").first()).toBeVisible();
   });
 
   test("can toggle todo completion and it persists after reload", async ({ page }) => {
@@ -52,14 +55,14 @@ test.describe.serial("Todo App", () => {
     await input.fill("Toggle Me");
     await page.getByRole("button", { name: /add todo/i }).click();
 
-    const checkbox = page.getByRole("checkbox", { name: /toggle completion for toggle me/i });
+    const checkbox = page.getByRole("checkbox", { name: /toggle completion for toggle me/i }).first();
     await expect(checkbox).not.toBeChecked();
 
     await checkbox.click();
     await expect(checkbox).toBeChecked();
 
     await page.reload();
-    const reloadedCheckbox = page.getByRole("checkbox", { name: /toggle completion for toggle me/i });
+    const reloadedCheckbox = page.getByRole("checkbox", { name: /toggle completion for toggle me/i }).first();
     await expect(reloadedCheckbox).toBeChecked();
   });
 
@@ -68,17 +71,21 @@ test.describe.serial("Todo App", () => {
     await input.fill("Original Title");
     await page.getByRole("button", { name: /add todo/i }).click();
 
-    const editBtn = page.getByRole("button", { name: /edit original title/i });
+    const editBtn = page.getByRole("button", { name: /edit original title/i }).first();
     await editBtn.click();
 
-    const editInput = page.getByRole("textbox", { name: /edit todo title/i });
-    await editInput.fill("Edited Title");
-    await editInput.press("Enter");
+    const dialog = page.getByRole("dialog", { name: /edit task/i });
+    await expect(dialog).toBeVisible();
 
-    await expect(page.getByText("Edited Title")).toBeVisible();
+    const editInput = dialog.getByRole("textbox", { name: /edit title/i });
+    await editInput.fill("Edited Title");
+    await dialog.getByRole("button", { name: /save changes/i }).click();
+    await expect(dialog).not.toBeVisible();
+
+    await expect(page.getByText("Edited Title").first()).toBeVisible();
 
     await page.reload();
-    await expect(page.getByText("Edited Title")).toBeVisible();
+    await expect(page.getByText("Edited Title").first()).toBeVisible();
   });
 
   test("can edit rich todo details and it persists after reload", async ({ page }) => {
@@ -86,31 +93,33 @@ test.describe.serial("Todo App", () => {
     await input.fill("Editable Todo");
     await page.getByRole("button", { name: /add todo/i }).click();
 
-    const editBtn = page.getByRole("button", { name: /edit editable todo/i });
+    const editBtn = page.getByRole("button", { name: /edit editable todo/i }).first();
     await editBtn.click();
 
-    const editInput = page.getByRole("textbox", { name: /edit todo title/i });
+    const dialog = page.getByRole("dialog", { name: /edit task/i });
+    await expect(dialog).toBeVisible();
+
+    const editInput = dialog.getByRole("textbox", { name: /edit title/i });
     await editInput.fill("Editable Todo Updated");
 
-    const highPriorityBtn = page.getByRole("group", { name: /edit priority/i }).getByRole("button", { name: /priority high/i });
+    const highPriorityBtn = dialog.getByRole("radio", { name: /priority high/i });
     await highPriorityBtn.click();
 
-    const categoryInput = page.getByRole("textbox", { name: /edit category/i });
-    await categoryInput.fill("Chores");
+    const categorySelect = dialog.getByLabel(/category/i);
+    await categorySelect.selectOption("Work");
 
-    const saveBtn = page.getByRole("button", { name: /save changes/i });
+    const saveBtn = dialog.getByRole("button", { name: /save changes/i });
     await saveBtn.click();
+    await expect(dialog).not.toBeVisible();
 
-    const item = page.getByRole("listitem");
-    await expect(item.getByText("Editable Todo Updated")).toBeVisible();
-    await expect(item.getByText("Chores")).toBeVisible();
-    await expect(item.getByText("high")).toBeVisible();
+    await expect(page.getByText("Editable Todo Updated").first()).toBeVisible();
+    await expect(page.getByText("Work").first()).toBeVisible();
+    await expect(page.getByText("high").first()).toBeVisible();
 
     await page.reload();
-    const reloadedItem = page.getByRole("listitem");
-    await expect(reloadedItem.getByText("Editable Todo Updated")).toBeVisible();
-    await expect(reloadedItem.getByText("Chores")).toBeVisible();
-    await expect(reloadedItem.getByText("high")).toBeVisible();
+    await expect(page.getByText("Editable Todo Updated").first()).toBeVisible();
+    await expect(page.getByText("Work").first()).toBeVisible();
+    await expect(page.getByText("high").first()).toBeVisible();
   });
 
   test("can delete a todo permanently", async ({ page }) => {
@@ -120,12 +129,19 @@ test.describe.serial("Todo App", () => {
 
     await expect(page.getByText("Delete Me Soon")).toBeVisible();
 
+    // Switch to Tasks view to delete from board
+    await page.getByRole("button", { name: /^tasks/i }).first().click();
+
     const deleteBtn = page.getByRole("button", { name: /delete delete me soon/i });
     await deleteBtn.click();
+
+    const confirmBtn = page.getByRole("button", { name: /confirm delete/i });
+    await confirmBtn.click();
 
     await expect(page.getByText("Delete Me Soon")).not.toBeVisible();
 
     await page.reload();
+    await page.getByRole("button", { name: /^tasks/i }).first().click();
     await expect(page.getByText("Delete Me Soon")).not.toBeVisible();
   });
 
@@ -138,6 +154,9 @@ test.describe.serial("Todo App", () => {
 
     await input.fill("Task 2 Completed");
     await addButton.click();
+
+    // Switch to Tasks View for full list and filter bar
+    await page.getByRole("button", { name: /^tasks/i }).first().click();
 
     // Toggle Task 2 to completed
     const task2Checkbox = page.getByRole("checkbox", { name: /toggle completion for task 2 completed/i });
@@ -194,19 +213,23 @@ test.describe.serial("Todo App", () => {
     await expect(page.getByText("Master Full Flow")).toBeVisible();
 
     // 2. Edit
-    const editBtn = page.getByRole("button", { name: /edit master full flow/i });
+    const editBtn = page.getByRole("button", { name: /edit master full flow/i }).first();
     await editBtn.click();
-    const editInput = page.getByRole("textbox", { name: /edit todo title/i });
+    const dialog = page.getByRole("dialog", { name: /edit task/i });
+    const editInput = dialog.getByRole("textbox", { name: /edit title/i });
     await editInput.fill("Master Full Flow Updated");
-    await editInput.press("Enter");
-    await expect(page.getByText("Master Full Flow Updated")).toBeVisible();
+    await dialog.getByRole("button", { name: /save changes/i }).click();
+    await expect(page.getByText("Master Full Flow Updated").first()).toBeVisible();
 
     // 3. Toggle
-    const checkbox = page.getByRole("checkbox", { name: /toggle completion for master full flow updated/i });
+    const checkbox = page.getByRole("checkbox", { name: /toggle completion for master full flow updated/i }).first();
     await checkbox.click();
     await expect(checkbox).toBeChecked();
 
-    // 4. Filter
+    // 4. Switch to mobile Tasks View
+    await page.getByRole("navigation", { name: /mobile navigation/i }).getByRole("button", { name: /tasks/i }).click();
+
+    // 5. Filter
     const activeFilterBtn = page.getByRole("button", { name: /^active/i });
     await activeFilterBtn.click();
     await expect(page.getByText("No active todos")).toBeVisible();
@@ -215,42 +238,48 @@ test.describe.serial("Todo App", () => {
     await completedFilterBtn.click();
     await expect(page.getByText("Master Full Flow Updated")).toBeVisible();
 
-    // 5. Delete
+    // 6. Delete
     const deleteBtn = page.getByRole("button", { name: /delete master full flow updated/i });
     await deleteBtn.click();
+    const confirmBtn = page.getByRole("button", { name: /confirm delete/i });
+    await confirmBtn.click();
     await expect(page.getByText("No completed todos")).toBeVisible();
 
-    // 6. Assert zero unhandled console errors
+    // 7. Assert zero unhandled console errors
     expect(consoleErrors).toEqual([]);
   });
 
   test("filters by priority, category, and sorts by dueDate and priority", async ({ page }) => {
-    const titleInput = page.getByRole("textbox", { name: /todo title/i });
-    const toggleDetails = page.getByRole("button", { name: /toggle details/i });
-    const addButton = page.getByRole("button", { name: /add todo/i });
-    const formPriorityGroup = page.getByRole("group", { name: "Priority", exact: true });
-
-    // Item 1: Work Urgent
-    await titleInput.fill("Work Urgent Item");
-    await toggleDetails.click();
-    await formPriorityGroup.getByRole("button", { name: /priority high/i }).click();
-    await page.getByLabel(/due date/i).fill("2026-12-01");
-    await page.getByRole("textbox", { name: /category/i }).fill("Work");
-    await addButton.click();
+    // Open New Task modal for Item 1: Work Urgent
+    const newTaskBtn = page.getByRole("button", { name: /open new task modal|\+ new task/i }).first();
+    await newTaskBtn.click();
+    let dialog = page.getByRole("dialog", { name: /new task/i });
+    await dialog.getByRole("textbox", { name: /title/i }).fill("Work Urgent Item");
+    await dialog.getByRole("radio", { name: /high priority/i }).click();
+    await dialog.getByLabel(/due date/i).fill("2026-12-01");
+    await dialog.getByLabel(/category/i).selectOption("Work");
+    await dialog.getByRole("button", { name: /create task/i }).click();
 
     // Item 2: Personal Low
-    await titleInput.fill("Personal Low Item");
-    await formPriorityGroup.getByRole("button", { name: /priority low/i }).click();
-    await page.getByLabel(/due date/i).fill("2026-10-15");
-    await page.getByRole("textbox", { name: /category/i }).fill("Personal");
-    await addButton.click();
+    await newTaskBtn.click();
+    dialog = page.getByRole("dialog", { name: /new task/i });
+    await dialog.getByRole("textbox", { name: /title/i }).fill("Personal Low Item");
+    await dialog.getByRole("radio", { name: /low priority/i }).click();
+    await dialog.getByLabel(/due date/i).fill("2026-10-15");
+    await dialog.getByLabel(/category/i).selectOption("Personal");
+    await dialog.getByRole("button", { name: /create task/i }).click();
 
-    // Item 3: Work Standard
-    await titleInput.fill("Work Standard Item");
-    await formPriorityGroup.getByRole("button", { name: /priority med/i }).click();
-    await page.getByLabel(/due date/i).fill("2026-11-20");
-    await page.getByRole("textbox", { name: /category/i }).fill("Work");
-    await addButton.click();
+    // Item 3: Work Standard (medium priority)
+    await newTaskBtn.click();
+    dialog = page.getByRole("dialog", { name: /new task/i });
+    await dialog.getByRole("textbox", { name: /title/i }).fill("Work Standard Item");
+    await dialog.getByRole("radio", { name: /medium priority/i }).click();
+    await dialog.getByLabel(/due date/i).fill("2026-11-20");
+    await dialog.getByLabel(/category/i).selectOption("Work");
+    await dialog.getByRole("button", { name: /create task/i }).click();
+
+    // Switch to Tasks view for filtering and sorting
+    await page.getByRole("button", { name: /^tasks/i }).first().click();
 
     await expect(page.getByText("Work Urgent Item")).toBeVisible();
     await expect(page.getByText("Personal Low Item")).toBeVisible();
@@ -283,7 +312,8 @@ test.describe.serial("Todo App", () => {
     const sortSelect = page.getByRole("combobox", { name: /sort todos by/i });
     await sortSelect.selectOption("dueDate");
 
-    const items = page.getByRole("listitem");
+    const board = page.getByRole("region", { name: /task list board/i });
+    const items = board.getByRole("listitem");
     await expect(items.nth(0)).toContainText("Personal Low Item");
     await expect(items.nth(1)).toContainText("Work Standard Item");
     await expect(items.nth(2)).toContainText("Work Urgent Item");
@@ -297,7 +327,7 @@ test.describe.serial("Todo App", () => {
 
   test("persists theme toggle across reload with zero-flash Warm Graphite (#121316) dark background, updates completion progress bar, and resets active filters", async ({ page }) => {
     // 1. Toggle dark theme and verify persistence and Warm Graphite background after reload
-    const darkThemeBtn = page.getByRole("button", { name: /dark theme/i });
+    const darkThemeBtn = page.getByRole("button", { name: /dark theme/i }).first();
     await darkThemeBtn.click();
     await expect(page.locator("html")).toHaveClass(/dark/);
 
@@ -307,7 +337,7 @@ test.describe.serial("Todo App", () => {
     expect(bodyBg).toBe("rgb(18, 19, 22)");
 
     // Switch back to light theme
-    const lightThemeBtn = page.getByRole("button", { name: /light theme/i });
+    const lightThemeBtn = page.getByRole("button", { name: /light theme/i }).first();
     await lightThemeBtn.click();
     await expect(page.locator("html")).not.toHaveClass(/dark/);
 
@@ -323,10 +353,11 @@ test.describe.serial("Todo App", () => {
     await titleInput.fill("Dashboard Task 2");
     await addButton.click();
 
-    await page.getByRole("checkbox", { name: /toggle completion for dashboard task 1/i }).click();
+    await page.getByRole("checkbox", { name: /toggle completion for dashboard task 1/i }).first().click();
     await expect(progressbar).toHaveAttribute("aria-valuenow", "50");
 
-    // 3. Filter to Completed and use Reset filters button to restore all tasks
+    // 3. Switch to Tasks View, filter to Completed and use Reset filters button to restore all tasks
+    await page.getByRole("button", { name: /^tasks/i }).first().click();
     await page.getByRole("button", { name: /^completed/i }).click();
     await expect(page.getByText("Dashboard Task 2")).not.toBeVisible();
 
@@ -341,24 +372,23 @@ test.describe.serial("Todo App", () => {
   test("creates a time-blocked task for today via the modal composer and verifies Today's Dashboard, Calendar & Schedule view, and Notification Center", async ({ page }) => {
     const todayStr = new Date().toISOString().slice(0, 10);
 
-    const titleInput = page.getByRole("textbox", { name: /todo title/i });
-    await titleInput.fill("Product Roadmap Time-Block");
+    // Open New Task modal
+    const newTaskBtn = page.getByRole("button", { name: /open new task modal|\+ new task/i }).first();
+    await newTaskBtn.click();
 
-    await page.getByRole("button", { name: /toggle details/i }).click();
-    const dialog = page.getByRole("dialog", { name: /task details and schedule/i });
+    const dialog = page.getByRole("dialog", { name: /new task/i });
     await expect(dialog).toBeVisible();
 
+    await dialog.getByRole("textbox", { name: /title/i }).fill("Product Roadmap Time-Block");
     await dialog.getByLabel(/due date/i).fill(todayStr);
     await dialog.getByLabel(/start time/i).fill("09:30");
     await dialog.getByLabel(/end time/i).fill("11:00");
-    await page.getByRole("button", { name: /add todo/i }).click();
+    await dialog.getByRole("button", { name: /create task/i }).click();
 
-    // Close modal via Close modal button
-    await dialog.getByRole("button", { name: /close modal/i }).click();
     await expect(dialog).not.toBeVisible();
 
     // 1. Appears in Today's Dashboard
-    const todayRegion = page.getByRole("region", { name: /tasks for the day/i });
+    const todayRegion = page.getByRole("region", { name: /today's tasks/i });
     await expect(todayRegion).toContainText("Product Roadmap Time-Block");
     await expect(todayRegion).toContainText("09:30 – 11:00");
 
@@ -369,15 +399,15 @@ test.describe.serial("Todo App", () => {
     const notifPanel = page.getByRole("region", { name: /notifications panel/i });
     await expect(notifPanel).toContainText("Product Roadmap Time-Block");
 
-    // 3. Switch to Calendar & Schedule view and verify time-blocked slot
-    await page.getByRole("button", { name: /calendar & schedule view/i }).click();
-    const scheduleRegion = page.getByRole("region", { name: /time-blocked schedule/i });
+    // 3. Switch to Calendar view and verify time-blocked slot in daily schedule
+    await page.getByRole("button", { name: /^calendar/i }).first().click();
+    const scheduleRegion = page.getByRole("complementary", { name: /daily schedule/i });
     await expect(scheduleRegion).toContainText("Product Roadmap Time-Block");
     await expect(scheduleRegion).toContainText("09:30 – 11:00");
 
     // 4. Reload and verify persistence
     await page.reload();
-    await expect(page.getByRole("region", { name: /tasks for the day/i })).toContainText(
+    await expect(page.getByRole("region", { name: /today's tasks/i })).toContainText(
       "Product Roadmap Time-Block"
     );
   });

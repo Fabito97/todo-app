@@ -124,7 +124,7 @@ export function SidebarNav({ activeView, onSelectView }: SidebarNavProps) {
       </nav>
 
       {/* Anchored Theme Toggle */}
-      <div className="mt-auto pt-4 border-t border-slate-200 dark:border-[#2e3340] flex flex-col gap-2">
+      <div className="mt-auto pt-4 pb-4 border-t border-slate-200 dark:border-[#2e3340] flex flex-col gap-2 relative z-10">
         <p className="text-[11px] font-medium text-slate-500 dark:text-zinc-400 px-1">
           Theme
         </p>

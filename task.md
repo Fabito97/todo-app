@@ -530,9 +530,9 @@ definitions, the API contract, and the data model live in
 
 ## V1.4 Slice 05: Finish version 1.4
 
-- [ ] Run `npm run verify && npm run e2e`
-- [ ] Run `/finish 1.4` — audit, documentation updates, and release notes
-- [ ] Human reviews output, merges branch to `main`, and tags `v1.4`
+- [x] Run `npm run verify && npm run e2e`
+- [x] Run `/finish 1.4` — audit, documentation updates, and release notes
+- [x] Human reviews output, merges branch to `main`, and tags `v1.4`
 
 **Acceptance criteria**
 

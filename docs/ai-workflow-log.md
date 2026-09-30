@@ -198,3 +198,13 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Review**: In-session review by autopilot; verified 7-column month grid (`Sun–Sat`) with month/year heading, previous/next month navigation buttons, `Today` jump button, today date highlight in indigo, selected date ring, and task count indicator dots (rose for high priority, indigo for default). Verified side-by-side Daily Schedule panel with independent panel scrolling (`overflow-y-auto`) showing time-blocked schedule slots and all-day / unscheduled tasks with toggle and details actions.
 - **Bug or issue caught**: In `CalendarView.test.tsx`, querying `getByText("30")` was ambiguous because August 30 was present in leading days of September 2026; resolved by asserting text within the button matching `todayStr`.
 - **Rule or prompt improvement**: None.
+
+## 2026-09-30 - V1.4 Slice 05: Finish version 1.4
+- **Commit**: `docs(v1.4): update README, test suite, and finish version 1.4 audit`
+- **Key prompt or instruction**: "/finish 1.4" via "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), unit/component tests (103 pass across 22 test files in `test/`), end-to-end Playwright tests (12 pass across 2 test files in `e2e/`), post-task full gate (`GATE PASSED (full)`).
+- **Review**: In-session review by autopilot; verified that all acceptance criteria across Version 1.4 slices are implemented and tested, `README.md` documents all V1.4 features, no leftover `TODO|FIXME|console.log`, `.env` / database files are uncommitted, and all tests pass with zero flakiness.
+- **Bug or issue caught**: Fixed Next.js dev overlay pointer interception on theme toggle by adding `devIndicators: false` in `next.config.ts` and bottom spacing/z-index in `SidebarNav.tsx`. Scoped `listitem` Playwright queries to `region` with name `Task list board`.
+- **Rule or prompt improvement**: None.
+
