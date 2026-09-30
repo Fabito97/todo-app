@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { X } from "lucide-react";
 import { CreateTodoInput, Priority } from "@/lib/schemas";
 
 interface AddTaskModalProps {
@@ -122,15 +123,7 @@ function AddTaskModalContent({
             aria-label="Close dialog"
             className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 cursor-pointer"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X aria-hidden="true" className="w-5 h-5" />
           </button>
         </div>
 

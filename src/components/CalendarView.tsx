@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Todo } from "@/lib/schemas";
 
 interface CalendarViewProps {
@@ -203,9 +204,7 @@ export function CalendarView({
               aria-label="Previous month"
               className="p-1.5 rounded-xl border border-slate-200 dark:border-[#2e3340] text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
-              </svg>
+              <ChevronLeft aria-hidden="true" className="w-4 h-4" />
             </button>
             <button
               type="button"
@@ -221,9 +220,7 @@ export function CalendarView({
               aria-label="Next month"
               className="p-1.5 rounded-xl border border-slate-200 dark:border-[#2e3340] text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
-              </svg>
+              <ChevronRight aria-hidden="true" className="w-4 h-4" />
             </button>
           </div>
         </div>

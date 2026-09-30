@@ -249,3 +249,12 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Review**: `project-auditor` audit completed. All requirements in `requirements.md`, `implementation_plan.md`, and `task.md` for Version 2 verified. Zero leftovers of `TODO`, `FIXME`, or `console.log`. Zero tracked `.env` or `.db` files. `README.md` comprehensively updated for Version 2 (Neon PostgreSQL, Drizzle ORM, Route Handlers, environment variables, migrations, API spec).
 - **Bug or issue caught**: None.
 - **Rule or prompt improvement**: None.
+
+## 2026-09-30 - V2.1 Slice 01: Lucide React iconography & Tasks Board toolbar search and category filter
+- **Commit**: `feat(v2.1): add lucide-react icons, tasks board search, and category filter`
+- **Key prompt or instruction**: "/autopilot 2.1"
+- **Human decision or correction**: Approved requirements and plan for Version 2.1.
+- **Checks run**: lint (pass), typecheck (pass), tests (160 pass across 26 test files in `test/`), verify gate (pass).
+- **Review**: In-session review by autopilot; verified `lucide-react` icons render cleanly without emojis across all navigation, modals, and views; verified real-time search input (`aria-label="Search tasks"`) filtering against title and description; verified category filter dropdown (`aria-label="Filter by category"`); verified `src/lib/date-utils.ts` and test suite.
+- **Bug or issue caught**: ContentHeader CTA button retained `+ New Task` text with Lucide `Plus` icon for accessibility and test suite alignment.
+- **Rule or prompt improvement**: None.

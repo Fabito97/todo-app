@@ -131,6 +131,43 @@ describe("useTodos", () => {
     ]);
   });
 
+  it("filters todos by searchTerm matching title or description case-insensitively", async () => {
+    await todoService.create({ title: "Fix authentication bug", description: "Session cookie expires too early" });
+    await todoService.create({ title: "Write unit tests", description: "Cover database queries" });
+    await todoService.create({ title: "Update README", description: "Document auth flow" });
+
+    const { result } = renderHook(() => useTodos());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.todos).toHaveLength(3);
+
+    // Search by title match
+    act(() => {
+      result.current.setSearchTerm("README");
+    });
+    expect(result.current.todos).toHaveLength(1);
+    expect(result.current.todos[0].title).toBe("Update README");
+
+    // Search by description match (cookie)
+    act(() => {
+      result.current.setSearchTerm("cookie");
+    });
+    expect(result.current.todos).toHaveLength(1);
+    expect(result.current.todos[0].title).toBe("Fix authentication bug");
+
+    // Search matching multiple items (auth in title or description)
+    act(() => {
+      result.current.setSearchTerm("auth");
+    });
+    expect(result.current.todos).toHaveLength(2);
+
+    // Empty search restores all
+    act(() => {
+      result.current.setSearchTerm("");
+    });
+    expect(result.current.todos).toHaveLength(3);
+  });
+
   describe("error handling and resilience", () => {
     it("surfaces error message and clears loading when initial fetch fails", async () => {
       vi.spyOn(todoService, "list").mockRejectedValueOnce(new Error("Network connection lost"));

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Plus } from "lucide-react";
 import { Todo, Priority } from "@/lib/schemas";
 import { TodoFilter, SortOption } from "@/services";
 import { FilterBar } from "./FilterBar";
@@ -19,13 +20,15 @@ interface TasksViewProps {
   categoryFilter: string | "all";
   onCategoryFilterChange: (category: string | "all") => void;
   categories: string[];
+  searchTerm?: string;
+  onSearchChange?: (term: string) => void;
   sortBy: SortOption;
   onSortChange: (sort: SortOption) => void;
   onToggle: (id: string, completed: boolean) => void;
   onOpenEdit: (todo: Todo) => void;
   onOpenDetails: (todo: Todo) => void;
   onDelete: (id: string) => void;
-  onOpenNewTask: () => void;
+  onOpenNewTask?: () => void;
 }
 
 export function TasksView({
@@ -41,6 +44,8 @@ export function TasksView({
   categoryFilter,
   onCategoryFilterChange,
   categories,
+  searchTerm = "",
+  onSearchChange = () => {},
   sortBy,
   onSortChange,
   onToggle,
@@ -50,7 +55,9 @@ export function TasksView({
   onOpenNewTask,
 }: TasksViewProps) {
   const hasActiveFilters =
-    priorityFilter !== "all" || categoryFilter !== "all";
+    priorityFilter !== "all" ||
+    categoryFilter !== "all" ||
+    Boolean(searchTerm && searchTerm.trim().length > 0);
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
@@ -65,24 +72,17 @@ export function TasksView({
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={onOpenNewTask}
-          aria-label="Open new task modal from tasks view"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs cursor-pointer"
-        >
-          <svg
-            aria-hidden="true"
-            className="w-3.5 h-3.5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            viewBox="0 0 24 24"
+        {onOpenNewTask && (
+          <button
+            type="button"
+            onClick={onOpenNewTask}
+            aria-label="Open new task modal from tasks view"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs cursor-pointer transition-all"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-          <span>New Task</span>
-        </button>
+            <Plus aria-hidden="true" className="w-4 h-4 shrink-0 stroke-[2.5]" />
+            <span>+ New Task</span>
+          </button>
+        )}
       </div>
 
       {/* Main Task List Card */}
@@ -123,6 +123,8 @@ export function TasksView({
               categoryFilter={categoryFilter}
               onCategoryFilterChange={onCategoryFilterChange}
               categories={categories}
+              searchTerm={searchTerm}
+              onSearchChange={onSearchChange}
               sortBy={sortBy}
               onSortChange={onSortChange}
             />

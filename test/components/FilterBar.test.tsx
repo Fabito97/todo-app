@@ -124,6 +124,27 @@ describe("FilterBar", () => {
     expect(onSortChange).toHaveBeenCalledWith("dueDate");
   });
 
+  it("renders search input and calls onSearchChange", async () => {
+    const onSearchChange = vi.fn();
+    const user = userEvent.setup();
+
+    render(
+      <FilterBar
+        activeCount={3}
+        currentFilter="all"
+        searchTerm=""
+        onFilterChange={vi.fn()}
+        onSearchChange={onSearchChange}
+      />
+    );
+
+    const searchInput = screen.getByRole("textbox", { name: /search tasks/i });
+    expect(searchInput).toBeInTheDocument();
+
+    await user.type(searchInput, "deploy");
+    expect(onSearchChange).toHaveBeenCalled();
+  });
+
   it("hides 'Reset filters' when all filters are default and resets all active filters when clicked", async () => {
     const onFilterChange = vi.fn();
     const onPriorityFilterChange = vi.fn();

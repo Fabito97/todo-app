@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Search } from "lucide-react";
 import type { TodoFilter, SortOption } from "@/services";
 import type { Priority } from "@/lib/schemas";
 
@@ -13,6 +14,8 @@ interface FilterBarProps {
   categoryFilter?: string | "all";
   onCategoryFilterChange?: (category: string | "all") => void;
   categories?: string[];
+  searchTerm?: string;
+  onSearchChange?: (term: string) => void;
   sortBy?: SortOption;
   onSortChange?: (sort: SortOption) => void;
 }
@@ -39,59 +42,81 @@ export function FilterBar({
   categoryFilter = "all",
   onCategoryFilterChange = () => {},
   categories = [],
+  searchTerm = "",
+  onSearchChange = () => {},
   sortBy = "newest",
   onSortChange = () => {},
 }: FilterBarProps) {
   const hasActiveFilters =
     currentFilter !== "all" ||
     priorityFilter !== "all" ||
-    categoryFilter !== "all";
+    categoryFilter !== "all" ||
+    Boolean(searchTerm && searchTerm.trim().length > 0);
 
   const handleResetFilters = () => {
     onFilterChange("all");
     onPriorityFilterChange("all");
     onCategoryFilterChange("all");
+    onSearchChange("");
   };
 
   return (
     <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-[#2e3340] text-xs text-slate-500 dark:text-zinc-300">
-      {/* Top Row: Counter & Status Tabs */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <span className="font-medium">
-            {activeCount} {activeCount === 1 ? "item" : "items"} left
-          </span>
-          {hasActiveFilters && (
-            <button
-              type="button"
-              onClick={handleResetFilters}
-              aria-label="Reset filters"
-              className="px-2 py-0.5 rounded-md text-[11px] font-medium text-indigo-600 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors cursor-pointer"
-            >
-              Reset filters
-            </button>
-          )}
+      {/* Top Row: Search Input, Counter & Status Tabs */}
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        {/* Live Search Input */}
+        <div className="relative flex-1 min-w-[200px] max-w-md">
+          <Search
+            aria-hidden="true"
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-zinc-500 pointer-events-none"
+          />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder="Search tasks..."
+            aria-label="Search tasks"
+            className="w-full rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] pl-9 pr-3 py-1.5 text-xs text-slate-900 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+          />
         </div>
 
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-[#121316] border border-transparent dark:border-[#2e3340]">
-          {STATUS_FILTERS.map(({ label, value }) => {
-            const isSelected = currentFilter === value;
-            return (
+        <div className="flex items-center justify-between md:justify-end gap-3 flex-wrap">
+          <div className="flex items-center gap-2">
+            <span className="font-medium whitespace-nowrap">
+              {activeCount} {activeCount === 1 ? "item" : "items"} left
+            </span>
+            {hasActiveFilters && (
               <button
-                key={value}
                 type="button"
-                onClick={() => onFilterChange(value)}
-                aria-current={isSelected ? "page" : undefined}
-                className={`px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
-                  isSelected
-                    ? "bg-white dark:bg-[#22262f] text-slate-900 dark:text-zinc-100 shadow-xs"
-                    : "text-slate-600 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white"
-                }`}
+                onClick={handleResetFilters}
+                aria-label="Reset filters"
+                className="px-2 py-0.5 rounded-md text-[11px] font-medium text-indigo-600 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors cursor-pointer"
               >
-                {label}
+                Reset filters
               </button>
-            );
-          })}
+            )}
+          </div>
+
+          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-[#121316] border border-transparent dark:border-[#2e3340]">
+            {STATUS_FILTERS.map(({ label, value }) => {
+              const isSelected = currentFilter === value;
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => onFilterChange(value)}
+                  aria-current={isSelected ? "page" : undefined}
+                  className={`px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
+                    isSelected
+                      ? "bg-white dark:bg-[#22262f] text-slate-900 dark:text-zinc-100 shadow-xs"
+                      : "text-slate-600 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 

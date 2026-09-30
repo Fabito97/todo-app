@@ -10,6 +10,7 @@ export function useTodos() {
   const [filter, setFilter] = useState<TodoFilter>("all");
   const [priorityFilter, setPriorityFilter] = useState<Priority | "all">("all");
   const [categoryFilter, setCategoryFilter] = useState<string | "all">("all");
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -146,6 +147,16 @@ export function useTodos() {
       result = result.filter((t) => t.category === categoryFilter);
     }
 
+    // Filter by search term
+    if (searchTerm.trim()) {
+      const query = searchTerm.trim().toLowerCase();
+      result = result.filter(
+        (t) =>
+          t.title.toLowerCase().includes(query) ||
+          (t.description ? t.description.toLowerCase().includes(query) : false)
+      );
+    }
+
     // Sort
     const priorityWeights: Record<Priority, number> = {
       high: 3,
@@ -181,7 +192,7 @@ export function useTodos() {
       // Default / fallback to newest (createdAt descending)
       return b.createdAt.localeCompare(a.createdAt);
     });
-  }, [todos, filter, priorityFilter, categoryFilter, sortBy]);
+  }, [todos, filter, priorityFilter, categoryFilter, searchTerm, sortBy]);
 
   const activeCount = useMemo(() => {
     return todos.filter((t) => !t.completed).length;
@@ -196,6 +207,8 @@ export function useTodos() {
     setPriorityFilter,
     categoryFilter,
     setCategoryFilter,
+    searchTerm,
+    setSearchTerm,
     sortBy,
     setSortBy,
     categories,

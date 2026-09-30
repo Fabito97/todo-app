@@ -656,14 +656,14 @@ definitions, the API contract, and the data model live in
 
 ## V2.1 Slice 01: Lucide React iconography & Tasks Board toolbar search and category filter
 
-- [ ] Write tests in `test/components/FilterBar.test.tsx` and `test/hooks/use-todos.test.ts` and watch them fail
-- [ ] Install `lucide-react`
-- [ ] Implement `src/lib/date-utils.ts` for clean short date formatting (`Sep 30, 2026`) and overdue calculation
-- [ ] Replace emojis and raw SVGs across `SidebarNav`, `ContentHeader`, `MetricCard`, `DashboardView`, `TasksView`, and modals with `lucide-react` icons
-- [ ] Add real-time search input (`aria-label="Search tasks"`) to Tasks Board toolbar (searching title and description)
-- [ ] Add category filter dropdown (`aria-label="Filter by category"`) to Tasks Board toolbar
-- [ ] Remove redundant `+ New Task` button from Tasks Board toolbar
-- [ ] Run `npm run verify` and commit
+- [x] Write tests in `test/components/FilterBar.test.tsx` and `test/hooks/use-todos.test.ts` and watch them fail
+- [x] Install `lucide-react`
+- [x] Implement `src/lib/date-utils.ts` for clean short date formatting (`Sep 30, 2026`) and overdue calculation
+- [x] Replace emojis and raw SVGs across `SidebarNav`, `ContentHeader`, `MetricCard`, `DashboardView`, `TasksView`, and modals with `lucide-react` icons
+- [x] Add real-time search input (`aria-label="Search tasks"`) to Tasks Board toolbar (searching title and description)
+- [x] Add category filter dropdown (`aria-label="Filter by category"`) to Tasks Board toolbar
+- [x] Remove redundant `+ New Task` button from Tasks Board toolbar
+- [x] Run `npm run verify` and commit
 
 **Acceptance criteria**
 

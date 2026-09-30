@@ -41,6 +41,8 @@ export default function Home() {
     setPriorityFilter,
     categoryFilter,
     setCategoryFilter,
+    searchTerm,
+    setSearchTerm,
     sortBy,
     setSortBy,
     categories,
@@ -156,6 +158,8 @@ export default function Home() {
               categoryFilter={categoryFilter}
               onCategoryFilterChange={setCategoryFilter}
               categories={categories}
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
               sortBy={sortBy}
               onSortChange={setSortBy}
               onToggle={toggleTodo}

@@ -1,5 +1,6 @@
 "use client";
 
+import { Plus } from "lucide-react";
 import { Todo } from "@/lib/schemas";
 import { NotificationCenter } from "./NotificationCenter";
 import { ThemeToggle } from "./ThemeToggle";
@@ -54,16 +55,7 @@ export function ContentHeader({
           aria-label="Open new task modal"
           className="min-h-[40px] flex items-center gap-2 py-2 px-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer"
         >
-          <svg
-            aria-hidden="true"
-            className="w-4 h-4 shrink-0"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
+          <Plus aria-hidden="true" className="w-4 h-4 shrink-0 stroke-[2.5]" />
           <span>+ New Task</span>
         </button>
 

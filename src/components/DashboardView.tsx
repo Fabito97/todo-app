@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { ClipboardList, Zap, CheckCircle2, Flame, Clock, Plus } from "lucide-react";
 import { Todo } from "@/lib/schemas";
 import { MetricCard } from "./MetricCard";
 
@@ -83,24 +84,28 @@ export function DashboardView({
           value={totalCount}
           sublabel={`${completionPercent}% done`}
           accent="total"
+          icon={<ClipboardList aria-hidden="true" className="w-4 h-4 text-slate-600 dark:text-zinc-400" />}
         />
         <MetricCard
           label="Active Tasks"
           value={activeCount}
           sublabel="tasks remaining"
           accent="active"
+          icon={<Zap aria-hidden="true" className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />}
         />
         <MetricCard
           label="Completed"
           value={completedCount}
           progress={completionPercent}
           accent="completed"
+          icon={<CheckCircle2 aria-hidden="true" className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />}
         />
         <MetricCard
           label="Critical Tasks"
           value={criticalCount}
           sublabel="high priority"
           accent="critical"
+          icon={<Flame aria-hidden="true" className="w-4 h-4 text-rose-600 dark:text-rose-400" />}
         />
       </div>
 
@@ -110,16 +115,7 @@ export function DashboardView({
         className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-2.5 shadow-md flex items-center gap-2"
       >
         <div className="pl-2 text-slate-400 dark:text-zinc-500">
-          <svg
-            aria-hidden="true"
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
+          <Plus aria-hidden="true" className="w-5 h-5" />
         </div>
         <input
           type="text"
@@ -216,8 +212,9 @@ export function DashboardView({
           className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-5 shadow-md space-y-3"
         >
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">
-              Important / Critical
+            <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100 flex items-center gap-1.5">
+              <Flame aria-hidden="true" className="w-4 h-4 text-rose-500 shrink-0" />
+              <span>Important / Critical</span>
             </h3>
             <span className="text-xs text-rose-600 dark:text-rose-400 font-semibold">
               {criticalTasks.length} active
@@ -277,8 +274,9 @@ export function DashboardView({
           className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-5 shadow-md space-y-3"
         >
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">
-              Recent Tasks
+            <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100 flex items-center gap-1.5">
+              <Clock aria-hidden="true" className="w-4 h-4 text-slate-500 dark:text-zinc-400 shrink-0" />
+              <span>Recent Tasks</span>
             </h3>
             <span className="text-xs text-slate-500 dark:text-zinc-400 font-medium">
               Latest 5

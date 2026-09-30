@@ -1,5 +1,7 @@
 "use client";
 
+import React from "react";
+import { LayoutDashboard, CheckSquare, Calendar, Check } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 
 export type WorkspaceView = "dashboard" | "tasks" | "calendar";
@@ -14,60 +16,17 @@ export function SidebarNav({ activeView, onSelectView }: SidebarNavProps) {
     {
       id: "dashboard",
       label: "Dashboard",
-      icon: (
-        <svg
-          aria-hidden="true"
-          className="w-5 h-5 shrink-0"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          viewBox="0 0 24 24"
-        >
-          <rect x="3" y="3" width="7" height="9" rx="1.5" />
-          <rect x="14" y="3" width="7" height="5" rx="1.5" />
-          <rect x="14" y="12" width="7" height="9" rx="1.5" />
-          <rect x="3" y="16" width="7" height="5" rx="1.5" />
-        </svg>
-      ),
+      icon: <LayoutDashboard aria-hidden="true" className="w-5 h-5 shrink-0" />,
     },
     {
       id: "tasks",
       label: "Tasks",
-      icon: (
-        <svg
-          aria-hidden="true"
-          className="w-5 h-5 shrink-0"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-          />
-        </svg>
-      ),
+      icon: <CheckSquare aria-hidden="true" className="w-5 h-5 shrink-0" />,
     },
     {
       id: "calendar",
       label: "Calendar",
-      icon: (
-        <svg
-          aria-hidden="true"
-          className="w-5 h-5 shrink-0"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          viewBox="0 0 24 24"
-        >
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-          <line x1="16" y1="2" x2="16" y2="6" />
-          <line x1="8" y1="2" x2="8" y2="6" />
-          <line x1="3" y1="10" x2="21" y2="10" />
-        </svg>
-      ),
+      icon: <Calendar aria-hidden="true" className="w-5 h-5 shrink-0" />,
     },
   ];
 
@@ -79,15 +38,7 @@ export function SidebarNav({ activeView, onSelectView }: SidebarNavProps) {
       {/* Brand logo & workspace title */}
       <div className="flex items-center gap-3 px-2 py-3 mb-4">
         <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-sm">
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
+          <Check aria-hidden="true" className="w-4 h-4 stroke-[3]" />
         </div>
         <div>
           <h2 className="text-sm font-bold text-slate-900 dark:text-zinc-100 leading-tight">

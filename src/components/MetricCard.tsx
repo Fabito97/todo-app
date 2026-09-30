@@ -10,6 +10,7 @@ interface MetricCardProps {
   sublabel?: string;
   progress?: number;
   accent?: MetricAccent;
+  icon?: React.ReactNode;
 }
 
 export function MetricCard({
@@ -18,6 +19,7 @@ export function MetricCard({
   sublabel,
   progress,
   accent = "total",
+  icon,
 }: MetricCardProps) {
   const accentClasses: Record<MetricAccent, string> = {
     total: "text-slate-700 dark:text-zinc-300",
@@ -32,9 +34,14 @@ export function MetricCard({
       className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-5 shadow-md flex flex-col justify-between min-h-[120px]"
     >
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-zinc-400">
-          {label}
-        </p>
+        <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
+          <span>{label}</span>
+          {icon && (
+            <span className="p-1 rounded-md bg-slate-100 dark:bg-[#22262f] text-slate-600 dark:text-zinc-400">
+              {icon}
+            </span>
+          )}
+        </div>
         <p
           className={`text-4xl font-extrabold tracking-tight mt-1 ${
             accentClasses[accent]
