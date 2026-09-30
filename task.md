@@ -398,12 +398,12 @@ definitions, the API contract, and the data model live in
 
 ## V1.3 Slice 04: Today's Dashboard, Interactive Calendar/Schedule View, and Notification Center
 
-- [ ] Write tests in `test/components/DashboardOverview.test.tsx`, `test/components/CalendarScheduleView.test.tsx`, `test/components/NotificationCenter.test.tsx`, `test/app/page.test.tsx`, and `e2e/todos.spec.ts` and watch them fail
-- [ ] Implement `src/components/DashboardOverview.tsx` (`design.md` §4.4): displays **Tasks for the Day** (`aria-label="Tasks for the day"`, items where `dueDate === today`, ordered by `startTime`, with time-block pills and completion checkboxes) alongside daily metrics (**Total**, **Active**, **Completed**, **Due Today**) and the completion `role="progressbar"`
-- [ ] Implement `src/components/CalendarScheduleView.tsx` (`design.md` §4.5): interactive date navigation (`Previous day`, `Today`, `Next day`, date picker `aria-label="Select schedule date"`, and 7-day week strip) + daily schedule separating **Time-Blocked Schedule** slots (`startTime – endTime`) from **All-Day / Unscheduled Tasks** for the selected date
-- [ ] Implement `src/components/NotificationCenter.tsx` (`design.md` §4.6): header notification button (`aria-label="Notifications"`) with active count badge for **Overdue** and **Today's Scheduled** incomplete tasks, opening an accessible `Notifications panel` popover (`role="region"`, `aria-label="Notifications panel"`)
-- [ ] Update `src/app/page.tsx` (`design.md` §3) to integrate `NotificationCenter` in the header, `DashboardOverview`, and workspace view tabs (**Tasks**, **Calendar & Schedule**, **Split View**)
-- [ ] Run `npm run verify && npm run e2e` and commit
+- [x] Write tests in `test/components/DashboardOverview.test.tsx`, `test/components/CalendarScheduleView.test.tsx`, `test/components/NotificationCenter.test.tsx`, `test/app/page.test.tsx`, and `e2e/todos.spec.ts` and watch them fail
+- [x] Implement `src/components/DashboardOverview.tsx` (`design.md` §4.4): displays **Tasks for the Day** (`aria-label="Tasks for the day"`, items where `dueDate === today`, ordered by `startTime`, with time-block pills and completion checkboxes) alongside daily metrics (**Total**, **Active**, **Completed**, **Due Today**) and the completion `role="progressbar"`
+- [x] Implement `src/components/CalendarScheduleView.tsx` (`design.md` §4.5): interactive date navigation (`Previous day`, `Today`, `Next day`, date picker `aria-label="Select schedule date"`, and 7-day week strip) + daily schedule separating **Time-Blocked Schedule** slots (`startTime – endTime`) from **All-Day / Unscheduled Tasks** for the selected date
+- [x] Implement `src/components/NotificationCenter.tsx` (`design.md` §4.6): header notification button (`aria-label="Notifications"`) with active count badge for **Overdue** and **Today's Scheduled** incomplete tasks, opening an accessible `Notifications panel` popover (`role="region"`, `aria-label="Notifications panel"`)
+- [x] Update `src/app/page.tsx` (`design.md` §3) to integrate `NotificationCenter` in the header, `DashboardOverview`, and workspace view tabs (**Tasks**, **Calendar & Schedule**, **Split View**)
+- [x] Run `npm run verify && npm run e2e` and commit
 
 **Acceptance criteria**
 

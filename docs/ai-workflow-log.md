@@ -144,3 +144,12 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Review**: In-session review by autopilot; verified accessible modal dialog (`role="dialog"`, `aria-modal="true"`, `aria-label="Task details and schedule"`), `Escape` and `Close modal` handlers, `Start time` / `End time` inputs and validation alert, `TodoItem` time-block badge (`09:00 – 10:30`), and demarcated Quick Command card in `src/app/page.tsx`.
 - **Bug or issue caught**: Preserved backward compatibility with existing tests by only including `startTime` and `endTime` in payloads when set or previously defined on the todo.
 - **Rule or prompt improvement**: None.
+
+## 2026-09-30 - V1.3 Slice 04: Today's Dashboard, Interactive Calendar/Schedule View, and Notification Center
+- **Commit**: `feat(v1.3): add Today's Dashboard, CalendarScheduleView, NotificationCenter, and view switcher`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (70 pass across 12 test files in `test/`), e2e (12 pass).
+- **Review**: In-session review by autopilot; verified `DashboardOverview` (**Tasks for the Day** ordered by `startTime`), `CalendarScheduleView` (date navigation, 7-day strip, time-blocked vs all-day slots), `NotificationCenter` (overdue + today's reminders popover), and workspace view tabs (`Tasks`, `Calendar & Schedule`, `Split View`).
+- **Bug or issue caught**: Controlled `<input type="date">` in `CalendarScheduleView` needed `onChange={(e) => setSelectedDate(e.target.value)}` without guarding on `if (e.target.value)` so `userEvent.clear` followed by `userEvent.type` could update the date cleanly in tests.
+- **Rule or prompt improvement**: None.

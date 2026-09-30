@@ -110,6 +110,36 @@ describe("Home page resilience", () => {
       expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "100");
     });
   });
+
+  it("integrates Today's Dashboard, Notification Center, and workspace view switching", async () => {
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const user = userEvent.setup();
+    render(<Home />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("textbox", { name: /todo title/i })).toBeInTheDocument();
+    });
+
+    await user.type(screen.getByRole("textbox", { name: /todo title/i }), "Today Strategy Sync");
+    await user.click(screen.getByRole("button", { name: /toggle details/i }));
+    await user.type(screen.getByLabelText(/due date/i), todayStr);
+    await user.type(screen.getByLabelText(/start time/i), "10:00");
+    await user.type(screen.getByLabelText(/end time/i), "11:00");
+    await user.click(screen.getByRole("button", { name: /add todo/i }));
+
+    // Appears in Today's Dashboard
+    const todayRegion = screen.getByRole("region", { name: /tasks for the day/i });
+    expect(todayRegion).toHaveTextContent("Today Strategy Sync");
+    expect(todayRegion).toHaveTextContent("10:00 – 11:00");
+
+    // Notification Center badge shows 1
+    const bellBtn = screen.getByRole("button", { name: /notifications/i });
+    expect(bellBtn).toHaveTextContent("1");
+
+    // Switch to Calendar & Schedule view
+    await user.click(screen.getByRole("button", { name: /calendar & schedule view/i }));
+    const calendarRegion = screen.getByRole("region", { name: /time-blocked schedule/i });
+    expect(calendarRegion).toHaveTextContent("Today Strategy Sync");
+    expect(calendarRegion).toHaveTextContent("10:00 – 11:00");
+  });
 });
-
-

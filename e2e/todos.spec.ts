@@ -337,6 +337,48 @@ test.describe.serial("Todo App", () => {
     await expect(page.getByText("Dashboard Task 1")).toBeVisible();
     await expect(page.getByText("Dashboard Task 2")).toBeVisible();
   });
+
+  test("creates a time-blocked task for today via the modal composer and verifies Today's Dashboard, Calendar & Schedule view, and Notification Center", async ({ page }) => {
+    const todayStr = new Date().toISOString().slice(0, 10);
+
+    const titleInput = page.getByRole("textbox", { name: /todo title/i });
+    await titleInput.fill("Product Roadmap Time-Block");
+
+    await page.getByRole("button", { name: /toggle details/i }).click();
+    const dialog = page.getByRole("dialog", { name: /task details and schedule/i });
+    await expect(dialog).toBeVisible();
+
+    await dialog.getByLabel(/due date/i).fill(todayStr);
+    await dialog.getByLabel(/start time/i).fill("09:30");
+    await dialog.getByLabel(/end time/i).fill("11:00");
+    await page.getByRole("button", { name: /add todo/i }).click();
+
+    // Close modal via Close modal button
+    await dialog.getByRole("button", { name: /close modal/i }).click();
+    await expect(dialog).not.toBeVisible();
+
+    // 1. Appears in Today's Dashboard
+    const todayRegion = page.getByRole("region", { name: /tasks for the day/i });
+    await expect(todayRegion).toContainText("Product Roadmap Time-Block");
+    await expect(todayRegion).toContainText("09:30 – 11:00");
+
+    // 2. Notification Center shows active reminder
+    const bellBtn = page.getByRole("button", { name: /notifications/i });
+    await expect(bellBtn).toContainText("1");
+    await bellBtn.click();
+    const notifPanel = page.getByRole("region", { name: /notifications panel/i });
+    await expect(notifPanel).toContainText("Product Roadmap Time-Block");
+
+    // 3. Switch to Calendar & Schedule view and verify time-blocked slot
+    await page.getByRole("button", { name: /calendar & schedule view/i }).click();
+    const scheduleRegion = page.getByRole("region", { name: /time-blocked schedule/i });
+    await expect(scheduleRegion).toContainText("Product Roadmap Time-Block");
+    await expect(scheduleRegion).toContainText("09:30 – 11:00");
+
+    // 4. Reload and verify persistence
+    await page.reload();
+    await expect(page.getByRole("region", { name: /tasks for the day/i })).toContainText(
+      "Product Roadmap Time-Block"
+    );
+  });
 });
-
-

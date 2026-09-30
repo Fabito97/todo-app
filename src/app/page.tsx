@@ -1,12 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import { useTodos } from "@/hooks/use-todos";
 import { AddTodoForm } from "@/components/AddTodoForm";
 import { TodoList } from "@/components/TodoList";
 import { FilterBar } from "@/components/FilterBar";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { DashboardOverview } from "@/components/DashboardOverview";
+import { CalendarScheduleView } from "@/components/CalendarScheduleView";
+import { NotificationCenter } from "@/components/NotificationCenter";
+
+type WorkspaceView = "tasks" | "calendar" | "split";
 
 export default function Home() {
+  const [viewMode, setViewMode] = useState<WorkspaceView>("tasks");
+
   const {
     todos,
     allTodos,
@@ -32,14 +40,9 @@ export default function Home() {
   const hasActiveFilters =
     priorityFilter !== "all" || categoryFilter !== "all";
 
-  const totalCount = allTodos.length;
-  const completedCount = totalCount - activeCount;
-  const completionPercentage =
-    totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-[#121316] py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className={`${viewMode === "split" ? "max-w-5xl" : "max-w-2xl"} mx-auto space-y-6`}>
         <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="space-y-1 text-center sm:text-left">
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-600 dark:from-white dark:via-zinc-100 dark:to-indigo-400 bg-clip-text text-transparent">
@@ -49,47 +52,14 @@ export default function Home() {
               Plan your tasks, daily schedule, and time blocks
             </p>
           </div>
-          <div className="flex justify-center sm:justify-end">
+          <div className="flex items-center justify-center sm:justify-end gap-2.5">
+            <NotificationCenter todos={allTodos} />
             <ThemeToggle />
           </div>
         </header>
 
-        {/* Dashboard Progress & Stat Summary */}
-        <section
-          aria-label="Task progress summary"
-          className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-4 sm:p-5 shadow-md shadow-slate-200/40 dark:shadow-black/40 space-y-3"
-        >
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2 text-xs font-medium">
-              <span className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-[#22262f] text-slate-700 dark:text-zinc-200 border border-slate-200 dark:border-[#2e3340]">
-                Total: <strong className="font-semibold">{totalCount}</strong>
-              </span>
-              <span className="px-2.5 py-1 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-800">
-                Active: <strong className="font-semibold">{activeCount}</strong>
-              </span>
-              <span className="px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
-                Completed: <strong className="font-semibold">{completedCount}</strong>
-              </span>
-            </div>
-            <span className="text-xs font-semibold text-slate-600 dark:text-zinc-300">
-              {completionPercentage}% done
-            </span>
-          </div>
-
-          <div
-            role="progressbar"
-            aria-label="Task completion progress"
-            aria-valuenow={completionPercentage}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            className="w-full h-2 rounded-full bg-slate-100 dark:bg-[#22262f] overflow-hidden"
-          >
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-emerald-500 transition-all duration-300"
-              style={{ width: `${completionPercentage}%` }}
-            />
-          </div>
-        </section>
+        {/* Today's Dashboard & Progress Summary */}
+        <DashboardOverview todos={allTodos} onToggle={toggleTodo} />
 
         {storageNotice && (
           <div
@@ -120,47 +90,108 @@ export default function Home() {
           <AddTodoForm onAdd={addTodo} />
         </section>
 
-        {/* Task Board Card */}
-        <section
-          aria-label="Task list board"
-          className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-6 shadow-md shadow-slate-200/40 dark:shadow-black/40 space-y-6"
+        {/* Workspace View Switcher */}
+        <div
+          role="group"
+          aria-label="Workspace view"
+          className="inline-flex items-center gap-1 rounded-xl border border-slate-200 dark:border-[#2e3340] bg-white dark:bg-[#1a1d24] p-1 shadow-xs"
         >
-          {error && (
-            <div
-              role="alert"
-              className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-xs text-rose-600 dark:text-rose-300"
+          <button
+            type="button"
+            onClick={() => setViewMode("tasks")}
+            aria-label="Tasks view"
+            aria-pressed={viewMode === "tasks"}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              viewMode === "tasks"
+                ? "bg-indigo-600 text-white shadow-xs"
+                : "text-slate-600 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#22262f]"
+            }`}
+          >
+            Tasks
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("calendar")}
+            aria-label="Calendar & Schedule view"
+            aria-pressed={viewMode === "calendar"}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              viewMode === "calendar"
+                ? "bg-indigo-600 text-white shadow-xs"
+                : "text-slate-600 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#22262f]"
+            }`}
+          >
+            Calendar &amp; Schedule
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("split")}
+            aria-label="Split View"
+            aria-pressed={viewMode === "split"}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              viewMode === "split"
+                ? "bg-indigo-600 text-white shadow-xs"
+                : "text-slate-600 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#22262f]"
+            }`}
+          >
+            Split View
+          </button>
+        </div>
+
+        {/* Workspace Content */}
+        <div
+          className={
+            viewMode === "split"
+              ? "grid grid-cols-1 lg:grid-cols-2 gap-6 items-start"
+              : "space-y-6"
+          }
+        >
+          {(viewMode === "tasks" || viewMode === "split") && (
+            <section
+              aria-label="Task list board"
+              className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-6 shadow-md shadow-slate-200/40 dark:shadow-black/40 space-y-6"
             >
-              {error}
-            </div>
+              {error && (
+                <div
+                  role="alert"
+                  className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-xs text-rose-600 dark:text-rose-300"
+                >
+                  {error}
+                </div>
+              )}
+
+              <div>
+                <TodoList
+                  todos={todos}
+                  loading={loading}
+                  filter={filter}
+                  hasActiveFilters={hasActiveFilters}
+                  onToggle={toggleTodo}
+                  onEdit={editTodo}
+                  onDelete={deleteTodo}
+                />
+              </div>
+
+              {!loading && (
+                <FilterBar
+                  activeCount={activeCount}
+                  currentFilter={filter}
+                  onFilterChange={setFilter}
+                  priorityFilter={priorityFilter}
+                  onPriorityFilterChange={setPriorityFilter}
+                  categoryFilter={categoryFilter}
+                  onCategoryFilterChange={setCategoryFilter}
+                  categories={categories}
+                  sortBy={sortBy}
+                  onSortChange={setSortBy}
+                />
+              )}
+            </section>
           )}
 
-          <div>
-            <TodoList
-              todos={todos}
-              loading={loading}
-              filter={filter}
-              hasActiveFilters={hasActiveFilters}
-              onToggle={toggleTodo}
-              onEdit={editTodo}
-              onDelete={deleteTodo}
-            />
-          </div>
-
-          {!loading && (
-            <FilterBar
-              activeCount={activeCount}
-              currentFilter={filter}
-              onFilterChange={setFilter}
-              priorityFilter={priorityFilter}
-              onPriorityFilterChange={setPriorityFilter}
-              categoryFilter={categoryFilter}
-              onCategoryFilterChange={setCategoryFilter}
-              categories={categories}
-              sortBy={sortBy}
-              onSortChange={setSortBy}
-            />
+          {(viewMode === "calendar" || viewMode === "split") && (
+            <CalendarScheduleView todos={allTodos} onToggle={toggleTodo} />
           )}
-        </section>
+        </div>
       </div>
     </main>
   );
