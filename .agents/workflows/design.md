@@ -1,0 +1,13 @@
+---
+description: Design the UI for one version. Produce design.md (and an optional mockup), verify contrast, then wait for the human's approval
+---
+1. Adopt the `ui-designer` skill. Read `.agents/rules/nextjs-todo.md`, `requirements.md`, and, if they exist, `implementation_plan.md`, `task.md`, `design.md`, and the existing UI under `src/components` and `src/app`. If `requirements.md` is missing, tell the human to run `/spec` first and stop.
+2. Decide which version you are designing: the number the human passed (for example `/design 1.1`), otherwise the lowest-numbered version whose design line is missing or not `APPROVED`. Say which one you chose.
+3. If the human has a preference (visual tone, brand colour, dark mode), use it. Otherwise ask up to three questions, ONE at a time, and always offer a default so the human can answer "use defaults". Typical questions: overall tone, accent colour, dark mode in or out.
+4. Write or update `design.md` in the project root using the structure in the skill. Keep one design line per version at the very top (`Design V1: DRAFT`, ...). For a later version, add and change only what that version needs, and do not rewrite approved earlier sections except to extend the tokens.
+5. Verify every colour pair with `node .agents/hooks/contrast.js <foreground-hex> <background-hex>`. Record each ratio in the accessibility checklist and fix any pair that fails.
+6. If the human asked for a mockup, or a browser tool is available, create `design/mockups/v<version>.html`, view it, and capture a screenshot. If you could not view it, say so.
+7. Self-check before presenting: every component the version's slices need is specified with all its states, no meaning depends on colour alone, keyboard behaviour has no conflicts (for example Enter in a textarea), and nothing in the design needs a new dependency.
+8. Present a short summary: the token table, the list of components, the mockup path or a wireframe, the contrast results, the "Suggested plan changes", and the open decisions. **STOP and wait.** Apply the human's comments and re-present, keeping the status as `DRAFT`.
+9. Only when the human explicitly says the design for that version is approved, change its line to `Design V<n>: APPROVED by human on <YYYY-MM-DD>`. Never write this line on your own initiative.
+10. Tell the human to commit the design files (`git add -A && git commit -m "docs: design for v<n>"`). Then say what comes next: if "Suggested plan changes" is not empty, or no plan exists for this version yet, run `/plan <n>` (running it again resets an already approved plan, which is expected); if the plan for this version is already approved and nothing needs changing, run `/autopilot` or, step by step, `/slice`.

@@ -9,4 +9,4 @@ description: Turn the project idea into requirements.md, including the version r
 5. Ask only about genuinely unresolved decisions, ONE question at a time (for example: extra features, whether a later version adds accounts, deployment target).
 6. Summarize back to the human, in under 25 lines: (a) the version table, (b) the core features, and (c) a **structure preview**, meaning the `src/` folders and the `TodoService` idea from the rules file, in a few lines. Ask for approval.
 7. On approval, write or update `requirements.md` in the project root with the sections Goal, Versions, Core Features (say which version each belongs to when it is not all of them), Tech Stack per version, Architecture Principle, Constraints, and **Out of Scope**.
-8. Do not write code. Tell the human to run `/plan` next.
+8. Do not write code. Tell the human to commit `requirements.md` (`git add -A && git commit -m "docs: requirements for v<n>"`), then what comes next: if this version adds or changes screens (almost always), run `/design <n>` (optional but recommended) and then `/plan <n>`; if it changes no UI, go straight to `/plan <n>`.

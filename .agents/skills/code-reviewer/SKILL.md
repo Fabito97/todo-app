@@ -53,6 +53,9 @@ Check every item. Mark each as PASS, FAIL, or N/A with evidence (file and line).
    - Are business rules (trim, length) in `schemas.ts` rather than only in a form?
    - Is every `TodoService` method async, and does each implementation pass the shared contract suite?
    - Could the next version swap the implementation by adding files and changing `src/services/index.ts` only? Name anything that would force a component or hook change.
+12. **Design conformity** (UI changes only)
+   - If `design.md` is approved for this version, does the UI use its tokens, component states, and copy? Flag invented colours or spacing.
+   - Is any meaning carried by colour alone? Does every control have an accessible name, a visible focus style, and keyboard support, and does Enter behave sensibly in multi-line fields?
 
 ## Output: `review.md`
 

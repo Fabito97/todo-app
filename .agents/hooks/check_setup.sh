@@ -15,6 +15,7 @@ for f in AGENTS.md \
          .agents/rules/nextjs-todo.md \
          .agents/workflows/spec.md .agents/workflows/plan.md \
          .agents/workflows/slice.md .agents/workflows/autopilot.md \
+         .agents/workflows/design.md .agents/skills/ui-designer/SKILL.md \
          .agents/hooks/post_task.sh \
          .agents/templates/todo-nextjs/requirements.md \
          .agents/templates/todo-nextjs/task.md; do
@@ -46,6 +47,7 @@ else
   echo "  not yet  requirements.md (/spec creates it from the built-in template)"
 fi
 [ -f task.md ] && ok "task.md" || echo "  not yet  task.md (/plan creates it)"
+[ -f design.md ] && ok "design.md" || echo "  not yet  design.md (/design creates it; optional)"
 [ -f implementation_plan.md ] && ok "implementation_plan.md" || echo "  not yet  implementation_plan.md (/plan creates it)"
 
 echo

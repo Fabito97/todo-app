@@ -91,6 +91,12 @@ Consequences you must respect:
 - Terminal safety: no `rm -rf` outside `.scaffold_tmp`, `.next`, `node_modules`, `test-results`, and `playwright-report`. Ask before deleting anything else.
 - Record decisions and caught bugs with the `/log` workflow.
 
+## Design
+
+- If `design.md` exists and the version being built has `Design V<n>: APPROVED by human`, read it before touching any UI and follow it: use its tokens, component specs, and copy, and do not invent colours, spacing, or wording that it defines. If that version's design is not approved, use plain Tailwind defaults and keep the UI simple.
+- Never edit `design.md` or the `design/` folder during a build. Only the `/design` workflow changes them.
+- These hold with or without a design: every control has an accessible name and a visible focus style, everything works by keyboard, and meaning is never carried by colour alone (always add a text label or icon alternative).
+
 ## Approval and autonomy
 
 - Only the human approves a version's plan. Approval is recorded as a line in `implementation_plan.md`: `Status V<n>: APPROVED by human on <date>`. Never write that line without an explicit approval message from the human in chat, and never edit `requirements.md` or `implementation_plan.md` during a build.

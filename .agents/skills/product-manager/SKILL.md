@@ -38,4 +38,4 @@ Once the user approves the synthesis, you must:
    - `## Tech Stack`: The agreed-upon technologies.
    - `## Constraints`: Any hard limitations for the downstream builder skills.
 3. **Licensing**: Generate a `LICENSE` file in the project space containing the text of their chosen license.
-4. **Handoff**: Tell the user that the requirements have been defined, and explicitly instruct them to: *"Equip the `team-lead-orchestrator` to read the `requirements.md` and begin architectural planning."*
+4. **Handoff**: Tell the user the requirements are defined and ask them to commit `requirements.md`. Then name the next step: `/design <n>` (optional, when the version adds or changes screens) and then `/plan <n>`, which uses the `team-lead-orchestrator`. Do not start planning or designing yourself.

@@ -13,7 +13,7 @@ Read `.agents/rules/nextjs-todo.md` first. The plan must not contradict it, in p
 ## Your Responsibilities
 
 1. **Ingest Requirements**
-   - Read `requirements.md` thoroughly, including the Versions section. If anything is vague or contradictory, ask clarifying questions before planning. List unresolved decisions explicitly instead of silently picking defaults.
+   - Read `requirements.md` thoroughly, including the Versions section. If `design.md` exists, read it too: it describes how the UI should look and behave, and it may list "Suggested plan changes" that you must either include in the plan or raise as open decisions. Never edit `design.md`. If anything is vague or contradictory, ask clarifying questions before planning. List unresolved decisions explicitly instead of silently picking defaults.
 
 2. **Produce `implementation_plan.md`** in the project root.
    - The first lines are one status line per version in `requirements.md`, for example:
@@ -56,6 +56,7 @@ Read `.agents/rules/nextjs-todo.md` first. The plan must not contradict it, in p
    - The last slice of every version is a `Finish version <n>` slice that runs `/finish`.
    - Mark a slice `(optional)` in its title when the human may not want it. Autopilot skips optional slices.
    - Every slice ends with a run-checks item, and every acceptance criterion must be testable.
+   - When a design exists, UI slices refer to its component names, states, copy, and keyboard behaviour in their acceptance criteria instead of inventing details. If the design needs a slice of its own (for example applying the design tokens before any component work), add it.
    - For Version 2 and later, at least one acceptance criterion must state that components and hooks are unchanged, and how that is checked (for example, `git diff` shows nothing under `src/components` or `src/hooks`).
 
 4. **Get Approval**

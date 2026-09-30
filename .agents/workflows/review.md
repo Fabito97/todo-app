@@ -9,4 +9,4 @@ description: Fresh-eyes review of the current slice's diff against the spec, con
 4. Run `bash .agents/hooks/post_task.sh incremental-orchestrator full` and record the result. Do not fix failures.
 5. Work through the full review checklist. For each new test file, name one deliberate breakage of the implementation that the tests should catch, and check the test would really fail.
 6. Write `review.md` in the required format. Do not modify source code, tests, or config.
-7. Give the human the verdict and the blocking findings in five lines or fewer. The human decides which findings go back to the builder.
+7. Give the human the verdict and the blocking findings in five lines or fewer. The human decides which findings go back to the builder. Then tell the human what comes next: on `REQUEST CHANGES`, take the blocking findings back to the builder conversation and run `/review` again in a fresh conversation afterwards; on `APPROVE` or `APPROVE WITH NITS`, merge the branch into `main` themselves, then run `/slice` for the next slice, `/finish <n>` when every slice of the version is done, or `/autopilot` for the rest.

@@ -16,6 +16,7 @@ Read these before making changes. When they disagree, the higher item wins.
 2. `.agents/rules/nextjs-todo.md`: stack, coding, testing, and git rules. This is the full rulebook.
 3. `implementation_plan.md`: architecture, the `TodoService` interface, and the API contract. A version may only be built when its line reads `Status V<n>: APPROVED by human on <date>`.
 4. `requirements.md` and `task.md`: scope, slices, and acceptance criteria.
+5. `design.md` (optional): tokens, layouts, and component specs for the UI. Follow it only for a version whose line reads `Design V<n>: APPROVED by human on <date>`.
 
 All of these files live in the project root, next to `package.json`. They are documents, not source code. Never put them in the Next.js `app/` folder.
 
@@ -83,8 +84,8 @@ Notes for tools other than Antigravity:
 
 **Two ways to build**
 
-- **Step by step**: `spec`, `plan`, `bootstrap`, then `slice` and `review` for every slice, then `finish`. You approve each slice.
-- **Hands-off**: `spec`, `plan` (the human approves the plan for the version), then `autopilot`. It builds, tests, reviews, and audits **one version** on a branch called `auto/v<n>`, then stops. Stopping earlier happens only when a human is genuinely needed. To do the next version, run `plan <n+1>` and then `autopilot` again.
+- **Step by step**: `spec`, optionally `design`, `plan`, `bootstrap`, then `slice` and `review` for every slice, then `finish`. You approve each slice.
+- **Hands-off**: `spec`, optionally `design`, `plan` (the human approves the plan for the version), then `autopilot`. It builds, tests, reviews, and audits **one version** on a branch called `auto/v<n>`, then stops. Stopping earlier happens only when a human is genuinely needed. To do the next version, run `plan <n+1>` and then `autopilot` again.
 
 | Command | File | Purpose |
 | :--- | :--- | :--- |
@@ -92,6 +93,7 @@ Notes for tools other than Antigravity:
 | `plan` | `.agents/workflows/plan.md` | Plans one version: `implementation_plan.md` and slice-based `task.md`; records approval |
 | `bootstrap` | `.agents/workflows/bootstrap.md` | Slice 0: scaffold and verification harness |
 | `slice` | `.agents/workflows/slice.md` | Build the next slice test-first with a verify gate |
+| `design` | `.agents/workflows/design.md` | Optional. Designs the UI for one version: `design.md` and an optional mockup; records approval |
 | `review` | `.agents/workflows/review.md` | Fresh-eyes review; writes `review.md`, changes no code |
 | `autopilot` | `.agents/workflows/autopilot.md` | Hands-off build of one approved version, then stops |
 | `verify` | `.agents/workflows/verify.md` | Run the full gate and report |
@@ -99,6 +101,23 @@ Notes for tools other than Antigravity:
 | `status-check` | `.agents/workflows/status-check.md` | Progress, gate health, next step |
 | `log` | `.agents/workflows/log.md` | Append to `docs/ai-workflow-log.md` |
 | `finish` | `.agents/workflows/finish.md` | Audit of one completed version and release notes |
+
+## What comes next
+
+Use this table to tell the human the right next command. `<n>` is the version being worked on.
+
+| Situation | Next command |
+| :--- | :--- |
+| No `requirements.md`, or a new version needs scoping | `/spec` |
+| Requirements ready, the version adds or changes screens, no approved design | `/design <n>` (optional), then `/plan <n>` |
+| Requirements (and design) ready, plan missing or not approved | `/plan <n>`, then approve it and commit the documents |
+| Plan approved, Version 1 not scaffolded | `/bootstrap` then `/slice`, or `/autopilot` |
+| Plan approved, version partly built | `/slice` (step by step) or `/autopilot` (hands-off) |
+| A slice is built but not reviewed | `/review` in a new conversation, then merge the branch |
+| Every slice of the version is ticked | `/finish <n>`, then merge and tag |
+| A version is finished and merged | `/spec` for the next version, then `/design`, `/plan` |
+| Something is broken | `/debug` |
+| Unsure where things stand | `/status-check` |
 
 ## Roles (skills)
 
@@ -108,6 +127,7 @@ Skills in `.agents/skills/<name>/SKILL.md` define roles. Use one role at a time,
 | :--- | :--- | :--- |
 | `product-manager` | Interviews the human, writes `requirements.md` | No |
 | `team-lead-orchestrator` | Architecture, API contract, `task.md` | No |
+| `ui-designer` | Tokens, layouts, component states, accessibility; writes `design.md` | No (docs and mockups only) |
 | `incremental-orchestrator` | Builds one slice with the test-first, gated loop | Yes |
 | `code-reviewer` | Reviews a diff, writes `review.md` | No |
 | `project-auditor` | Final completeness audit | No |
@@ -135,19 +155,9 @@ A slice is done only when all of these are true:
 - `.agents/templates/`: seed `requirements.md` and `task.md` that `spec` and `plan` copy into the project.
 - `.agents/hooks/`: `check_setup.sh` reports missing or outdated kit files. `post_task.sh` is the check gate the workflows call. `pre_task.sh` is not used by any workflow; ignore it.
 - `QUICKSTART.md`: beginner walkthrough. `PROMPTS.md`: prompts to copy for each stage.
-- `requirements.md`, `implementation_plan.md`, `task.md`: project documents in the root. `review.md` and `autopilot-report.md` are throwaway reports.
+- `requirements.md`, `implementation_plan.md`, `task.md`, `design.md`: project documents in the root. `design/mockups/` holds optional static mockups. `review.md` and `autopilot-report.md` are throwaway reports.
 - `docs/ai-workflow-log.md`: running log written after every slice by `log` (what was done, checks run, review result, bugs caught). `docs/autopilot-report-v<n>.md` is the autopilot's report for a finished version.
 
 ## When in doubt
 
 Prefer the smaller change, ask a question, and show evidence (test output, diff, error text) instead of asserting that something works.
-
-<!-- BEGIN:nextjs-agent-rules -->
-
-# This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
-
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
-
-<!-- END:nextjs-agent-rules -->

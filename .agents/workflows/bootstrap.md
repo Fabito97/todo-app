@@ -14,4 +14,4 @@ description: Version 1, Slice 00. Scaffold the Next.js app (with a src folder) a
 // turbo
 11. Run `bash .agents/hooks/post_task.sh incremental-orchestrator full`. It must pass.
 12. Check off V1 Slice 00 in `task.md`, make one commit per logical step using Conventional Commits (the last one includes the `task.md` update), then run the `/log` workflow, which commits its own entry.
-13. Summarize the result and **STOP**. Tell the human to review the diff and then run `/slice` for the next slice.
+13. Summarize the result and **STOP**. Tell the human to review the diff and merge `slice/v1-00-bootstrap` into `main` themselves (later slices branch from `main`). Then they continue with `/slice` for the next slice, or with `/autopilot` to build the rest of the version hands-off (it resumes from `task.md`).
