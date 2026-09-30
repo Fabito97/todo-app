@@ -1,6 +1,7 @@
 Status V1: APPROVED by human on 2026-09-29
 Status V1.1: APPROVED by human on 2026-09-29
 Status V1.2: APPROVED by human on 2026-09-29
+Status V1.3: APPROVED by human on 2026-09-30
 Status V2: DRAFT
 
 ---
@@ -14,6 +15,7 @@ The app is a Next.js App Router project with a strict `src/` layout for producti
 - In **Version 1** and **Version 1.1**, the UI runs entirely in the browser and delegates storage to `LocalTodoService`, which is the only module allowed to touch `localStorage`.
 - In **Version 1.1**, the data model and UI are enriched with `description`, `priority`, `dueDate`, and `category`, along with rich filtering/sorting and backwards compatibility with existing stored V1 data.
 - In **Version 1.2**, all Vitest test suites are relocated out of `src/` into a dedicated root-level `test/` folder, the dark mode palette is softened from harsh pitch-black (`#0a0a0a` / `zinc-950`) to a layered slate surface hierarchy (`#0f172a` / `slate-900` & `slate-800`) with an interactive **Theme Toggle** (**Light** / **Dark** / **System**), and the dashboard UI is redesigned with a completion progress bar, stat pills, a one-click **Reset Filters** control, and priority-accented todo cards.
+- In **Version 1.3**, the data model adds optional nullable `startTime` and `endTime` (`"HH:mm"` | `null`) for time-blocking and schedule sorting; dark mode is upgraded to the approved **Warm Graphite** surface hierarchy (`#121316` canvas, `#1a1d24` cards, `#22262f` inputs, `#2e3340` borders) with a synchronous `<head>` theme script that eliminates initial light-to-dark flash (FOUC); task creation is demarcated into a dedicated Quick Command card whose details/schedule fields open in an accessible **Modal Dialog** (`role="dialog"`); and the workspace adds **Today's Dashboard** (`DashboardOverview`), an interactive **Calendar & Schedule View** (`CalendarScheduleView`), a header **Notification Center** (`NotificationCenter`), and a workspace view switcher (**Tasks** | **Calendar & Schedule** | **Split View**).
 - In **Version 2**, the UI calls `HttpTodoService`, which calls Route Handlers that in turn call a `TodoRepository` backed by Neon (PostgreSQL) via Drizzle ORM. Swapping versions is a one-file change (`src/services/index.ts`) plus new server-side files; no component or hook changes.
 
 ESLint rules enforce the service boundary: components and hooks may not import `localStorage`, `sessionStorage`, `fetch`, or concrete service classes.
@@ -33,38 +35,71 @@ import { z } from 'zod'
 export const PrioritySchema = z.enum(['low', 'medium', 'high'])
 export type Priority = z.infer<typeof PrioritySchema>
 
-export const TodoSchema = z.object({
-  id:          z.string().uuid(),
-  title:       z.string().trim().min(1, 'Title is required').max(200, 'Title must be 200 characters or fewer'),
-  completed:   z.boolean(),
-  createdAt:   z.string().datetime(),
-  updatedAt:   z.string().datetime(),
-  description: z.string().trim().max(1000, 'Description must be 1000 characters or fewer').optional().default(''),
-  priority:    PrioritySchema.default('medium'),
-  dueDate:     z.string().nullable().optional(),
-  category:    z.string().trim().max(50, 'Category must be 50 characters or fewer').nullable().optional(),
-})
+export const TimeStringSchema = z
+  .string()
+  .regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Time must be in HH:MM (24-hour) format')
+
+const hasValidTimeRange = (data: { startTime?: string | null; endTime?: string | null }) => {
+  if (data.startTime && data.endTime) {
+    return data.endTime > data.startTime
+  }
+  return true
+}
+
+export const TodoSchema = z
+  .object({
+    id:          z.string().uuid(),
+    title:       z.string().trim().min(1, 'Title is required').max(200, 'Title must be 200 characters or fewer'),
+    completed:   z.boolean(),
+    createdAt:   z.string().datetime(),
+    updatedAt:   z.string().datetime(),
+    description: z.string().trim().max(1000, 'Description must be 1000 characters or fewer').optional().default(''),
+    priority:    PrioritySchema.default('medium'),
+    dueDate:     z.string().nullable().optional(),
+    startTime:   TimeStringSchema.nullable().optional().default(null),
+    endTime:     TimeStringSchema.nullable().optional().default(null),
+    category:    z.string().trim().max(50, 'Category must be 50 characters or fewer').nullable().optional(),
+  })
+  .refine(hasValidTimeRange, {
+    message: 'End time must be after start time',
+    path: ['endTime'],
+  })
 
 export type Todo = z.infer<typeof TodoSchema>
 
-export const CreateTodoSchema = z.object({
-  title:       z.string().trim().min(1, 'Title is required').max(200, 'Title must be 200 characters or fewer'),
-  description: z.string().trim().max(1000).optional(),
-  priority:    PrioritySchema.optional().default('medium'),
-  dueDate:     z.string().nullable().optional(),
-  category:    z.string().trim().max(50).nullable().optional(),
-})
+export const CreateTodoSchema = z
+  .object({
+    title:       z.string().trim().min(1, 'Title is required').max(200, 'Title must be 200 characters or fewer'),
+    description: z.string().trim().max(1000, 'Description must be 1000 characters or fewer').optional(),
+    priority:    PrioritySchema.optional().default('medium'),
+    dueDate:     z.string().nullable().optional(),
+    startTime:   TimeStringSchema.nullable().optional().default(null),
+    endTime:     TimeStringSchema.nullable().optional().default(null),
+    category:    z.string().trim().max(50, 'Category must be 50 characters or fewer').nullable().optional(),
+  })
+  .refine(hasValidTimeRange, {
+    message: 'End time must be after start time',
+    path: ['endTime'],
+  })
 
 export type CreateTodoInput = z.infer<typeof CreateTodoSchema>
 
-export const TodoPatchSchema = z.object({
-  title:       z.string().trim().min(1).max(200).optional(),
-  completed:   z.boolean().optional(),
-  description: z.string().trim().max(1000).optional(),
-  priority:    PrioritySchema.optional(),
-  dueDate:     z.string().nullable().optional(),
-  category:    z.string().trim().max(50).nullable().optional(),
-}).refine(d => Object.keys(d).length > 0, { message: 'At least one field required' })
+export const TodoPatchSchema = z
+  .object({
+    title:       z.string().trim().min(1, 'Title is required').max(200, 'Title must be 200 characters or fewer').optional(),
+    completed:   z.boolean().optional(),
+    description: z.string().trim().max(1000, 'Description must be 1000 characters or fewer').optional(),
+    priority:    PrioritySchema.optional(),
+    dueDate:     z.string().nullable().optional(),
+    startTime:   TimeStringSchema.nullable().optional(),
+    endTime:     TimeStringSchema.nullable().optional(),
+    category:    z.string().trim().max(50, 'Category must be 50 characters or fewer').nullable().optional(),
+  })
+  .refine(d => Object.keys(d).length > 0, { message: 'At least one field required' })
+  .refine(hasValidTimeRange, {
+    message: 'End time must be after start time',
+    path: ['endTime'],
+  })
 
 export type TodoPatchInput = z.infer<typeof TodoPatchSchema>
 ```
@@ -114,39 +149,45 @@ export interface TodoService {
 
 ### Folder structure
 
-```
+```text
 src/
-  app/                   # Next.js App Router pages and layouts
+  app/                          # Next.js App Router pages and layouts
     globals.css
     layout.tsx
     page.tsx
-    api/todos/           # V2 only: route handlers
+    api/todos/                  # V2 only: route handlers
   lib/
-    schemas.ts           # Todo type, Priority, Zod schemas
-    errors.ts            # NotFoundError
+    schemas.ts                  # Todo type, Priority, TimeStringSchema, Zod schemas
+    errors.ts                   # NotFoundError
   services/
-    todo-service.ts      # Interface + TodoFilter, ListOptions, SortOption types
-    local-todo-service.ts  # V1/V1.x localStorage implementation
-    theme-storage.ts     # V1.2 theme preference storage helper (theme:v1)
-    index.ts             # Active service export + storage/theme helpers
-    http-todo-service.ts # V2 HTTP implementation
+    todo-service.ts             # Interface + TodoFilter, ListOptions, SortOption types
+    local-todo-service.ts       # V1/V1.x localStorage implementation
+    theme-storage.ts            # V1.2+ theme preference storage helper (theme:v1)
+    index.ts                    # Active service export + storage/theme helpers
+    http-todo-service.ts        # V2 HTTP implementation
   hooks/
-    use-todos.ts         # React hook; depends only on TodoService
-    use-theme.ts         # V1.2 React hook for Light/Dark/System theme mode
-  components/            # UI components; no direct storage or fetch
-    AddTodoForm.tsx
+    use-todos.ts                # React hook; depends only on TodoService
+    use-theme.ts                # V1.2+ React hook for Light/Dark/System theme mode
+  components/                   # UI components; no direct storage or fetch
+    AddTodoForm.tsx             # V1.3 Quick Command Bar + Modal Composer
+    CalendarScheduleView.tsx    # V1.3 Interactive Calendar & Schedule View
+    DashboardOverview.tsx       # V1.3 Today's Dashboard (stats, progress, Tasks for the Day)
     FilterBar.tsx
-    ThemeToggle.tsx      # V1.2 Light / Dark / System switcher
-    TodoItem.tsx
+    NotificationCenter.tsx      # V1.3 Header Notification Bell & Popover
+    ThemeToggle.tsx             # V1.2+ Light / Dark / System switcher
+    TodoItem.tsx                # V1.3+ Task card with time-block badge & edit inputs
     TodoList.tsx
-  server/                # V2 only: DB client, Drizzle schema, repository
-test/                    # V1.2+: All Vitest unit, component, and contract tests
+  server/                       # V2 only: DB client, Drizzle schema, repository
+test/                           # V1.2+: All Vitest unit, component, and contract tests
   sanity.test.ts
   app/
     page.test.tsx
   components/
     AddTodoForm.test.tsx
+    CalendarScheduleView.test.tsx
+    DashboardOverview.test.tsx
     FilterBar.test.tsx
+    NotificationCenter.test.tsx
     ThemeToggle.test.tsx
     TodoItem.test.tsx
     TodoList.test.tsx
@@ -155,7 +196,7 @@ test/                    # V1.2+: All Vitest unit, component, and contract tests
   services/
     local-todo-service.test.ts
     todo-service.contract.ts
-e2e/                     # Playwright end-to-end tests
+e2e/                            # Playwright end-to-end tests
 ```
 
 ---
@@ -172,7 +213,9 @@ Completed and verified on branch `auto/v1.1` (merged to `main`). Added `descript
 
 ---
 
-## Version 1.2 Plan — `/test` Directory Reorganization, Softer Dark Mode, & Intuitive UI Redesign
+## Version 1.2 Plan — `/test` Directory Reorganization, Softer Dark Mode, & Intuitive UI Redesign (Completed)
+
+Completed and verified on branch `auto/v1.2` (merged to `main`).
 
 ### What is new
 1. **Dedicated `/test` Directory**:
@@ -189,33 +232,96 @@ Completed and verified on branch `auto/v1.1` (merged to `main`). Added `descript
    - **Streamlined Filter & Sort Toolbar (`FilterBar.tsx`)**: Clean two-tier filter bar with a one-click **Reset filters** button (`aria-label="Reset filters"`) visible whenever status, priority, or category filters are active.
    - **Priority-Accented Todo Cards (`TodoItem.tsx`)**: Left accent border (`border-l-4`) color-coded by priority (`high` rose, `medium` amber, `low` blue) for instant visual scanning, plus refined spacing and badge contrast.
 
-### Files to Add or Modify in Version 1.2
+### Open Decisions for V1.2
+- None (`OPEN` count: 0).
+
+---
+
+## Version 1.3 Plan — Zero-Flash Warm Graphite Dark Mode, Modal Composer, Time-Blocking & Today's Dashboard
+
+**Design Reference**: Relies on [`design.md`](file:///c:/Users/hp/Documents/hng/todo-list/design.md) (`Design V1.3: APPROVED by human on 2026-09-30`), including Section 2 (Warm Graphite tokens), Section 3 (Desktop/Mobile layouts), Section 4 (Components 4.1–4.6), Section 6 (Microcopy), and Section 7 (Verified WCAG contrast pairs).
+
+### What is new in Version 1.3 (and what it leaves alone)
+1. **Time-Blocking Data Model & Sorting (`src/lib/schemas.ts`, `src/services/local-todo-service.ts`, `src/hooks/use-todos.ts`)**:
+   - Adds optional, nullable `startTime` and `endTime` (`"HH:mm"` 24-hour format, defaulting to `null`) to `TodoSchema`, `CreateTodoSchema`, and `TodoPatchSchema`.
+   - Enforces `endTime > startTime` whenever both `startTime` and `endTime` are non-null (both on create and when merging a patch with an existing todo in `LocalTodoService.update`), failing with `"End time must be after start time"`.
+   - Preserves 100% backwards compatibility with existing V1, V1.1, and V1.2 records in `localStorage` (`todos:v1`) by defaulting missing `startTime` and `endTime` to `null`.
+   - Enhances `sortBy: 'dueDate'` in `LocalTodoService` and `useTodos` so todos sharing the same `dueDate` are sorted chronologically by `startTime` (earliest `startTime` first; items without a `startTime` placed after time-blocked items on that same date).
+   - Leaves the `TodoService` method signatures (`list`, `create`, `update`, `remove`) and storage keys (`todos:v1`, `theme:v1`) unchanged.
+2. **Zero-Flash Theme Initialization & Warm Graphite Dark Palette (`src/app/layout.tsx`, `src/app/globals.css`, components)**:
+   - Injects a synchronous blocking `<script>` in `<head>` inside `src/app/layout.tsx` that reads `localStorage.getItem("theme:v1")` (or falls back to `window.matchMedia("(prefers-color-scheme: dark)").matches`) and applies `.dark` to `document.documentElement` before first paint so reloading never flashes light.
+   - Replaces the blue-tinted `slate-900` (`#0f172a`) dark background across the app with the approved **Warm Graphite** surface hierarchy from `design.md`: `#121316` page canvas (`dark:bg-[#121316]`), `#1a1d24` elevated cards/modals (`dark:bg-[#1a1d24]`), `#22262f` inputs/controls (`dark:bg-[#22262f]`), and `#2e3340` borders (`dark:border-[#2e3340]`).
+   - Removes initial page-load background transition classes on `<body>`/`<main>` that previously caused a visible fade from light to dark on load.
+3. **Demarcated Task Creation & Modal Composer (`src/components/AddTodoForm.tsx`, `src/components/TodoItem.tsx`, `src/app/page.tsx`)**:
+   - Renders `AddTodoForm` inside its own dedicated Quick Command card (`aria-label="Create task"`), visually demarcated from the Task Board card below.
+   - Clicking `Toggle details` (`aria-label="Toggle details"`) opens an accessible **Modal Dialog** (`role="dialog"`, `aria-modal="true"`, `aria-label="Task details and schedule"`) with Description, Priority, Due Date, `Start time` (`aria-label="Start time"`), `End time` (`aria-label="End time"`), and Category + preset chips, closing automatically on valid submission or when pressing `Escape` / clicking `Close modal`.
+   - Updates `TodoItem.tsx` to render a monospace time-block badge (e.g., `09:00 – 10:30`) when `startTime` or `endTime` is set, and adds `Edit start time` (`aria-label="Edit start time"`) and `Edit end time` (`aria-label="Edit end time"`) inputs in inline edit mode.
+4. **Today's Dashboard, Interactive Calendar & Schedule View, and Notification Center**:
+   - **`src/components/DashboardOverview.tsx`**: Renders the `Task progress summary` card with daily stat pills (**Total**, **Active**, **Completed**, **Due Today**), completion `role="progressbar"`, and a **Tasks for the Day** section (`aria-label="Tasks for the day"`) listing todos due today (`dueDate === today`) ordered by `startTime`, with interactive completion checkboxes and time-block pills.
+   - **`src/components/CalendarScheduleView.tsx`**: Interactive date navigator (`Previous day`, `Today`, `Next day`, date picker `aria-label="Select schedule date"`, and 7-day week strip) plus a daily schedule separating **Time-Blocked Schedule** (`startTime – endTime`) from **All-Day / Unscheduled Tasks** for the selected date.
+   - **`src/components/NotificationCenter.tsx`**: Header `Notifications` button (`aria-label="Notifications"`) with an active count badge for overdue incomplete tasks and today's scheduled incomplete tasks, toggling an accessible `Notifications panel` popover (`role="region"`, `aria-label="Notifications panel"`).
+   - **`src/app/page.tsx`**: Integrates `NotificationCenter`, `DashboardOverview`, demarcated `AddTodoForm`, workspace view switcher (**Tasks** | **Calendar & Schedule** | **Split View**), `TodoList`/`FilterBar`, and `CalendarScheduleView`.
+
+### Storage & Data Model Details (Version 1.3)
+- **Todo Storage Key**: `todos:v1` in browser `localStorage` (JSON array of `Todo` objects).
+- **Theme Storage Key**: `theme:v1` in browser `localStorage` (`"light"` | `"dark"` | `"system"`).
+- **Stored Todo JSON Shape**:
+  ```json
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "title": "Architecture sync & API review",
+    "completed": false,
+    "createdAt": "2026-09-30T08:00:00.000Z",
+    "updatedAt": "2026-09-30T08:00:00.000Z",
+    "description": "Review V1.3 schema and schedule views",
+    "priority": "high",
+    "dueDate": "2026-09-30",
+    "startTime": "09:00",
+    "endTime": "10:30",
+    "category": "Work"
+  }
+  ```
+
+### Files Expected to be Added or Changed in Version 1.3
 
 | File | Change |
 | :--- | :--- |
-| `vitest.config.ts` | Update `test.include` to `["test/**/*.{test,spec}.{ts,tsx}"]` |
-| `test/**/*` (moved from `src/**/*`) | Relocate `sanity.test.ts`, `app/page.test.tsx`, `components/*.test.tsx`, `hooks/use-todos.test.ts`, `services/local-todo-service.test.ts`, and `services/todo-service.contract.ts` into `test/` |
-| `src/services/theme-storage.ts` | New helper to read/write `theme:v1` (`light` \| `dark` \| `system`) safely in `try/catch` |
-| `src/services/index.ts` | Re-export `getStoredTheme`, `setStoredTheme`, and `ThemeMode` |
-| `src/hooks/use-theme.ts` | Hook managing `ThemeMode` state and syncing `.dark` class on `document.documentElement` |
-| `src/components/ThemeToggle.tsx` | Accessible segmented control for Light / Dark / System theme selection |
-| `test/components/ThemeToggle.test.tsx` | Component tests for theme switching and persistence |
-| `src/app/globals.css` | Add `@custom-variant dark` and softer slate dark mode palette variables (`#0f172a`) |
-| `src/app/page.tsx` | Redesign dashboard header with `ThemeToggle`, completion progress bar, stat pills, and softer dark mode surfaces |
-| `src/components/AddTodoForm.tsx` | Update surface colors and focus styling for softer dark mode and intuitive layout |
-| `src/components/FilterBar.tsx` | Streamlined toolbar layout, softer dark mode styling, and **Reset filters** button |
-| `src/components/TodoItem.tsx` | Left priority accent bar, softer dark mode card surfaces, and polished badge contrast |
-| `src/components/TodoList.tsx` | Softer dark mode empty state and list spacing |
-| `test/components/FilterBar.test.tsx` | Add test for **Reset filters** button |
-| `test/app/page.test.tsx` | Add tests for progress bar / stats summary and theme toggle integration |
-| `e2e/todos.spec.ts` | Add e2e test verifying theme toggle (`.dark` class & softer background) and filter reset |
+| `src/lib/schemas.ts` | Add `TimeStringSchema` (`HH:mm`), nullable `startTime` and `endTime` (`default(null)`), and `endTime > startTime` refinement to `TodoSchema`, `CreateTodoSchema`, and `TodoPatchSchema` |
+| `src/services/local-todo-service.ts` | Normalize `startTime` and `endTime` to `null` on legacy records, validate merged `startTime`/`endTime` on `update`, and sort same-date items by `startTime` when `sortBy === 'dueDate'` |
+| `src/hooks/use-todos.ts` | Include `startTime` chronological secondary sort when sorting by `dueDate` |
+| `src/app/layout.tsx` | Add synchronous `<head>` theme initialization script and Warm Graphite `dark:bg-[#121316]` body classes |
+| `src/app/globals.css` | Update `.dark` CSS custom properties to Warm Graphite (`--background: #121316`, `--foreground: #f4f4f5`) |
+| `src/components/AddTodoForm.tsx` | Convert `Toggle details` into an accessible Modal Dialog (`role="dialog"`) with `Start time` and `End time` inputs and Warm Graphite tokens |
+| `src/components/TodoItem.tsx` | Render `startTime – endTime` time-block badge, add `Edit start time` / `Edit end time` inputs in edit mode, and apply Warm Graphite tokens |
+| `src/components/TodoList.tsx` | Apply Warm Graphite dark surface and border tokens |
+| `src/components/FilterBar.tsx` | Apply Warm Graphite dark surface and control tokens |
+| `src/components/ThemeToggle.tsx` | Apply Warm Graphite dark control tokens |
+| `src/components/DashboardOverview.tsx` | **New component**: Stat pills, completion progress bar, and **Tasks for the Day** section |
+| `src/components/CalendarScheduleView.tsx` | **New component**: Date navigator, 7-day strip, and daily **Time-Blocked Schedule** + **All-Day Tasks** |
+| `src/components/NotificationCenter.tsx` | **New component**: Header `Notifications` button, active reminder count badge, and notifications popover |
+| `src/app/page.tsx` | Integrate `NotificationCenter`, `DashboardOverview`, demarcated Quick Command card, workspace view tabs (**Tasks**, **Calendar & Schedule**, **Split View**), and `CalendarScheduleView` |
+| `test/services/todo-service.contract.ts` | Add contract tests for `startTime`/`endTime` creation, defaults, `endTime <= startTime` rejection, and `dueDate` + `startTime` sorting |
+| `test/services/local-todo-service.test.ts` | Add legacy backwards-compatibility test for missing `startTime`/`endTime` |
+| `test/hooks/use-todos.test.ts` | Add hook test for `sortBy: 'dueDate'` ordering same-day items by `startTime` |
+| `test/components/AddTodoForm.test.tsx` | Add tests for Modal Dialog (`role="dialog"`), `Start time`/`End time` submission, invalid time range alert, and `Escape` dismissal |
+| `test/components/TodoItem.test.tsx` | Add tests for time-block badge rendering and editing `startTime`/`endTime` |
+| `test/components/DashboardOverview.test.tsx` | **New test file**: Tests **Tasks for the Day** ordering, completion toggle, empty state, and progress stats |
+| `test/components/CalendarScheduleView.test.tsx` | **New test file**: Tests date switching, time-blocked slots, and all-day tasks |
+| `test/components/NotificationCenter.test.tsx` | **New test file**: Tests badge count for overdue + today's scheduled tasks and popover toggle |
+| `test/app/page.test.tsx` | Update integration tests for Warm Graphite theme, Today's Dashboard, Notification Center, and workspace view switching |
+| `e2e/todos.spec.ts` | Add E2E tests for zero-flash dark reload (`#121316`), modal time-block creation, Today's Dashboard, Calendar & Schedule view, and Notification Center |
 
-### Open Decisions for V1.2
-- None (`OPEN` count: 0). All requirements (moving tests to `/test`, softer slate dark mode palette with Light/Dark/System toggle, and intuitive dashboard redesign) were confirmed during `/spec`.
+### Test Strategy for Version 1.3
+- **Contract & Unit (`test/services/`, `test/hooks/`)**: Verify `startTime`/`endTime` validation, `null` defaults, `endTime <= startTime` error handling, backwards compatibility with legacy `localStorage` items, and chronological `startTime` sorting.
+- **Component (`test/components/`, `test/app/`)**: Verify modal `role="dialog"` behavior, time-block badge & edit inputs, `DashboardOverview` (**Tasks for the Day**), `CalendarScheduleView`, `NotificationCenter`, and workspace view tabs using accessible `getByRole`/`getByLabelText` queries.
+- **End-to-End (`e2e/todos.spec.ts`)**: Verify dark mode has `class="dark"` and `rgb(18, 19, 22)` (`#121316`) immediately on reload without flashing, and verify creating a time-blocked task for today via the Modal Composer updates Today's Dashboard, Calendar & Schedule view, and Notification Center.
+
+### Risks and Open Decisions for Version 1.3
+- **Open Decisions**: None (`0` `OPEN` items). Every requirement and design token has been specified and approved in `requirements.md` and `design.md`.
 
 ---
 
 ## Version 2 Plan — Neon + Vercel (Outline; detail with `/plan 2`)
 
 ### Goal
-Move persistence from browser `localStorage` to Neon PostgreSQL via Drizzle ORM and Next.js Route Handlers. The database schema will directly reflect the enriched `Todo` shape. Components and hooks remain completely unchanged.
+Move persistence from browser `localStorage` to Neon PostgreSQL via Drizzle ORM and Next.js Route Handlers (`/api/todos` and `/api/todos/[id]`). The database schema will directly reflect the enriched `Todo` shape (including `startTime` and `endTime`). Components and hooks remain completely unchanged (`git diff` under `src/components/` and `src/hooks/` must be empty).

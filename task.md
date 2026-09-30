@@ -327,7 +327,105 @@ definitions, the API contract, and the data model live in
 ## V1.2 Slice 04: Finish version 1.2
 
 - [x] Run `/finish 1.2` — audit, README update, and release notes
-- [ ] Human reviews output, merges branch to `main`, and tags `v1.2`
+- [x] Human reviews output, merges branch to `main`, and tags `v1.2`
+
+---
+
+# Version 1.3: Zero-Flash Warm-Graphite Dark Mode, Modal Composer, Time-Blocking & Today's Dashboard
+
+## V1.3 Slice 01: Time-blocking schema (nullable startTime & endTime) and service support
+
+- [ ] Write tests in `test/services/todo-service.contract.ts`, `test/services/local-todo-service.test.ts`, and `test/hooks/use-todos.test.ts` and watch them fail
+- [ ] Update `src/lib/schemas.ts`: add `TimeStringSchema` (`HH:MM` 24-hour format) and nullable `startTime` and `endTime` (`null` default) to `TodoSchema`, `CreateTodoSchema`, and `TodoPatchSchema`, plus refinement ensuring `endTime > startTime` when both are provided
+- [ ] Update `src/services/local-todo-service.ts` and `src/hooks/use-todos.ts`: normalize `startTime` and `endTime` to `null` for legacy records, validate merged time ranges on `update`, and use `startTime` as secondary sort key when sorting by `dueDate`
+- [ ] Run `npm run verify` and commit
+
+**Acceptance criteria**
+
+- `CreateTodoSchema` and `TodoService.create` accept optional nullable `startTime` (`"HH:mm"` | `null`) and `endTime` (`"HH:mm"` | `null`), defaulting both to `null` when omitted.
+- Creating or patching a todo where both `startTime` and `endTime` are provided and `endTime <= startTime` fails validation with `"End time must be after start time"`.
+- Existing Version 1 / 1.1 / 1.2 items in `localStorage` without `startTime` or `endTime` parse cleanly with `startTime: null` and `endTime: null`.
+- Sorting by `dueDate` orders items sharing the same `dueDate` chronologically by `startTime` (earliest `startTime` first, items without `startTime` after time-blocked items on that same date).
+
+**Tests**
+
+- contract (`test/services/todo-service.contract.ts`): create and update with `startTime` and `endTime`, default `null` when omitted, reject `endTime <= startTime`, and sort same-day todos by `startTime`.
+- unit (`test/services/local-todo-service.test.ts`): legacy stored todos without `startTime`/`endTime` normalize to `null`.
+- hook (`test/hooks/use-todos.test.ts`): `sortBy: "dueDate"` orders same-day items by `startTime`.
+
+---
+
+## V1.3 Slice 02: Zero-flash dark theme initialization and Warm-Graphite dark background palette
+
+- [ ] Write tests in `test/app/page.test.tsx` and `e2e/todos.spec.ts` and watch them fail
+- [ ] Update `src/app/layout.tsx` (`design.md` §4.1) to include a synchronous blocking `<script>` in `<head>` that reads `localStorage.getItem("theme:v1")` (or `window.matchMedia("(prefers-color-scheme: dark)")`) and applies `.dark` to `document.documentElement` before first paint
+- [ ] Update `src/app/globals.css`, `src/app/layout.tsx`, `src/app/page.tsx`, `src/components/ThemeToggle.tsx`, `src/components/FilterBar.tsx`, `src/components/TodoList.tsx`, and `src/components/TodoItem.tsx` to apply the Warm Graphite tokens from `design.md` §2 (`#121316` canvas `dark:bg-[#121316]`, `#1a1d24` cards `dark:bg-[#1a1d24]`, `#22262f` inputs `dark:bg-[#22262f]`, `#2e3340` borders `dark:border-[#2e3340]`) and remove initial page-load background transition flash
+- [ ] Run `npm run verify` and commit
+
+**Acceptance criteria**
+
+- Reloading the page when `theme:v1` is `"dark"` applies `.dark` to `<html>` synchronously via the `<head>` initialization script (`design.md` §4.1) before first paint so the page never flashes light.
+- Dark mode uses the Warm Graphite surface hierarchy from `design.md` §2 (`#121316` canvas background, `#1a1d24` elevated cards, `#22262f` interactive controls, `#2e3340` borders) instead of `slate-900` (`#0f172a`).
+
+**Tests**
+
+- component (`test/app/page.test.tsx`): verifies Warm Graphite dark surface classes and theme toggle behavior.
+- e2e (`e2e/todos.spec.ts`): sets dark theme, reloads page, and verifies `<html>` has class `dark` and `rgb(18, 19, 22)` (`#121316`) background immediately on load.
+
+---
+
+## V1.3 Slice 03: Demarcated task creation, Modal Composer, and time-block badges/editing
+
+- [ ] Write tests in `test/components/AddTodoForm.test.tsx` and `test/components/TodoItem.test.tsx` and watch them fail
+- [ ] Update `src/components/AddTodoForm.tsx` (`design.md` §4.2) so clicking `Toggle details` opens an accessible Modal Dialog (`role="dialog"`, `aria-modal="true"`, `aria-label="Task details and schedule"`, `Escape` or `Close modal` button to dismiss) containing Description, Priority, Due Date, `Start time` (`aria-label="Start time"`), `End time` (`aria-label="End time"`), and Category, and closes the modal after successful submission
+- [ ] Update `src/components/TodoItem.tsx` (`design.md` §4.3) to display a monospace time-block badge (e.g., `09:00 – 10:30`) when `startTime` or `endTime` is present, and add `Edit start time` (`aria-label="Edit start time"`) and `Edit end time` (`aria-label="Edit end time"`) inputs in edit mode
+- [ ] Update `src/app/page.tsx` (`design.md` §3 & §4.2) so `AddTodoForm` sits in its own dedicated Quick Command card (`aria-label="Create task"`) visually demarcated from the Task Board card
+- [ ] Run `npm run verify` and commit
+
+**Acceptance criteria**
+
+- `AddTodoForm` is rendered in a dedicated top Quick Command card (`aria-label="Create task"`) separate from the listed todos container (`design.md` §3 & §4.2).
+- Clicking `Toggle details` opens an accessible Modal Dialog (`role="dialog"`, `aria-modal="true"`, `aria-label="Task details and schedule"`) without pushing the todo list inline; pressing `Escape` or clicking `Close modal` closes the dialog.
+- Users can enter optional `Start time` and `End time` in the modal composer and in `TodoItem` edit mode; invalid time ranges (`endTime <= startTime`) show a visible `role="alert"` message (`"End time must be after start time"`).
+- `TodoItem` displays a visible time-block badge (`09:00 – 10:30`) when `startTime` and `endTime` are set (`design.md` §4.3).
+
+**Tests**
+
+- component (`test/components/AddTodoForm.test.tsx`): opens modal dialog (`role="dialog"`) on `Toggle details`, submits todo with `startTime` and `endTime`, shows alert when `endTime <= startTime`, and closes modal on `Escape`.
+- component (`test/components/TodoItem.test.tsx`): renders `startTime – endTime` badge and edits `startTime`/`endTime` in edit mode.
+
+---
+
+## V1.3 Slice 04: Today's Dashboard, Interactive Calendar/Schedule View, and Notification Center
+
+- [ ] Write tests in `test/components/DashboardOverview.test.tsx`, `test/components/CalendarScheduleView.test.tsx`, `test/components/NotificationCenter.test.tsx`, `test/app/page.test.tsx`, and `e2e/todos.spec.ts` and watch them fail
+- [ ] Implement `src/components/DashboardOverview.tsx` (`design.md` §4.4): displays **Tasks for the Day** (`aria-label="Tasks for the day"`, items where `dueDate === today`, ordered by `startTime`, with time-block pills and completion checkboxes) alongside daily metrics (**Total**, **Active**, **Completed**, **Due Today**) and the completion `role="progressbar"`
+- [ ] Implement `src/components/CalendarScheduleView.tsx` (`design.md` §4.5): interactive date navigation (`Previous day`, `Today`, `Next day`, date picker `aria-label="Select schedule date"`, and 7-day week strip) + daily schedule separating **Time-Blocked Schedule** slots (`startTime – endTime`) from **All-Day / Unscheduled Tasks** for the selected date
+- [ ] Implement `src/components/NotificationCenter.tsx` (`design.md` §4.6): header notification button (`aria-label="Notifications"`) with active count badge for **Overdue** and **Today's Scheduled** incomplete tasks, opening an accessible `Notifications panel` popover (`role="region"`, `aria-label="Notifications panel"`)
+- [ ] Update `src/app/page.tsx` (`design.md` §3) to integrate `NotificationCenter` in the header, `DashboardOverview`, and workspace view tabs (**Tasks**, **Calendar & Schedule**, **Split View**)
+- [ ] Run `npm run verify && npm run e2e` and commit
+
+**Acceptance criteria**
+
+- `DashboardOverview` (`design.md` §4.4) displays a dedicated **Tasks for the Day** section listing tasks due today ordered by `startTime`, plus Total, Active, Completed, and Due Today counts and the completion progress bar (`role="progressbar"`).
+- `CalendarScheduleView` (`design.md` §4.5) lets the user select a date and displays that date's time-blocked tasks (`startTime – endTime`) in chronological order alongside all-day/unscheduled tasks due on that date.
+- `NotificationCenter` (`design.md` §4.6) renders a `Notifications` button in the header with a count of overdue + today's scheduled active tasks, and clicking it displays a popover listing those reminders.
+- Users can switch workspace views between **Tasks**, **Calendar & Schedule**, and **Split View** in `src/app/page.tsx`.
+
+**Tests**
+
+- component (`test/components/DashboardOverview.test.tsx`): renders today's tasks ordered by `startTime`, shows empty state (`"No tasks scheduled for today."`) when no tasks are due today, and updates progress bar.
+- component (`test/components/CalendarScheduleView.test.tsx`): switches selected date and renders time-blocked tasks and all-day tasks for that date.
+- component (`test/components/NotificationCenter.test.tsx`): displays badge count for overdue and today's scheduled tasks and toggles notification panel on click.
+- component (`test/app/page.test.tsx`): integrates Today's Dashboard, Notification Center, and workspace view switching.
+- e2e (`e2e/todos.spec.ts`): creates a time-blocked task for today via the modal composer, verifies it appears in Today's Dashboard, Calendar & Schedule view, and Notification Center, and persists across reload.
+
+---
+
+## V1.3 Slice 05: Finish version 1.3
+
+- [ ] Run `/finish 1.3` — audit, README update, and release notes
+- [ ] Human reviews output, merges branch to `main`, and tags `v1.3`
 
 ---
 
