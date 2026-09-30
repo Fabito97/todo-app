@@ -258,3 +258,12 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Review**: In-session review by autopilot; verified `lucide-react` icons render cleanly without emojis across all navigation, modals, and views; verified real-time search input (`aria-label="Search tasks"`) filtering against title and description; verified category filter dropdown (`aria-label="Filter by category"`); verified `src/lib/date-utils.ts` and test suite.
 - **Bug or issue caught**: ContentHeader CTA button retained `+ New Task` text with Lucide `Plus` icon for accessibility and test suite alignment.
 - **Rule or prompt improvement**: None.
+
+## 2026-09-30 - V2.1 Slice 02: Exact mockup task card, short date formatting & overdue task treatment
+- **Commit**: `feat(v2.1): exact mockup task card, short date formatting and overdue treatment`
+- **Key prompt or instruction**: "/autopilot 2.1"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (162 pass across 26 test files in `test/`), verify gate (pass).
+- **Review**: In-session review by autopilot; verified `TodoItem.tsx` matches `design/mockups/v1.4.html` with `border-l-4` color-coded accent borders, 1-line description clamp (`line-clamp-1`), short human-readable dates (e.g. `Due: Sep 30, 2026`), overdue warning badge (`Overdue (Sep 28)`) and cancellation styling, interactive card body click opening `TaskDetailsModal`, and Lucide `Edit3`/`X` buttons with stop propagation.
+- **Bug or issue caught**: None.
+- **Rule or prompt improvement**: None.

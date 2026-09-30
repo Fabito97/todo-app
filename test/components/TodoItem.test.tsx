@@ -19,7 +19,7 @@ const mockTodo: Todo = {
 };
 
 describe("TodoItem (V1.4 view-only row)", () => {
-  it("renders todo title, priority badge, category tag, and overdue indicator", () => {
+  it("renders todo title, priority badge, category tag, 1-line description, and overdue indicator with short date", () => {
     render(
       <TodoItem
         todo={mockTodo}
@@ -35,6 +35,32 @@ describe("TodoItem (V1.4 view-only row)", () => {
     expect(screen.getByText("Work")).toBeInTheDocument();
     expect(screen.getByText(/overdue/i)).toBeInTheDocument();
     expect(screen.getByText("09:00 – 10:30")).toBeInTheDocument();
+    expect(screen.getByText("Detailed description here")).toHaveClass("line-clamp-1");
+  });
+
+  it("renders short date format and exact mockup left border classes", () => {
+    const futureTodo: Todo = {
+      ...mockTodo,
+      id: "future-id",
+      dueDate: "2026-10-15",
+      completed: false,
+      priority: "medium",
+    };
+
+    const { container } = render(
+      <TodoItem
+        todo={futureTodo}
+        onToggle={vi.fn()}
+        onOpenEdit={vi.fn()}
+        onOpenDetails={vi.fn()}
+        onDelete={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText("Due: Oct 15, 2026")).toBeInTheDocument();
+    const item = container.querySelector("li");
+    expect(item).toHaveClass("border-l-4");
+    expect(item).toHaveClass("border-l-amber-500");
   });
 
   it("toggles completion when checkbox is clicked", async () => {
@@ -78,6 +104,26 @@ describe("TodoItem (V1.4 view-only row)", () => {
     });
     await user.click(titleBtn);
 
+    expect(onOpenDetails).toHaveBeenCalledWith(mockTodo);
+  });
+
+  it("triggers onOpenDetails modal when card body is clicked", async () => {
+    const onOpenDetails = vi.fn();
+    const user = userEvent.setup();
+
+    const { container } = render(
+      <TodoItem
+        todo={mockTodo}
+        onToggle={vi.fn()}
+        onOpenEdit={vi.fn()}
+        onOpenDetails={onOpenDetails}
+        onDelete={vi.fn()}
+      />
+    );
+
+    const card = container.querySelector("li");
+    expect(card).toBeInTheDocument();
+    if (card) await user.click(card);
     expect(onOpenDetails).toHaveBeenCalledWith(mockTodo);
   });
 

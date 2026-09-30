@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
+import { Edit3, X } from "lucide-react";
 import type { Todo, TodoPatchInput } from "@/lib/schemas";
+import { formatShortDate, isOverdue, formatOverdueLabel } from "@/lib/date-utils";
 
 interface TodoItemProps {
   todo: Todo;
@@ -21,61 +23,76 @@ export function TodoItem({
 }: TodoItemProps) {
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
 
-  const todayStr = new Date().toISOString().slice(0, 10);
-  const isOverdue = Boolean(todo.dueDate && !todo.completed && todo.dueDate < todayStr);
+  const isOverdueItem = isOverdue(todo.dueDate, todo.completed);
 
-  const priorityBorderClass =
-    todo.priority === "high"
-      ? "border-l-rose-500 dark:border-l-rose-400"
-      : todo.priority === "medium"
-      ? "border-l-amber-500 dark:border-l-amber-400"
-      : "border-l-blue-500 dark:border-l-blue-400";
+  const priorityBorderClass = todo.completed
+    ? "border-l-emerald-500 dark:border-l-emerald-400"
+    : todo.priority === "high"
+    ? "border-l-rose-500 dark:border-l-rose-400"
+    : todo.priority === "medium"
+    ? "border-l-amber-500 dark:border-l-amber-400"
+    : "border-l-blue-500 dark:border-l-blue-400";
 
   return (
     <li
       role="listitem"
-      className={`group flex flex-col p-3.5 rounded-xl border border-slate-200 dark:border-[#2e3340] border-l-4 ${priorityBorderClass} bg-white dark:bg-[#1a1d24] transition-all hover:border-slate-300 dark:hover:border-zinc-600 hover:shadow-xs`}
+      onClick={() => onOpenDetails?.(todo)}
+      className={`group flex flex-col p-4 rounded-2xl border border-slate-200 dark:border-[#2e3340] border-l-4 ${priorityBorderClass} bg-white dark:bg-[#1a1d24] shadow-xs hover:shadow-md transition-all cursor-pointer`}
     >
       <div className="space-y-2">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 flex-1 min-w-0">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
             <input
               type="checkbox"
               checked={todo.completed}
-              onChange={(e) => onToggle(todo.id, e.target.checked)}
+              onChange={(e) => {
+                e.stopPropagation();
+                onToggle(todo.id, e.target.checked);
+              }}
+              onClick={(e) => e.stopPropagation()}
               aria-label={`Toggle completion for ${todo.title}`}
-              className="h-4 w-4 rounded-md border-slate-300 dark:border-zinc-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer transition-colors"
+              className="h-4 w-4 rounded-md border-slate-300 dark:border-zinc-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer transition-colors shrink-0"
             />
-            <button
-              type="button"
-              onClick={() => onOpenDetails?.(todo)}
-              aria-label={`View details for ${todo.title}`}
-              className={`text-sm text-left truncate select-none cursor-pointer flex-1 font-medium transition-colors ${
-                todo.completed
-                  ? "line-through text-slate-400 dark:text-zinc-500"
-                  : "text-slate-800 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400"
-              }`}
-            >
-              {todo.title}
-            </button>
+            <div className="min-w-0 flex-1">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenDetails?.(todo);
+                }}
+                aria-label={`View details for ${todo.title}`}
+                className={`text-sm text-left truncate select-none cursor-pointer w-full font-semibold transition-colors ${
+                  todo.completed
+                    ? "line-through text-slate-400 dark:text-zinc-500"
+                    : isOverdueItem
+                    ? "text-slate-800 dark:text-zinc-100 line-through decoration-rose-400/80"
+                    : "text-slate-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400"
+                }`}
+              >
+                {todo.title}
+              </button>
+              {todo.description && (
+                <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5 line-clamp-1">
+                  {todo.description}
+                </p>
+              )}
+            </div>
           </div>
 
-          <div className="flex items-center gap-1.5 opacity-90 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+          {/* Action buttons */}
+          <div
+            className="flex items-center gap-1.5 shrink-0"
+            onClick={(e) => e.stopPropagation()}
+          >
             {onOpenEdit && (
               <button
                 type="button"
                 onClick={() => onOpenEdit(todo)}
                 aria-label={`Edit ${todo.title}`}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-[#22262f] transition-colors cursor-pointer"
+                className="p-1.5 sm:px-2.5 sm:py-1 rounded-xl text-slate-500 dark:text-zinc-400 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-[#22262f] transition-colors text-xs font-medium cursor-pointer flex items-center gap-1"
               >
-                <svg
-                  className="h-3.5 w-3.5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                </svg>
+                <Edit3 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Edit</span>
               </button>
             )}
 
@@ -83,27 +100,19 @@ export function TodoItem({
               type="button"
               onClick={() => setIsConfirmingDelete(true)}
               aria-label={`Delete ${todo.title}`}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-[#22262f] transition-colors cursor-pointer"
+              className="p-1.5 sm:px-2 sm:py-1 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors text-xs cursor-pointer flex items-center gap-1"
             >
-              <svg
-                className="h-3.5 w-3.5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                />
-              </svg>
+              <X className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
 
         {/* Delete confirmation inline bar */}
         {isConfirmingDelete && (
-          <div className="flex items-center justify-between p-2 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 mt-1">
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center justify-between p-2 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 mt-1"
+          >
             <span className="text-xs font-semibold text-rose-700 dark:text-rose-300">
               Confirm delete?
             </span>
@@ -129,10 +138,10 @@ export function TodoItem({
           </div>
         )}
 
-        {/* Badges Row */}
-        <div className="flex flex-wrap items-center gap-1.5 pl-7 text-[11px]">
+        {/* Metadata Pills Row */}
+        <div className="flex flex-wrap items-center gap-2 pl-7 mt-2 text-[11px]">
           <span
-            className={`px-2 py-0.5 rounded-full border font-semibold capitalize ${
+            className={`px-2 py-0.5 rounded-full border font-bold capitalize ${
               todo.priority === "high"
                 ? "bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950/70 dark:text-rose-300 dark:border-rose-700"
                 : todo.priority === "medium"
@@ -143,6 +152,12 @@ export function TodoItem({
             {todo.priority}
           </span>
 
+          {todo.category && (
+            <span className="px-2 py-0.5 rounded-full border bg-slate-100 dark:bg-[#22262f] text-slate-600 dark:text-zinc-300 border-slate-200 dark:border-[#2e3340]">
+              {todo.category}
+            </span>
+          )}
+
           {todo.startTime && (
             <span className="px-2 py-0.5 rounded-full border font-semibold font-mono bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/70 dark:text-indigo-300 dark:border-indigo-800">
               {todo.startTime}
@@ -150,33 +165,16 @@ export function TodoItem({
             </span>
           )}
 
-          {todo.category && (
-            <span className="px-2 py-0.5 rounded-full border bg-slate-100 dark:bg-[#22262f] text-slate-600 dark:text-zinc-300 border-slate-200 dark:border-[#2e3340]">
-              {todo.category}
+          {todo.dueDate && !isOverdueItem && (
+            <span className="px-2 py-0.5 rounded-full border font-medium bg-slate-50 text-slate-600 border-slate-200 dark:bg-[#22262f] dark:text-zinc-300 dark:border-[#2e3340]">
+              Due: {formatShortDate(todo.dueDate)}
             </span>
           )}
 
-          {todo.dueDate && (
-            <span
-              className={`px-2 py-0.5 rounded-full border font-medium flex items-center gap-1 ${
-                isOverdue
-                  ? "bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800"
-                  : "bg-slate-50 text-slate-600 border-slate-200 dark:bg-[#22262f] dark:text-zinc-300 dark:border-[#2e3340]"
-              }`}
-            >
-              {isOverdue ? `Overdue: ${todo.dueDate}` : `Due: ${todo.dueDate}`}
+          {isOverdueItem && (
+            <span className="px-2 py-0.5 rounded-full border font-semibold bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/70 dark:text-rose-300 dark:border-rose-800">
+              {formatOverdueLabel(todo.dueDate)}
             </span>
-          )}
-
-          {todo.description && (
-            <button
-              type="button"
-              onClick={() => onOpenDetails?.(todo)}
-              aria-label="View notes"
-              className="text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-white underline text-[10px] ml-1 cursor-pointer"
-            >
-              View notes
-            </button>
           )}
         </div>
       </div>

@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { ClipboardList, Zap, CheckCircle2, Flame, Clock, Plus } from "lucide-react";
 import { Todo } from "@/lib/schemas";
+import { formatShortDate, isOverdue, formatOverdueLabel } from "@/lib/date-utils";
 import { MetricCard } from "./MetricCard";
 
 interface DashboardViewProps {
@@ -247,8 +248,16 @@ export function DashboardView({
 
                   <div className="flex items-center gap-2 shrink-0">
                     {task.dueDate && (
-                      <span className="text-[11px] text-slate-500 dark:text-zinc-400">
-                        {task.dueDate}
+                      <span
+                        className={`text-[11px] font-medium ${
+                          isOverdue(task.dueDate, task.completed)
+                            ? "text-rose-600 dark:text-rose-400 font-semibold"
+                            : "text-slate-500 dark:text-zinc-400"
+                        }`}
+                      >
+                        {isOverdue(task.dueDate, task.completed)
+                          ? formatOverdueLabel(task.dueDate)
+                          : formatShortDate(task.dueDate)}
                       </span>
                     )}
                     {onEditTask && (

@@ -681,17 +681,17 @@ definitions, the API contract, and the data model live in
 
 ## V2.1 Slice 02: Exact mockup task card, short date formatting & overdue task treatment
 
-- [ ] Write tests in `test/components/TodoItem.test.tsx` and `test/lib/date-utils.test.ts` and watch them fail
-- [ ] Implement short date formatting (`Sep 30, 2026`) and overdue calculation in `src/lib/date-utils.ts`
-- [ ] Update `src/components/TodoItem.tsx` to match the exact mockup card from `design/mockups/v1.4.html`:
+- [x] Write tests in `test/components/TodoItem.test.tsx` and `test/lib/date-utils.test.ts` and watch them fail
+- [x] Implement short date formatting (`Sep 30, 2026`) and overdue calculation in `src/lib/date-utils.ts`
+- [x] Update `src/components/TodoItem.tsx` to match the exact mockup card from `design/mockups/v1.4.html`:
   - `border-l-4` priority accent border (`rose-500` high, `amber-500` medium, `blue-500` low, `emerald-500` completed)
   - Title and 1-line description (`line-clamp-1 text-slate-500 dark:text-zinc-400`)
   - Metadata pills: Priority badge, Category tag, Time-block range, and short Due date
   - Overdue cancellation styling and `Overdue (<short date>)` warning badge for active overdue tasks
   - Inline action buttons: `Edit` button and `✕` delete button with click propagation stopped
   - Card body click opens `TaskDetailsModal`
-- [ ] Update `DashboardView.tsx` Critical/Important and Today's panels to use short dates and overdue badge
-- [ ] Run `npm run verify` and commit
+- [x] Update `DashboardView.tsx` Critical/Important and Today's panels to use short dates and overdue badge
+- [x] Run `npm run verify` and commit
 
 **Acceptance criteria**
 
