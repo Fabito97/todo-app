@@ -181,4 +181,11 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Bug or issue caught**: Avoided calling impure `Date.now()` inside render by calculating yesterday's date from the existing `today` object.
 - **Rule or prompt improvement**: None.
 
-
+## 2026-09-30 - V1.4 Slice 03: True centered modal system (Add, Details, Edit) and dedicated tasks board
+- **Commit**: `feat(v1.4): add modal system and dedicated tasks board`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (98 pass across 21 test files in `test/`).
+- **Review**: In-session review by autopilot; verified accessible modal dialogs for `AddTaskModal`, `TaskDetailsModal`, and `EditTaskModal` with backdrop blur, focus trapping/timing, and `Escape` key handling. Verified `TodoItem` is simplified to view-only rows with modal triggers on title and edit actions. Verified `TasksView` renders board header with task counter, quick modal trigger, `FilterBar`, and `TodoList`.
+- **Bug or issue caught**: Fixed ESLint `react-hooks/set-state-in-effect` by extracting inner modal content components keyed by `todo.id` to guarantee clean state initialization without effects. Disambiguated `/confirm delete/i` query in `TodoItem.test.tsx`.
+- **Rule or prompt improvement**: None.

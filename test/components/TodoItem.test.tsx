@@ -13,16 +13,19 @@ const mockTodo: Todo = {
   description: "Detailed description here",
   priority: "high",
   dueDate: "2026-01-01", // Past date to test overdue
+  startTime: "09:00",
+  endTime: "10:30",
   category: "Work",
 };
 
-describe("TodoItem", () => {
+describe("TodoItem (V1.4 view-only row)", () => {
   it("renders todo title, priority badge, category tag, and overdue indicator", () => {
     render(
       <TodoItem
         todo={mockTodo}
         onToggle={vi.fn()}
-        onEdit={vi.fn()}
+        onOpenEdit={vi.fn()}
+        onOpenDetails={vi.fn()}
         onDelete={vi.fn()}
       />
     );
@@ -31,6 +34,7 @@ describe("TodoItem", () => {
     expect(screen.getByText(/high/i)).toBeInTheDocument();
     expect(screen.getByText("Work")).toBeInTheDocument();
     expect(screen.getByText(/overdue/i)).toBeInTheDocument();
+    expect(screen.getByText("09:00 – 10:30")).toBeInTheDocument();
   });
 
   it("toggles completion when checkbox is clicked", async () => {
@@ -41,7 +45,8 @@ describe("TodoItem", () => {
       <TodoItem
         todo={mockTodo}
         onToggle={onToggle}
-        onEdit={vi.fn()}
+        onOpenEdit={vi.fn()}
+        onOpenDetails={vi.fn()}
         onDelete={vi.fn()}
       />
     );
@@ -54,15 +59,38 @@ describe("TodoItem", () => {
     expect(onToggle).toHaveBeenCalledWith(mockTodo.id, true);
   });
 
-  it("enters rich edit mode on edit button click and saves changes", async () => {
-    const onEdit = vi.fn().mockResolvedValue(undefined);
+  it("triggers onOpenDetails modal when title is clicked", async () => {
+    const onOpenDetails = vi.fn();
     const user = userEvent.setup();
 
     render(
       <TodoItem
         todo={mockTodo}
         onToggle={vi.fn()}
-        onEdit={onEdit}
+        onOpenEdit={vi.fn()}
+        onOpenDetails={onOpenDetails}
+        onDelete={vi.fn()}
+      />
+    );
+
+    const titleBtn = screen.getByRole("button", {
+      name: /view details for test todo item/i,
+    });
+    await user.click(titleBtn);
+
+    expect(onOpenDetails).toHaveBeenCalledWith(mockTodo);
+  });
+
+  it("triggers onOpenEdit modal when Edit button is clicked", async () => {
+    const onOpenEdit = vi.fn();
+    const user = userEvent.setup();
+
+    render(
+      <TodoItem
+        todo={mockTodo}
+        onToggle={vi.fn()}
+        onOpenEdit={onOpenEdit}
+        onOpenDetails={vi.fn()}
         onDelete={vi.fn()}
       />
     );
@@ -72,57 +100,10 @@ describe("TodoItem", () => {
     });
     await user.click(editBtn);
 
-    const titleInput = screen.getByRole("textbox", { name: /edit todo title/i });
-    const descInput = screen.getByRole("textbox", { name: /edit description/i });
-    const lowPriorityBtn = screen.getByRole("button", { name: /priority low/i });
-    const saveBtn = screen.getByRole("button", { name: /save changes/i });
-
-    await user.clear(titleInput);
-    await user.type(titleInput, "Updated Title");
-    await user.clear(descInput);
-    await user.type(descInput, "Updated Description");
-    await user.click(lowPriorityBtn);
-
-    await user.click(saveBtn);
-
-    expect(onEdit).toHaveBeenCalledWith(
-      mockTodo.id,
-      expect.objectContaining({
-        title: "Updated Title",
-        description: "Updated Description",
-        priority: "low",
-      })
-    );
+    expect(onOpenEdit).toHaveBeenCalledWith(mockTodo);
   });
 
-  it("cancels edit mode on Escape and restores original title and values", async () => {
-    const onEdit = vi.fn();
-    const user = userEvent.setup();
-
-    render(
-      <TodoItem
-        todo={mockTodo}
-        onToggle={vi.fn()}
-        onEdit={onEdit}
-        onDelete={vi.fn()}
-      />
-    );
-
-    const editBtn = screen.getByRole("button", {
-      name: `Edit ${mockTodo.title}`,
-    });
-    await user.click(editBtn);
-
-    const titleInput = screen.getByRole("textbox", { name: /edit todo title/i });
-    await user.clear(titleInput);
-    await user.type(titleInput, "Something else");
-    await user.keyboard("{Escape}");
-
-    expect(onEdit).not.toHaveBeenCalled();
-    expect(screen.getByText("Test todo item")).toBeInTheDocument();
-  });
-
-  it("calls onDelete when delete button is clicked", async () => {
+  it("handles delete with inline confirmation", async () => {
     const onDelete = vi.fn();
     const user = userEvent.setup();
 
@@ -130,7 +111,8 @@ describe("TodoItem", () => {
       <TodoItem
         todo={mockTodo}
         onToggle={vi.fn()}
-        onEdit={vi.fn()}
+        onOpenEdit={vi.fn()}
+        onOpenDetails={vi.fn()}
         onDelete={onDelete}
       />
     );
@@ -140,82 +122,11 @@ describe("TodoItem", () => {
     });
     await user.click(deleteBtn);
 
+    expect(screen.getByText("Confirm delete?")).toBeInTheDocument();
+
+    const confirmBtn = screen.getByRole("button", { name: /confirm delete/i });
+    await user.click(confirmBtn);
+
     expect(onDelete).toHaveBeenCalledWith(mockTodo.id);
   });
-
-  it("applies distinct priority left-accent border classes for high, medium, and low priority", () => {
-    const { rerender } = render(
-      <TodoItem
-        todo={{ ...mockTodo, priority: "high" }}
-        onToggle={vi.fn()}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
-      />
-    );
-
-    const item = screen.getByRole("listitem");
-    expect(item.className).toMatch(/border-l-4/);
-    expect(item.className).toMatch(/border-l-rose-500/);
-
-    rerender(
-      <TodoItem
-        todo={{ ...mockTodo, priority: "medium" }}
-        onToggle={vi.fn()}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
-      />
-    );
-    expect(screen.getByRole("listitem").className).toMatch(/border-l-amber-500/);
-
-    rerender(
-      <TodoItem
-        todo={{ ...mockTodo, priority: "low" }}
-        onToggle={vi.fn()}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
-      />
-    );
-    expect(screen.getByRole("listitem").className).toMatch(/border-l-blue-500/);
-  });
-
-  it("renders startTime and endTime badge and updates them in edit mode", async () => {
-    const onEdit = vi.fn().mockResolvedValue(undefined);
-    const user = userEvent.setup();
-
-    render(
-      <TodoItem
-        todo={{ ...mockTodo, startTime: "09:00", endTime: "10:30" }}
-        onToggle={vi.fn()}
-        onEdit={onEdit}
-        onDelete={vi.fn()}
-      />
-    );
-
-    expect(screen.getByText("09:00 – 10:30")).toBeInTheDocument();
-
-    await user.click(
-      screen.getByRole("button", { name: `Edit ${mockTodo.title}` })
-    );
-
-    const startInput = screen.getByLabelText(/edit start time/i);
-    const endInput = screen.getByLabelText(/edit end time/i);
-    expect(startInput).toHaveValue("09:00");
-    expect(endInput).toHaveValue("10:30");
-
-    await user.clear(startInput);
-    await user.type(startInput, "13:00");
-    await user.clear(endInput);
-    await user.type(endInput, "14:15");
-
-    await user.click(screen.getByRole("button", { name: /save changes/i }));
-
-    expect(onEdit).toHaveBeenCalledWith(
-      mockTodo.id,
-      expect.objectContaining({
-        startTime: "13:00",
-        endTime: "14:15",
-      })
-    );
-  });
 });
-

@@ -5,14 +5,23 @@ import { useTodos } from "@/hooks/use-todos";
 import { SidebarNav, WorkspaceView } from "@/components/SidebarNav";
 import { ContentHeader } from "@/components/ContentHeader";
 import { DashboardView } from "@/components/DashboardView";
-import { TodoList } from "@/components/TodoList";
-import { FilterBar } from "@/components/FilterBar";
+import { TasksView } from "@/components/TasksView";
 import { CalendarScheduleView } from "@/components/CalendarScheduleView";
 import { Toast, ToastMessage } from "@/components/Toast";
+import { AddTaskModal } from "@/components/AddTaskModal";
+import { TaskDetailsModal } from "@/components/TaskDetailsModal";
+import { EditTaskModal } from "@/components/EditTaskModal";
+import { Todo } from "@/lib/schemas";
 
 export default function Home() {
   const [activeView, setActiveView] = useState<WorkspaceView>("dashboard");
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  // Modal States
+  const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
+  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
 
   const addToast = (type: "success" | "error", text: string) => {
     const id = Date.now().toString() + Math.random().toString(36).slice(2, 6);
@@ -50,8 +59,20 @@ export default function Home() {
     addToast("success", "Task added");
   };
 
-  const hasActiveFilters =
-    priorityFilter !== "all" || categoryFilter !== "all";
+  const handleOpenDetails = (todo: Todo) => {
+    setSelectedTodo(todo);
+    setIsDetailsModalOpen(true);
+  };
+
+  const handleOpenEdit = (todo: Todo) => {
+    setSelectedTodo(todo);
+    setIsEditTaskModalOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    await deleteTodo(id);
+    addToast("success", "Task deleted");
+  };
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-[#121316]">
@@ -65,12 +86,7 @@ export default function Home() {
         {/* Content Top Header */}
         <ContentHeader
           activeView={activeView}
-          onOpenNewTask={() => {
-            // In Slice 03, this opens AddTaskModal
-            if (activeView !== "dashboard") {
-              setActiveView("dashboard");
-            }
-          }}
+          onOpenNewTask={() => setIsAddTaskModalOpen(true)}
           todos={allTodos}
         />
 
@@ -102,53 +118,32 @@ export default function Home() {
               todos={allTodos}
               onQuickAdd={handleQuickAdd}
               onToggle={toggleTodo}
-              onEditTask={() => {
-                // In Slice 03, opens EditTaskModal
-              }}
+              onEditTask={handleOpenEdit}
             />
           )}
 
           {activeView === "tasks" && (
-            <section
-              aria-label="Task list board"
-              className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-6 shadow-md shadow-slate-200/40 dark:shadow-black/40 space-y-6 max-w-5xl mx-auto"
-            >
-              {error && (
-                <div
-                  role="alert"
-                  className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-xs text-rose-600 dark:text-rose-300"
-                >
-                  {error}
-                </div>
-              )}
-
-              <div>
-                <TodoList
-                  todos={todos}
-                  loading={loading}
-                  filter={filter}
-                  hasActiveFilters={hasActiveFilters}
-                  onToggle={toggleTodo}
-                  onEdit={editTodo}
-                  onDelete={deleteTodo}
-                />
-              </div>
-
-              {!loading && (
-                <FilterBar
-                  activeCount={activeCount}
-                  currentFilter={filter}
-                  onFilterChange={setFilter}
-                  priorityFilter={priorityFilter}
-                  onPriorityFilterChange={setPriorityFilter}
-                  categoryFilter={categoryFilter}
-                  onCategoryFilterChange={setCategoryFilter}
-                  categories={categories}
-                  sortBy={sortBy}
-                  onSortChange={setSortBy}
-                />
-              )}
-            </section>
+            <TasksView
+              todos={todos}
+              totalCount={allTodos.length}
+              activeCount={activeCount}
+              loading={loading}
+              error={error}
+              filter={filter}
+              onFilterChange={setFilter}
+              priorityFilter={priorityFilter}
+              onPriorityFilterChange={setPriorityFilter}
+              categoryFilter={categoryFilter}
+              onCategoryFilterChange={setCategoryFilter}
+              categories={categories}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+              onToggle={toggleTodo}
+              onOpenEdit={handleOpenEdit}
+              onOpenDetails={handleOpenDetails}
+              onDelete={handleDelete}
+              onOpenNewTask={() => setIsAddTaskModalOpen(true)}
+            />
           )}
 
           {activeView === "calendar" && (
@@ -204,6 +199,35 @@ export default function Home() {
 
       {/* Floating Toast Notification Container */}
       <Toast toasts={toasts} onDismiss={dismissToast} />
+
+      {/* Modals */}
+      <AddTaskModal
+        isOpen={isAddTaskModalOpen}
+        onClose={() => setIsAddTaskModalOpen(false)}
+        onAdd={async (input) => {
+          await addTodo(input);
+          addToast("success", "Task added");
+        }}
+      />
+
+      <TaskDetailsModal
+        isOpen={isDetailsModalOpen}
+        todo={selectedTodo}
+        onClose={() => setIsDetailsModalOpen(false)}
+        onToggle={toggleTodo}
+        onEdit={handleOpenEdit}
+        onDelete={handleDelete}
+      />
+
+      <EditTaskModal
+        isOpen={isEditTaskModalOpen}
+        todo={selectedTodo}
+        onClose={() => setIsEditTaskModalOpen(false)}
+        onSave={async (id, updates) => {
+          await editTodo(id, updates);
+          addToast("success", "Task updated");
+        }}
+      />
     </div>
   );
 }

@@ -481,14 +481,14 @@ definitions, the API contract, and the data model live in
 
 ## V1.4 Slice 03: True centered modal system (Add, Details, Edit) and dedicated tasks board
 
-- [ ] Write tests in `test/components/AddTaskModal.test.tsx`, `test/components/TaskDetailsModal.test.tsx`, `test/components/EditTaskModal.test.tsx`, `test/components/TasksView.test.tsx`, and updated `test/components/TodoItem.test.tsx` and watch them fail
-- [ ] Implement `src/components/AddTaskModal.tsx` (`design.md` §4.14): centered modal dialog (`role="dialog"`, `aria-modal="true"`, `aria-label="New Task"`) for full metadata creation, supporting Title, Description, Priority, Due Date, Start Time, End Time, and Category, with `Escape` dismissal and focus management
-- [ ] Implement `src/components/TaskDetailsModal.tsx` (`design.md` §4.15): inspection dialog (`role="dialog"`, `aria-modal="true"`, `aria-label="Task details"`) showing complete metadata, time block, notes, and actions to Toggle Complete, Edit, or Delete (with inline confirmation)
-- [ ] Implement `src/components/EditTaskModal.tsx` (`design.md` §4.16): pre-populated modal dialog (`role="dialog"`, `aria-modal="true"`, `aria-label="Edit task"`) for modifying all task fields
-- [ ] Refactor `src/components/TodoItem.tsx` (`design.md` §4.17): simplified to clean view-only row without inline form expansion; clicking title opens Task Details Modal, clicking Edit button opens Edit Task Modal, clicking checkbox toggles complete, clicking Delete confirms deletion
-- [ ] Implement `src/components/TasksView.tsx` (`design.md` §4.12): full-width dedicated task board with `FilterBar`, task counter, and `TodoList`
-- [ ] Wire all `+ New Task` triggers (header, Tasks view) to `AddTaskModal` in `src/app/page.tsx`
-- [ ] Run `npm run verify` and commit
+- [x] Write tests in `test/components/AddTaskModal.test.tsx`, `test/components/TaskDetailsModal.test.tsx`, `test/components/EditTaskModal.test.tsx`, `test/components/TasksView.test.tsx`, and updated `test/components/TodoItem.test.tsx` and watch them fail
+- [x] Implement `src/components/AddTaskModal.tsx` (`design.md` §4.14): centered modal dialog (`role="dialog"`, `aria-modal="true"`, `aria-label="New Task"`) for full metadata creation, supporting Title, Description, Priority, Due Date, Start Time, End Time, and Category, with `Escape` dismissal and focus management
+- [x] Implement `src/components/TaskDetailsModal.tsx` (`design.md` §4.15): inspection dialog (`role="dialog"`, `aria-modal="true"`, `aria-label="Task details"`) showing complete metadata, time block, notes, and actions to Toggle Complete, Edit, or Delete (with inline confirmation)
+- [x] Implement `src/components/EditTaskModal.tsx` (`design.md` §4.16): pre-populated modal dialog (`role="dialog"`, `aria-modal="true"`, `aria-label="Edit task"`) for modifying all task fields
+- [x] Refactor `src/components/TodoItem.tsx` (`design.md` §4.17): simplified to clean view-only row without inline form expansion; clicking title opens Task Details Modal, clicking Edit button opens Edit Task Modal, clicking checkbox toggles complete, clicking Delete confirms deletion
+- [x] Implement `src/components/TasksView.tsx` (`design.md` §4.12): full-width dedicated task board with `FilterBar`, task counter, and `TodoList`
+- [x] Wire all `+ New Task` triggers (header, Tasks view) to `AddTaskModal` in `src/app/page.tsx`
+- [x] Run `npm run verify` and commit
 
 **Acceptance criteria**
 

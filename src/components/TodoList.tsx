@@ -12,6 +12,8 @@ interface TodoListProps {
   hasActiveFilters?: boolean;
   onToggle?: (id: string, completed: boolean) => void;
   onEdit?: (id: string, patch: TodoPatchInput | string) => Promise<unknown> | void;
+  onOpenEdit?: (todo: Todo) => void;
+  onOpenDetails?: (todo: Todo) => void;
   onDelete?: (id: string) => void;
 }
 
@@ -22,6 +24,8 @@ export function TodoList({
   hasActiveFilters = false,
   onToggle = () => {},
   onEdit = () => {},
+  onOpenEdit,
+  onOpenDetails,
   onDelete = () => {},
 }: TodoListProps) {
   if (loading) {
@@ -74,6 +78,8 @@ export function TodoList({
           todo={todo}
           onToggle={onToggle}
           onEdit={onEdit}
+          onOpenEdit={onOpenEdit}
+          onOpenDetails={onOpenDetails}
           onDelete={onDelete}
         />
       ))}
