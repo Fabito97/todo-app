@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { Plus } from "lucide-react";
 import { Todo, Priority } from "@/lib/schemas";
 import { TodoFilter, SortOption } from "@/services";
 import { FilterBar } from "./FilterBar";
@@ -52,7 +51,6 @@ export function TasksView({
   onOpenEdit,
   onOpenDetails,
   onDelete,
-  onOpenNewTask,
 }: TasksViewProps) {
   const hasActiveFilters =
     priorityFilter !== "all" ||
@@ -61,30 +59,6 @@ export function TasksView({
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      {/* Board Header Bar */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-zinc-100">
-            Tasks
-          </h2>
-          <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
-            {totalCount} {totalCount === 1 ? "task" : "tasks"} total ({activeCount} active)
-          </p>
-        </div>
-
-        {onOpenNewTask && (
-          <button
-            type="button"
-            onClick={onOpenNewTask}
-            aria-label="Open new task modal from tasks view"
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs cursor-pointer transition-all"
-          >
-            <Plus aria-hidden="true" className="w-4 h-4 shrink-0 stroke-[2.5]" />
-            <span>+ New Task</span>
-          </button>
-        )}
-      </div>
-
       {/* Error alert if any */}
       {error && (
         <div

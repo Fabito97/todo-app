@@ -56,7 +56,7 @@ export function ContentHeader({
           className="min-h-[40px] flex items-center gap-2 py-2 px-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer"
         >
           <Plus aria-hidden="true" className="w-4 h-4 shrink-0 stroke-[2.5]" />
-          <span>+ New Task</span>
+          <span>New Task</span>
         </button>
 
         {/* Notification Center */}

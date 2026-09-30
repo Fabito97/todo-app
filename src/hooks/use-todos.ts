@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import type { Todo, CreateTodoInput, TodoPatchInput, Priority } from "@/lib/schemas";
+import { TASK_CATEGORIES } from "@/lib/schemas";
 import type { TodoFilter, SortOption } from "@/services";
 import { todoService, subscribeStorageNotice } from "@/services";
 
@@ -118,7 +119,7 @@ export function useTodos() {
   }, []);
 
   const categories = useMemo(() => {
-    const set = new Set<string>();
+    const set = new Set<string>(TASK_CATEGORIES);
     for (const t of todos) {
       if (t.category && t.category.trim()) {
         set.add(t.category.trim());

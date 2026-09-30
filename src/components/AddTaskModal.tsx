@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
-import { CreateTodoInput, Priority } from "@/lib/schemas";
+import { CreateTodoInput, Priority, TASK_CATEGORIES } from "@/lib/schemas";
 
 interface AddTaskModalProps {
   isOpen: boolean;
@@ -10,7 +10,7 @@ interface AddTaskModalProps {
   onAdd: (todo: CreateTodoInput) => Promise<void>;
 }
 
-const PRESET_CATEGORIES = ["Work", "Personal", "Errands", "Health", "Finance", "Study"];
+const PRESET_CATEGORIES = TASK_CATEGORIES;
 
 export function AddTaskModal({ isOpen, onClose, onAdd }: AddTaskModalProps) {
   if (!isOpen) return null;

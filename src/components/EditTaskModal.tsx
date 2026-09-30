@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
-import { Priority, Todo, TodoPatchInput } from "@/lib/schemas";
+import { Priority, Todo, TodoPatchInput, TASK_CATEGORIES } from "@/lib/schemas";
 
 interface EditTaskModalProps {
   isOpen: boolean;
@@ -11,7 +11,7 @@ interface EditTaskModalProps {
   onSave: (id: string, updates: TodoPatchInput) => Promise<void>;
 }
 
-const PRESET_CATEGORIES = ["Work", "Personal", "Errands", "Health", "Finance", "Study"];
+const PRESET_CATEGORIES = TASK_CATEGORIES;
 
 export function EditTaskModal({
   isOpen,

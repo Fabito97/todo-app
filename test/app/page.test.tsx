@@ -98,12 +98,12 @@ describe("Home page workspace layout and resilience", () => {
     expect(screen.getByRole("region", { name: /monthly calendar/i })).toBeInTheDocument();
   });
 
-  it("renders '+ New Task' primary action button in the content header", () => {
+  it("renders 'New Task' primary action button in the content header", () => {
     render(<Home />);
 
     const newBtn = screen.getByRole("button", { name: /open new task modal/i });
     expect(newBtn).toBeInTheDocument();
-    expect(newBtn).toHaveTextContent(/\+ New Task/i);
+    expect(newBtn).toHaveTextContent(/New Task/i);
   });
 
   it("switches theme between light and dark via ThemeToggle", async () => {

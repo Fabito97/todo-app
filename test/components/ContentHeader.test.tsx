@@ -74,7 +74,7 @@ describe("ContentHeader component", () => {
 
     const newBtn = screen.getByRole("button", { name: /open new task modal/i });
     expect(newBtn).toBeInTheDocument();
-    expect(newBtn).toHaveTextContent(/\+ New Task/i);
+    expect(newBtn).toHaveTextContent(/New Task/i);
 
     await user.click(newBtn);
     expect(handleOpenNewTask).toHaveBeenCalledOnce();

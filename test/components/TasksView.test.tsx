@@ -21,10 +21,7 @@ const sampleTodos: Todo[] = [
 ];
 
 describe("TasksView component", () => {
-  it("renders header with task count and '+ New Task' button", async () => {
-    const handleOpenNewTask = vi.fn();
-    const user = userEvent.setup();
-
+  it("renders only the filter/sort bar and task board without duplicate title or button", () => {
     render(
       <TasksView
         todos={sampleTodos}
@@ -43,17 +40,18 @@ describe("TasksView component", () => {
         onOpenEdit={vi.fn()}
         onOpenDetails={vi.fn()}
         onDelete={vi.fn()}
-        onOpenNewTask={handleOpenNewTask}
       />
     );
 
-    expect(screen.getByRole("heading", { level: 2, name: "Tasks" })).toBeInTheDocument();
-    expect(screen.getByText(/1 task/i)).toBeInTheDocument();
+    // Filter and sort bar region exists
+    expect(screen.getByRole("region", { name: /task filters and sorting/i })).toBeInTheDocument();
 
-    const newBtn = screen.getByRole("button", { name: /open new task modal from tasks view/i });
-    expect(newBtn).toBeInTheDocument();
-    await user.click(newBtn);
-    expect(handleOpenNewTask).toHaveBeenCalledOnce();
+    // Task board region exists
+    expect(screen.getByRole("region", { name: /task list board/i })).toBeInTheDocument();
+
+    // No internal duplicate heading or button inside the task section
+    expect(screen.queryByRole("heading", { level: 2, name: "Tasks" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /open new task modal from tasks view/i })).not.toBeInTheDocument();
   });
 
   it("renders filter bar and task item", () => {

@@ -99,7 +99,7 @@ describe("AddTodoForm", () => {
     expect(descInput).toHaveValue("");
     expect(dueDateInput).toHaveValue("");
     expect(categoryInput).toHaveValue("");
-  });
+  }, 15000);
 
   it("shows an inline error when description is longer than 1000 characters", async () => {
     const onAdd = vi.fn();

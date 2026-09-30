@@ -3,6 +3,16 @@ import { z } from "zod";
 export const PrioritySchema = z.enum(["low", "medium", "high"]);
 export type Priority = z.infer<typeof PrioritySchema>;
 
+export const TASK_CATEGORIES = [
+  "Work",
+  "Personal",
+  "Errands",
+  "Health",
+  "Finance",
+  "Study",
+] as const;
+export type TaskCategory = (typeof TASK_CATEGORIES)[number];
+
 export const TimeStringSchema = z
   .string()
   .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Time must be in HH:MM (24-hour) format");
