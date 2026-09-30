@@ -4,14 +4,24 @@ import { useState } from "react";
 import { useTodos } from "@/hooks/use-todos";
 import { SidebarNav, WorkspaceView } from "@/components/SidebarNav";
 import { ContentHeader } from "@/components/ContentHeader";
-import { AddTodoForm } from "@/components/AddTodoForm";
+import { DashboardView } from "@/components/DashboardView";
 import { TodoList } from "@/components/TodoList";
 import { FilterBar } from "@/components/FilterBar";
-import { DashboardOverview } from "@/components/DashboardOverview";
 import { CalendarScheduleView } from "@/components/CalendarScheduleView";
+import { Toast, ToastMessage } from "@/components/Toast";
 
 export default function Home() {
   const [activeView, setActiveView] = useState<WorkspaceView>("dashboard");
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  const addToast = (type: "success" | "error", text: string) => {
+    const id = Date.now().toString() + Math.random().toString(36).slice(2, 6);
+    setToasts((prev) => [...prev, { id, type, text }]);
+  };
+
+  const dismissToast = (id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
 
   const {
     todos,
@@ -34,6 +44,11 @@ export default function Home() {
     editTodo,
     deleteTodo,
   } = useTodos();
+
+  const handleQuickAdd = async (title: string) => {
+    await addTodo({ title, priority: "medium" });
+    addToast("success", "Task added");
+  };
 
   const hasActiveFilters =
     priorityFilter !== "all" || categoryFilter !== "all";
@@ -83,18 +98,14 @@ export default function Home() {
           )}
 
           {activeView === "dashboard" && (
-            <div className="space-y-6 max-w-5xl mx-auto">
-              {/* Today's Dashboard & Progress Summary */}
-              <DashboardOverview todos={allTodos} onToggle={toggleTodo} />
-
-              {/* Quick Task Creation Section */}
-              <section
-                aria-label="Create task"
-                className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-4 sm:p-5 shadow-md shadow-slate-200/40 dark:shadow-black/40"
-              >
-                <AddTodoForm onAdd={addTodo} />
-              </section>
-            </div>
+            <DashboardView
+              todos={allTodos}
+              onQuickAdd={handleQuickAdd}
+              onToggle={toggleTodo}
+              onEditTask={() => {
+                // In Slice 03, opens EditTaskModal
+              }}
+            />
           )}
 
           {activeView === "tasks" && (
@@ -190,6 +201,9 @@ export default function Home() {
           </button>
         </nav>
       </main>
+
+      {/* Floating Toast Notification Container */}
+      <Toast toasts={toasts} onDismiss={dismissToast} />
     </div>
   );
 }

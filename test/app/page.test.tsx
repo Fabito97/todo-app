@@ -26,7 +26,7 @@ describe("Home page workspace layout and resilience", () => {
     });
 
     // In Dashboard view, Today's tasks shows empty state
-    expect(screen.getByText(/no tasks scheduled for today/i)).toBeInTheDocument();
+    expect(screen.getByText(/no tasks due today/i)).toBeInTheDocument();
   });
 
   it("continues to work in memory and shows visible notice when localStorage.setItem throws", async () => {
@@ -41,16 +41,14 @@ describe("Home page workspace layout and resilience", () => {
     });
 
     const user = userEvent.setup();
-    const input = screen.getByRole("textbox", { name: /todo title/i });
-    const button = screen.getByRole("button", { name: /add todo/i });
+    const input = screen.getByRole("textbox", { name: /quick add task title|todo title/i });
+    const button = screen.getByRole("button", { name: /quick add task|add todo/i });
 
     await user.type(input, "In-memory Task");
     await user.click(button);
 
     // Visible notice appears
-    expect(screen.getByRole("status")).toHaveTextContent(
-      /changes will only persist in memory/i
-    );
+    expect(screen.getByText(/changes will only persist in memory/i)).toBeInTheDocument();
 
     // Switch to tasks view to see the created task
     const tasksBtn = screen.getAllByRole("button", { name: /^tasks/i })[0];

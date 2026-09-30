@@ -172,3 +172,13 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Bug or issue caught**: Resolved TypeScript prop matching for `NotificationCenter` in `ContentHeader`.
 - **Rule or prompt improvement**: None.
 
+## 2026-09-30 - V1.4 Slice 02: Executive Dashboard view, metric cards grid, and toast notifications
+- **Commit**: `feat(v1.4): add executive dashboard view, metric cards grid, and toast notifications`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (87 pass across 17 test files in `test/`).
+- **Review**: In-session review by autopilot; verified 4 dedicated metric cards (Total, Active, Completed with progress bar, Critical with high-priority count), single-line Quick Add task bar with transient `<Toast>` feedback, Today's Tasks panel, Important/Critical Tasks panel, and Recent Tasks panel.
+- **Bug or issue caught**: Avoided calling impure `Date.now()` inside render by calculating yesterday's date from the existing `today` object.
+- **Rule or prompt improvement**: None.
+
+

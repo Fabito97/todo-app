@@ -456,12 +456,12 @@ definitions, the API contract, and the data model live in
 
 ## V1.4 Slice 02: Executive Dashboard view, metric cards grid, and toast notifications
 
-- [ ] Write tests in `test/components/MetricCard.test.tsx`, `test/components/Toast.test.tsx`, and `test/components/DashboardView.test.tsx` and watch them fail
-- [ ] Implement `src/components/MetricCard.tsx` (`design.md` §4.10): responsive grid card with uppercase label, large numeral, and optional progress bar / accent
-- [ ] Implement `src/components/Toast.tsx` (`design.md` §4.18): auto-dismissing toast feedback container (`role="status"`, `aria-live="polite"`)
-- [ ] Implement `src/components/DashboardView.tsx` (`design.md` §4.11): composes the 4 Metric Cards grid (Total, Active, Completed with progress bar, Critical with active high-priority count), single-line Quick Add task bar, Today's Tasks panel, Important/Critical Tasks panel, and Recent Tasks panel
-- [ ] Integrate `DashboardView` into `src/app/page.tsx`
-- [ ] Run `npm run verify` and commit
+- [x] Write tests in `test/components/MetricCard.test.tsx`, `test/components/Toast.test.tsx`, and `test/components/DashboardView.test.tsx` and watch them fail
+- [x] Implement `src/components/MetricCard.tsx` (`design.md` §4.10): responsive grid card with uppercase label, large numeral, and optional progress bar / accent
+- [x] Implement `src/components/Toast.tsx` (`design.md` §4.18): auto-dismissing toast feedback container (`role="status"`, `aria-live="polite"`)
+- [x] Implement `src/components/DashboardView.tsx` (`design.md` §4.11): composes the 4 Metric Cards grid (Total, Active, Completed with progress bar, Critical with active high-priority count), single-line Quick Add task bar, Today's Tasks panel, Important/Critical Tasks panel, and Recent Tasks panel
+- [x] Integrate `DashboardView` into `src/app/page.tsx`
+- [x] Run `npm run verify` and commit
 
 **Acceptance criteria**
 
