@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Todo List — Version 1.4 Mockup (Full-Viewport Sidebar Workspace)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    };
+  </script>
+  <style>
+    /* Custom scrollbar styling for slick warm graphite look */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(150, 150, 150, 0.2);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(150, 150, 150, 0.4);
+    }
+  </style>
+</head>
+<body class="h-screen w-screen overflow-hidden bg-slate-50 dark:bg-[#121316] text-slate-900 dark:text-zinc-100 antialiased font-sans flex flex-col lg:flex-row">
+
+  <!-- ==================== SIDEBAR (DESKTOP) ==================== -->
+  <aside aria-label="Main navigation" class="hidden lg:flex w-60 flex-none flex-col justify-between bg-slate-100 dark:bg-[#161920] border-r border-slate-200 dark:border-[#2e3340] p-4 select-none">
+    <div class="space-y-6">
+      <!-- App Brand / Logo -->
+      <div class="flex items-center gap-3 px-2 pt-1">
+        <div class="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-black text-base shadow-sm">
+          ✓
+        </div>
+        <div>
+          <h2 class="text-sm font-bold tracking-tight text-slate-900 dark:text-zinc-100">Task Workspace</h2>
+          <span class="text-[10px] font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">v1.4 Workspace</span>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav aria-label="Sidebar navigation">
+        <ul class="space-y-1 text-sm font-medium">
+          <li>
+            <button id="nav-btn-dashboard" onclick="switchView('dashboard')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold transition text-left">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+              <span>Dashboard</span>
+            </button>
+          </li>
+          <li>
+            <button id="nav-btn-tasks" onclick="switchView('tasks')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-[#22262f] transition text-left">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+              <span>Tasks</span>
+              <span class="ml-auto px-1.5 py-0.5 rounded-full bg-slate-200 dark:bg-[#22262f] text-[10px] font-bold text-slate-600 dark:text-zinc-400">12</span>
+            </button>
+          </li>
+          <li>
+            <button id="nav-btn-calendar" onclick="switchView('calendar')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-[#22262f] transition text-left">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span>Calendar</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Bottom Sidebar Section: Theme Switcher & Status -->
+    <div class="pt-4 border-t border-slate-200 dark:border-[#2e3340] space-y-3">
+      <div class="flex items-center justify-between text-xs text-slate-500 dark:text-zinc-400 px-1">
+        <span>Appearance</span>
+        <span class="text-[10px] font-mono">Warm Graphite</span>
+      </div>
+      <div class="inline-flex w-full p-1 rounded-xl bg-slate-200/80 dark:bg-[#22262f] border border-slate-300/60 dark:border-[#2e3340] text-xs">
+        <button onclick="setTheme('light')" id="theme-btn-light" class="flex-1 py-1 rounded-lg text-slate-600 dark:text-zinc-300 font-medium hover:text-slate-900 transition">Light</button>
+        <button onclick="setTheme('dark')" id="theme-btn-dark" class="flex-1 py-1 rounded-lg bg-white dark:bg-[#1a1d24] text-slate-900 dark:text-white font-medium shadow-xs transition">Dark</button>
+        <button onclick="setTheme('system')" id="theme-btn-system" class="flex-1 py-1 rounded-lg text-slate-600 dark:text-zinc-300 font-medium hover:text-slate-900 transition">System</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==================== MAIN CONTENT PANE ==================== -->
+  <main class="flex-1 min-w-0 flex flex-col h-full overflow-hidden">
+
+    <!-- Top Header Bar -->
+    <header class="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-[#2e3340] bg-white dark:bg-[#1a1d24] flex-none z-10">
+      <div>
+        <h1 id="view-title" class="text-xl font-bold tracking-tight text-slate-900 dark:text-zinc-100">Dashboard</h1>
+        <p id="view-subtitle" class="text-xs text-slate-500 dark:text-zinc-400">Your executive task overview & daily schedule</p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <!-- + New Task Primary CTA Button -->
+        <button onclick="openModal('add-task-modal')" aria-label="Open new task modal" class="flex items-center gap-2 py-2 px-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white text-xs sm:text-sm font-semibold shadow-xs transition cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+          <span>New Task</span>
+        </button>
+
+        <!-- Notification Center -->
+        <button onclick="toggleNotifications()" aria-label="Notifications" class="relative p-2.5 rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] hover:bg-slate-100 dark:hover:bg-[#2e3340] text-slate-700 dark:text-zinc-200 transition cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center shadow-xs">2</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Scrollable View Container -->
+    <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+
+      <!-- ==================== VIEW 1: DASHBOARD ==================== -->
+      <section id="view-dashboard" class="space-y-6 max-w-7xl mx-auto">
+        <!-- 4 Metric Cards Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Card 1: Total Tasks -->
+          <div class="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-5 shadow-sm space-y-2">
+            <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
+              <span>Total Tasks</span>
+              <span class="p-1 rounded-md bg-slate-100 dark:bg-[#22262f] text-slate-600 dark:text-zinc-400">📋</span>
+            </div>
+            <p class="text-3xl sm:text-4xl font-extrabold text-slate-800 dark:text-zinc-200">12</p>
+            <p class="text-xs text-slate-500 dark:text-zinc-400">All saved in localStorage</p>
+          </div>
+
+          <!-- Card 2: Active Tasks -->
+          <div class="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-5 shadow-sm space-y-2">
+            <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
+              <span>Active</span>
+              <span class="p-1 rounded-md bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">⚡</span>
+            </div>
+            <p class="text-3xl sm:text-4xl font-extrabold text-indigo-600 dark:text-indigo-400">5</p>
+            <p class="text-xs text-slate-500 dark:text-zinc-400">tasks remaining</p>
+          </div>
+
+          <!-- Card 3: Completed Tasks -->
+          <div class="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-5 shadow-sm space-y-2">
+            <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
+              <span>Completed</span>
+              <span class="p-1 rounded-md bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">✓</span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <p class="text-3xl sm:text-4xl font-extrabold text-emerald-600 dark:text-emerald-400">7</p>
+              <span class="text-xs font-medium text-emerald-600 dark:text-emerald-400">58%</span>
+            </div>
+            <!-- Progress Bar -->
+            <div class="w-full h-1.5 rounded-full bg-slate-100 dark:bg-[#22262f] overflow-hidden">
+              <div class="h-full bg-emerald-500 rounded-full" style="width: 58%"></div>
+            </div>
+          </div>
+
+          <!-- Card 4: Critical Tasks -->
+          <div class="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-5 shadow-sm space-y-2">
+            <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
+              <span>Critical</span>
+              <span class="p-1 rounded-md bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400">🔥</span>
+            </div>
+            <p class="text-3xl sm:text-4xl font-extrabold text-rose-600 dark:text-rose-400">2</p>
+            <p class="text-xs text-rose-600 dark:text-rose-400 font-medium">high priority active</p>
+          </div>
+        </div>
+
+        <!-- Quick Add Single-Line Command Bar -->
+        <section aria-label="Quick add task" class="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-3 sm:p-4 shadow-sm">
+          <form onsubmit="handleQuickAdd(event)" class="flex gap-2">
+            <div class="relative flex-1">
+              <input id="quick-input" type="text" placeholder="Add a task quickly... (Press Enter to save)" class="w-full rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] px-4 py-2.5 text-sm text-slate-900 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+            <button type="submit" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-xs transition">
+              Add
+            </button>
+          </form>
+        </section>
+
+        <!-- Two Column Dashboard Layout: Today's Tasks + (Critical & Recent) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+          <!-- Left Column (7 cols): Today's Tasks -->
+          <section aria-label="Today's tasks" class="lg:col-span-7 bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-5 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-base font-bold text-slate-900 dark:text-zinc-100">Today's Tasks</h2>
+                <p class="text-xs text-slate-500 dark:text-zinc-400">Wednesday, September 30, 2026</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900">
+                2 scheduled
+              </span>
+            </div>
+
+            <ul class="space-y-2.5">
+              <!-- Today Task 1 -->
+              <li class="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-[#2e3340] border-l-4 border-l-rose-500 bg-slate-50/50 dark:bg-[#22262f]/60 hover:bg-slate-100/60 dark:hover:bg-[#22262f] transition cursor-pointer" onclick="openModal('task-details-modal')">
+                <div class="flex items-center gap-3 min-w-0">
+                  <input type="checkbox" onclick="event.stopPropagation()" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer" />
+                  <div class="min-w-0">
+                    <p class="text-sm font-medium text-slate-900 dark:text-zinc-100 truncate">Engineering sprint demo & architecture review</p>
+                    <div class="flex items-center gap-2 text-[11px] text-slate-500 dark:text-zinc-400">
+                      <span class="font-mono text-indigo-600 dark:text-indigo-400 font-semibold">09:00 – 10:30</span>
+                      <span>•</span>
+                      <span>Work</span>
+                    </div>
+                  </div>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-900">high</span>
+              </li>
+
+              <!-- Today Task 2 -->
+              <li class="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-[#2e3340] border-l-4 border-l-amber-500 bg-slate-50/50 dark:bg-[#22262f]/60 hover:bg-slate-100/60 dark:hover:bg-[#22262f] transition cursor-pointer" onclick="openModal('task-details-modal')">
+                <div class="flex items-center gap-3 min-w-0">
+                  <input type="checkbox" onclick="event.stopPropagation()" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer" />
+                  <div class="min-w-0">
+                    <p class="text-sm font-medium text-slate-900 dark:text-zinc-100 truncate">Review pull requests and approve release notes</p>
+                    <div class="flex items-center gap-2 text-[11px] text-slate-500 dark:text-zinc-400">
+                      <span class="font-mono text-slate-500 dark:text-zinc-400">All day</span>
+                      <span>•</span>
+                      <span>Work</span>
+                    </div>
+                  </div>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-900">medium</span>
+              </li>
+            </ul>
+          </section>
+
+          <!-- Right Column (5 cols): Important / Critical & Recent -->
+          <div class="lg:col-span-5 space-y-6">
+            <!-- Critical Tasks Panel -->
+            <section aria-label="Critical tasks" class="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-5 shadow-sm space-y-3">
+              <div class="flex items-center justify-between">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-zinc-100 flex items-center gap-2">
+                  <span class="text-rose-500">🔥</span>
+                  <span>Important / Critical</span>
+                </h3>
+                <span class="text-xs text-rose-600 dark:text-rose-400 font-semibold">2 pending</span>
+              </div>
+              <ul class="space-y-2 text-xs">
+                <li class="flex items-center justify-between p-2.5 rounded-xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40">
+                  <div class="truncate pr-2">
+                    <p class="font-semibold text-slate-900 dark:text-zinc-100 truncate">Engineering sprint demo</p>
+                    <p class="text-[10px] text-rose-600 dark:text-rose-400 font-medium">Due Today at 09:00</p>
+                  </div>
+                  <button onclick="openModal('edit-task-modal')" class="px-2 py-1 rounded-lg bg-white dark:bg-[#22262f] text-slate-700 dark:text-zinc-300 hover:text-indigo-600 border border-slate-200 dark:border-[#2e3340] text-[11px] font-medium shrink-0">Edit</button>
+                </li>
+                <li class="flex items-center justify-between p-2.5 rounded-xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40">
+                  <div class="truncate pr-2">
+                    <p class="font-semibold text-slate-900 dark:text-zinc-100 truncate">Fix zero-flash theme bug in Safari</p>
+                    <p class="text-[10px] text-rose-600 dark:text-rose-400 font-medium">Overdue (Sep 28)</p>
+                  </div>
+                  <button onclick="openModal('edit-task-modal')" class="px-2 py-1 rounded-lg bg-white dark:bg-[#22262f] text-slate-700 dark:text-zinc-300 hover:text-indigo-600 border border-slate-200 dark:border-[#2e3340] text-[11px] font-medium shrink-0">Edit</button>
+                </li>
+              </ul>
+            </section>
+
+            <!-- Recent Tasks Panel -->
+            <section aria-label="Recent tasks" class="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-5 shadow-sm space-y-3">
+              <h3 class="text-sm font-bold text-slate-900 dark:text-zinc-100 flex items-center gap-2">
+                <span>🕒</span>
+                <span>Recent Tasks</span>
+              </h3>
+              <ul class="space-y-2 text-xs divide-y divide-slate-100 dark:divide-[#2e3340]">
+                <li class="pt-2 flex items-center justify-between">
+                  <span class="text-slate-800 dark:text-zinc-200 truncate pr-2">Setup Vitest /test folder structure</span>
+                  <span class="text-[10px] text-slate-400 dark:text-zinc-500 shrink-0">Today</span>
+                </li>
+                <li class="pt-2 flex items-center justify-between">
+                  <span class="text-slate-800 dark:text-zinc-200 truncate pr-2">Add nullable startTime to schema</span>
+                  <span class="text-[10px] text-slate-400 dark:text-zinc-500 shrink-0">Yesterday</span>
+                </li>
+              </ul>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== VIEW 2: TASKS (FULL BOARD) ==================== -->
+      <section id="view-tasks" class="hidden space-y-6 max-w-7xl mx-auto">
+        <!-- Controls & Filters Bar -->
+        <div class="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <!-- Filter Tabs -->
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs font-semibold text-slate-500 dark:text-zinc-400 mr-1">Status:</span>
+            <div class="inline-flex p-1 rounded-xl bg-slate-100 dark:bg-[#22262f] text-xs font-medium">
+              <button class="px-3 py-1 rounded-lg bg-white dark:bg-[#1a1d24] text-slate-900 dark:text-white shadow-xs">All (12)</button>
+              <button class="px-3 py-1 rounded-lg text-slate-600 dark:text-zinc-400 hover:text-slate-900">Active (5)</button>
+              <button class="px-3 py-1 rounded-lg text-slate-600 dark:text-zinc-400 hover:text-slate-900">Done (7)</button>
+            </div>
+
+            <!-- Priority Dropdown -->
+            <select class="rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] px-3 py-1.5 text-xs text-slate-700 dark:text-zinc-200 focus:outline-none">
+              <option>All Priorities</option>
+              <option>High Priority</option>
+              <option>Medium Priority</option>
+              <option>Low Priority</option>
+            </select>
+          </div>
+
+          <!-- Sort & Reset -->
+          <div class="flex items-center gap-2">
+            <select class="rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] px-3 py-1.5 text-xs text-slate-700 dark:text-zinc-200 focus:outline-none">
+              <option>Sort: Due Date</option>
+              <option>Sort: Newest</option>
+              <option>Sort: Priority</option>
+            </select>
+            <button onclick="openModal('add-task-modal')" class="px-3.5 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold shadow-xs">
+              + New Task
+            </button>
+          </div>
+        </div>
+
+        <!-- Task List Items -->
+        <div class="space-y-3">
+          <!-- Item 1 -->
+          <div class="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] border-l-4 border-l-rose-500 rounded-2xl p-4 shadow-sm hover:shadow-md transition cursor-pointer" onclick="openModal('task-details-modal')">
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-center gap-3 min-w-0">
+                <input type="checkbox" onclick="event.stopPropagation()" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500" />
+                <div>
+                  <h3 class="text-sm font-semibold text-slate-900 dark:text-zinc-100">Engineering sprint demo & architecture review</h3>
+                  <p class="text-xs text-slate-500 dark:text-zinc-400 mt-0.5 line-clamp-1">Review the V1.4 full-viewport layout specification and verify the test gate.</p>
+                </div>
+              </div>
+              <!-- Action buttons -->
+              <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
+                <button onclick="openModal('edit-task-modal')" class="p-2 rounded-xl text-slate-500 dark:text-zinc-400 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-[#22262f] transition text-xs font-medium">Edit</button>
+                <button class="p-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition text-xs">✕</button>
+              </div>
+            </div>
+            <!-- Metadata Pills -->
+            <div class="flex flex-wrap items-center gap-2 pl-7 mt-3 text-[11px]">
+              <span class="px-2 py-0.5 rounded-full font-bold bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-900">high</span>
+              <span class="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-[#22262f] text-slate-600 dark:text-zinc-300 border border-slate-200 dark:border-[#2e3340]">Work</span>
+              <span class="px-2 py-0.5 rounded-full font-mono bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-800 font-semibold">09:00 – 10:30</span>
+              <span class="px-2 py-0.5 rounded-full bg-slate-50 dark:bg-[#22262f] text-slate-600 dark:text-zinc-300 border border-slate-200 dark:border-[#2e3340]">Due: 2026-09-30</span>
+            </div>
+          </div>
+
+          <!-- Item 2 -->
+          <div class="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] border-l-4 border-l-amber-500 rounded-2xl p-4 shadow-sm hover:shadow-md transition cursor-pointer" onclick="openModal('task-details-modal')">
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-center gap-3 min-w-0">
+                <input type="checkbox" onclick="event.stopPropagation()" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500" />
+                <div>
+                  <h3 class="text-sm font-semibold text-slate-900 dark:text-zinc-100">Review pull requests and approve release notes</h3>
+                  <p class="text-xs text-slate-500 dark:text-zinc-400 mt-0.5 line-clamp-1">Ensure changelog reflects all changes in V1.3 and V1.4.</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
+                <button onclick="openModal('edit-task-modal')" class="p-2 rounded-xl text-slate-500 dark:text-zinc-400 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-[#22262f] transition text-xs font-medium">Edit</button>
+                <button class="p-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition text-xs">✕</button>
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 pl-7 mt-3 text-[11px]">
+              <span class="px-2 py-0.5 rounded-full font-bold bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-900">medium</span>
+              <span class="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-[#22262f] text-slate-600 dark:text-zinc-300 border border-slate-200 dark:border-[#2e3340]">Work</span>
+              <span class="px-2 py-0.5 rounded-full bg-slate-50 dark:bg-[#22262f] text-slate-600 dark:text-zinc-300 border border-slate-200 dark:border-[#2e3340]">Due: 2026-09-30</span>
+            </div>
+          </div>
+
+          <!-- Item 3 (Completed) -->
+          <div class="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] border-l-4 border-l-emerald-500 opacity-70 rounded-2xl p-4 shadow-sm hover:shadow-md transition cursor-pointer" onclick="openModal('task-details-modal')">
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-center gap-3 min-w-0">
+                <input type="checkbox" checked onclick="event.stopPropagation()" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500" />
+                <div>
+                  <h3 class="text-sm font-semibold line-through text-slate-500 dark:text-zinc-400">Implement zero-flash blocking theme script in layout.tsx</h3>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
+                <button onclick="openModal('edit-task-modal')" class="p-2 rounded-xl text-slate-500 dark:text-zinc-400 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-[#22262f] transition text-xs font-medium">Edit</button>
+                <button class="p-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition text-xs">✕</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== VIEW 3: CALENDAR (FULL MONTH GRID) ==================== -->
+      <section id="view-calendar" class="hidden max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
+
+          <!-- Month Grid Column -->
+          <div class="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-5 shadow-sm space-y-4">
+            <!-- Calendar Navigation Header -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <h2 class="text-lg font-bold text-slate-900 dark:text-zinc-100">September 2026</h2>
+                <button class="px-2.5 py-1 rounded-lg border border-slate-200 dark:border-[#2e3340] text-xs font-medium bg-slate-50 dark:bg-[#22262f] hover:bg-slate-100">Today</button>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button aria-label="Previous month" class="p-2 rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] hover:bg-slate-100 text-xs">◀</button>
+                <button aria-label="Next month" class="p-2 rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] hover:bg-slate-100 text-xs">▶</button>
+              </div>
+            </div>
+
+            <!-- Month Table -->
+            <div class="w-full">
+              <!-- Weekday Headers -->
+              <div class="grid grid-cols-7 mb-2 text-center text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
+                <div>Sun</div>
+                <div>Mon</div>
+                <div>Tue</div>
+                <div>Wed</div>
+                <div>Thu</div>
+                <div>Fri</div>
+                <div>Sat</div>
+              </div>
+
+              <!-- Month Day Cells (7 cols) -->
+              <div class="grid grid-cols-7 gap-1.5 text-xs">
+                <!-- Row 1: Leading Days from August -->
+                <div class="min-h-[72px] p-2 rounded-xl bg-slate-50/50 dark:bg-[#161920]/40 text-slate-300 dark:text-zinc-600">30</div>
+                <div class="min-h-[72px] p-2 rounded-xl bg-slate-50/50 dark:bg-[#161920]/40 text-slate-300 dark:text-zinc-600">31</div>
+                <!-- Sep 1 -->
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">1</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">2</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">3</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">4</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">5</div>
+
+                <!-- Row 2 -->
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">6</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">7</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">8</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">9</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">10</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">11</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">12</div>
+
+                <!-- Row 3 -->
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">13</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">14</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">15</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">16</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">17</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">18</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">19</div>
+
+                <!-- Row 4 -->
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">20</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">21</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">22</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">23</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">24</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">25</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">26</div>
+
+                <!-- Row 5: Sep 27 - 30 -->
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">27</div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer flex flex-col justify-between">
+                  <span>28</span>
+                  <div class="flex gap-1"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span></div>
+                </div>
+                <div class="min-h-[72px] p-2 rounded-xl border border-slate-100 dark:border-[#2e3340]/60 hover:bg-slate-100 dark:hover:bg-[#22262f] transition cursor-pointer">29</div>
+
+                <!-- TODAY: Sep 30 (Selected) -->
+                <div class="min-h-[72px] p-2 rounded-xl bg-indigo-600 text-white font-bold ring-2 ring-indigo-400 dark:ring-indigo-300 shadow-md flex flex-col justify-between cursor-pointer">
+                  <div class="flex items-center justify-between">
+                    <span>30</span>
+                    <span class="text-[9px] uppercase px-1 rounded bg-white/20">Today</span>
+                  </div>
+                  <div class="flex gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-rose-300"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                  </div>
+                </div>
+
+                <!-- Next Month Days -->
+                <div class="min-h-[72px] p-2 rounded-xl bg-slate-50/50 dark:bg-[#161920]/40 text-slate-300 dark:text-zinc-600">1</div>
+                <div class="min-h-[72px] p-2 rounded-xl bg-slate-50/50 dark:bg-[#161920]/40 text-slate-300 dark:text-zinc-600">2</div>
+                <div class="min-h-[72px] p-2 rounded-xl bg-slate-50/50 dark:bg-[#161920]/40 text-slate-300 dark:text-zinc-600">3</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Daily Schedule Panel Column -->
+          <div class="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-5 shadow-sm space-y-5">
+            <div class="border-b border-slate-200 dark:border-[#2e3340] pb-3">
+              <h3 class="text-sm font-bold text-slate-900 dark:text-zinc-100">Schedule for Sep 30</h3>
+              <p class="text-xs text-slate-500 dark:text-zinc-400">Wednesday • 2 items scheduled</p>
+            </div>
+
+            <!-- Time Blocked Slots -->
+            <div class="space-y-3">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">Time-Blocked Tasks</span>
+              <div class="p-3 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-900/60 space-y-1">
+                <span class="font-mono text-xs font-bold text-indigo-700 dark:text-indigo-300">09:00 – 10:30</span>
+                <p class="text-xs font-semibold text-slate-900 dark:text-zinc-100">Engineering sprint demo</p>
+                <p class="text-[10px] text-slate-500 dark:text-zinc-400">Work • High priority</p>
+              </div>
+            </div>
+
+            <!-- All-Day Items -->
+            <div class="space-y-3">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">All-Day / Unscheduled</span>
+              <div class="p-3 rounded-xl bg-slate-50 dark:bg-[#22262f] border border-slate-200 dark:border-[#2e3340] space-y-1">
+                <p class="text-xs font-semibold text-slate-900 dark:text-zinc-100">Review pull requests</p>
+                <p class="text-[10px] text-slate-500 dark:text-zinc-400">Work • Medium priority</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ==================== MOBILE BOTTOM NAV BAR ==================== -->
+    <nav aria-label="Mobile navigation" class="lg:hidden flex items-center justify-around py-2.5 px-4 bg-white dark:bg-[#1a1d24] border-t border-slate-200 dark:border-[#2e3340] text-xs font-medium z-10">
+      <button onclick="switchView('dashboard')" id="mob-btn-dashboard" class="flex flex-col items-center gap-1 text-indigo-600 dark:text-indigo-400">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <span>Dashboard</span>
+      </button>
+      <button onclick="switchView('tasks')" id="mob-btn-tasks" class="flex flex-col items-center gap-1 text-slate-500 dark:text-zinc-400">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+        <span>Tasks</span>
+      </button>
+      <button onclick="switchView('calendar')" id="mob-btn-calendar" class="flex flex-col items-center gap-1 text-slate-500 dark:text-zinc-400">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        <span>Calendar</span>
+      </button>
+      <button onclick="openModal('add-task-modal')" class="flex flex-col items-center gap-1 text-slate-500 dark:text-zinc-400">
+        <div class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold">+</div>
+        <span>New</span>
+      </button>
+    </nav>
+  </main>
+
+  <!-- ==================== MODAL 1: ADD TASK MODAL ==================== -->
+  <div id="add-task-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+    <div class="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-[#2e3340] pb-3">
+        <h3 class="text-base font-bold text-slate-900 dark:text-zinc-100">New Task</h3>
+        <button onclick="closeModal('add-task-modal')" class="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 text-sm">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700 dark:text-zinc-300">Task Title *</label>
+          <input type="text" placeholder="What needs to be done?" class="w-full rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] p-2.5 text-sm" />
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700 dark:text-zinc-300">Description / Notes</label>
+          <textarea rows="2" placeholder="Optional context or notes..." class="w-full rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] p-2.5"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700 dark:text-zinc-300">Priority</label>
+            <div class="flex gap-1">
+              <button type="button" class="flex-1 py-1.5 rounded-lg border border-slate-200 dark:border-[#2e3340] bg-slate-100 dark:bg-[#22262f]">Low</button>
+              <button type="button" class="flex-1 py-1.5 rounded-lg border border-indigo-300 bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold">Med</button>
+              <button type="button" class="flex-1 py-1.5 rounded-lg border border-slate-200 dark:border-[#2e3340] bg-slate-100 dark:bg-[#22262f]">High</button>
+            </div>
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700 dark:text-zinc-300">Category</label>
+            <input type="text" placeholder="e.g. Work, Personal" class="w-full rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] p-2" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700 dark:text-zinc-300">Due Date</label>
+            <input type="date" value="2026-09-30" class="w-full rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] p-2" />
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700 dark:text-zinc-300">Start Time</label>
+            <input type="time" class="w-full rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] p-2 font-mono" />
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700 dark:text-zinc-300">End Time</label>
+            <input type="time" class="w-full rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] p-2 font-mono" />
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-[#2e3340]">
+        <button onclick="closeModal('add-task-modal')" class="px-4 py-2 rounded-xl border border-slate-200 dark:border-[#2e3340] text-xs font-semibold">Cancel</button>
+        <button onclick="submitModal('add-task-modal', 'Task added')" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold shadow-xs">Add Task</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 2: TASK DETAILS MODAL ==================== -->
+  <div id="task-details-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+    <div class="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-4">
+      <div class="flex items-start justify-between border-b border-slate-100 dark:border-[#2e3340] pb-3">
+        <div>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-900">High Priority</span>
+          <h3 class="text-base font-bold text-slate-900 dark:text-zinc-100 mt-1">Engineering sprint demo & architecture review</h3>
+        </div>
+        <button onclick="closeModal('task-details-modal')" class="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 text-sm">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <span class="font-semibold text-slate-500 dark:text-zinc-400">Description:</span>
+          <p class="mt-1 text-slate-800 dark:text-zinc-200 leading-relaxed">
+            Review the V1.4 full-viewport layout specification, verify that the Vitest test gate is passing, and check contrast with the script before deploying.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 p-3 rounded-xl bg-slate-50 dark:bg-[#22262f] border border-slate-200 dark:border-[#2e3340]">
+          <div>
+            <span class="text-slate-400 dark:text-zinc-500 block text-[10px]">TIME BLOCK</span>
+            <span class="font-mono font-semibold text-indigo-600 dark:text-indigo-400">09:00 – 10:30</span>
+          </div>
+          <div>
+            <span class="text-slate-400 dark:text-zinc-500 block text-[10px]">DUE DATE</span>
+            <span class="font-medium text-slate-800 dark:text-zinc-200">Sep 30, 2026</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-[#2e3340]">
+        <button onclick="submitModal('task-details-modal', 'Task deleted')" class="px-3 py-2 rounded-xl text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-xs font-semibold">Delete</button>
+        <div class="flex gap-2">
+          <button onclick="closeModal('task-details-modal'); openModal('edit-task-modal');" class="px-3 py-2 rounded-xl border border-slate-200 dark:border-[#2e3340] text-xs font-semibold">Edit</button>
+          <button onclick="submitModal('task-details-modal', 'Marked as completed')" class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-semibold shadow-xs">Complete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 3: EDIT TASK MODAL ==================== -->
+  <div id="edit-task-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+    <div class="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-[#2e3340] pb-3">
+        <h3 class="text-base font-bold text-slate-900 dark:text-zinc-100">Edit Task</h3>
+        <button onclick="closeModal('edit-task-modal')" class="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 text-sm">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700 dark:text-zinc-300">Task Title</label>
+          <input type="text" value="Engineering sprint demo & architecture review" class="w-full rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] p-2.5 text-sm" />
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700 dark:text-zinc-300">Description / Notes</label>
+          <textarea rows="2" class="w-full rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] p-2.5">Review the V1.4 full-viewport layout specification and verify the test gate.</textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700 dark:text-zinc-300">Priority</label>
+            <div class="flex gap-1">
+              <button type="button" class="flex-1 py-1.5 rounded-lg border border-slate-200 dark:border-[#2e3340] bg-slate-100 dark:bg-[#22262f]">Low</button>
+              <button type="button" class="flex-1 py-1.5 rounded-lg border border-slate-200 dark:border-[#2e3340] bg-slate-100 dark:bg-[#22262f]">Med</button>
+              <button type="button" class="flex-1 py-1.5 rounded-lg border border-rose-300 bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-300 font-bold">High</button>
+            </div>
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700 dark:text-zinc-300">Category</label>
+            <input type="text" value="Work" class="w-full rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] p-2" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700 dark:text-zinc-300">Due Date</label>
+            <input type="date" value="2026-09-30" class="w-full rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] p-2" />
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700 dark:text-zinc-300">Start Time</label>
+            <input type="time" value="09:00" class="w-full rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] p-2 font-mono" />
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700 dark:text-zinc-300">End Time</label>
+            <input type="time" value="10:30" class="w-full rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] p-2 font-mono" />
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-[#2e3340]">
+        <button onclick="closeModal('edit-task-modal')" class="px-4 py-2 rounded-xl border border-slate-200 dark:border-[#2e3340] text-xs font-semibold">Cancel</button>
+        <button onclick="submitModal('edit-task-modal', 'Changes saved')" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold shadow-xs">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TOAST NOTIFICATION CONTAINER ==================== -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 space-y-2 pointer-events-none"></div>
+
+  <!-- ==================== INTERACTIVITY JAVASCRIPT ==================== -->
+  <script>
+    // View Switcher logic
+    function switchView(viewName) {
+      const views = ['dashboard', 'tasks', 'calendar'];
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        const navBtn = document.getElementById(`nav-btn-${v}`);
+        const mobBtn = document.getElementById(`mob-btn-${v}`);
+
+        if (v === viewName) {
+          el.classList.remove('hidden');
+          if (navBtn) {
+            navBtn.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold transition text-left";
+          }
+          if (mobBtn) {
+            mobBtn.className = "flex flex-col items-center gap-1 text-indigo-600 dark:text-indigo-400";
+          }
+        } else {
+          el.classList.add('hidden');
+          if (navBtn) {
+            navBtn.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-[#22262f] transition text-left";
+          }
+          if (mobBtn) {
+            mobBtn.className = "flex flex-col items-center gap-1 text-slate-500 dark:text-zinc-400";
+          }
+        }
+      });
+
+      // Update View Title
+      const titleEl = document.getElementById('view-title');
+      const subEl = document.getElementById('view-subtitle');
+      if (viewName === 'dashboard') {
+        titleEl.textContent = 'Dashboard';
+        subEl.textContent = 'Your executive task overview & daily schedule';
+      } else if (viewName === 'tasks') {
+        titleEl.textContent = 'Tasks';
+        subEl.textContent = 'Manage, filter, and organize all your workspace items';
+      } else if (viewName === 'calendar') {
+        titleEl.textContent = 'Calendar';
+        subEl.textContent = 'Browse by month and inspect your time-blocked schedule';
+      }
+    }
+
+    // Modal helpers
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    function submitModal(id, toastMsg) {
+      closeModal(id);
+      showToast(toastMsg);
+    }
+
+    function handleQuickAdd(e) {
+      e.preventDefault();
+      const input = document.getElementById('quick-input');
+      if (input.value.trim()) {
+        showToast(`Task added: "${input.value.trim()}"`);
+        input.value = '';
+      }
+    }
+
+    function showToast(message) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = "px-4 py-3 rounded-xl bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] border-l-4 border-l-emerald-500 shadow-xl text-xs font-semibold text-slate-900 dark:text-zinc-100 flex items-center gap-2 transition duration-200 transform translate-y-2 opacity-0 pointer-events-auto";
+      toast.innerHTML = `<span>✓</span><span>${message}</span>`;
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 200);
+      }, 3000);
+    }
+
+    function toggleNotifications() {
+      showToast("2 notifications: 1 Overdue task, 1 Today at 09:00");
+    }
+
+    // Theme Switcher helper
+    function setTheme(mode) {
+      const html = document.documentElement;
+      const lightBtn = document.getElementById('theme-btn-light');
+      const darkBtn = document.getElementById('theme-btn-dark');
+      const sysBtn = document.getElementById('theme-btn-system');
+
+      [lightBtn, darkBtn, sysBtn].forEach(b => {
+        b.className = "flex-1 py-1 rounded-lg text-slate-600 dark:text-zinc-300 font-medium hover:text-slate-900 transition";
+      });
+
+      if (mode === 'dark') {
+        html.classList.add('dark');
+        darkBtn.className = "flex-1 py-1 rounded-lg bg-white dark:bg-[#1a1d24] text-slate-900 dark:text-white font-medium shadow-xs transition";
+      } else if (mode === 'light') {
+        html.classList.remove('dark');
+        lightBtn.className = "flex-1 py-1 rounded-lg bg-white text-slate-900 font-medium shadow-xs transition";
+      } else {
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          html.classList.add('dark');
+        } else {
+          html.classList.remove('dark');
+        }
+        sysBtn.className = "flex-1 py-1 rounded-lg bg-white dark:bg-[#1a1d24] text-slate-900 dark:text-white font-medium shadow-xs transition";
+      }
+    }
+  </script>
+</body>
+</html>
