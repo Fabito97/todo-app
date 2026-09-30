@@ -642,10 +642,103 @@ definitions, the API contract, and the data model live in
 
 - [x] Run `npm run verify && npm run e2e`
 - [x] Run `/finish 2` — audit, README update, and release notes
-- [ ] Human reviews output, merges branch to `main`, tags `v2`, and deploys to Vercel
+- [x] Human reviews output, merges branch to `main`, tags `v2`, and deploys to Vercel
 
 **Acceptance criteria**
 
 - All unit, component, contract, and end-to-end tests pass cleanly.
 - `README.md` documents Version 2 architecture, database setup, environment variables, and deployment instructions.
 - Release notes written and committed.
+
+---
+
+# Version 2.1: High-Fidelity UI Polish & Mockup Alignment
+
+## V2.1 Slice 01: Lucide React iconography & Tasks Board toolbar search and category filter
+
+- [ ] Write tests in `test/components/FilterBar.test.tsx` and `test/hooks/use-todos.test.ts` and watch them fail
+- [ ] Install `lucide-react`
+- [ ] Implement `src/lib/date-utils.ts` for clean short date formatting (`Sep 30, 2026`) and overdue calculation
+- [ ] Replace emojis and raw SVGs across `SidebarNav`, `ContentHeader`, `MetricCard`, `DashboardView`, `TasksView`, and modals with `lucide-react` icons
+- [ ] Add real-time search input (`aria-label="Search tasks"`) to Tasks Board toolbar (searching title and description)
+- [ ] Add category filter dropdown (`aria-label="Filter by category"`) to Tasks Board toolbar
+- [ ] Remove redundant `+ New Task` button from Tasks Board toolbar
+- [ ] Run `npm run verify` and commit
+
+**Acceptance criteria**
+
+- `lucide-react` icons render cleanly without emojis across all views, metric cards, sidebar nav, and modal dialogs.
+- Typing in the Tasks Board search input (`aria-label="Search tasks"`) filters visible tasks in real time by title or description text.
+- Selecting a category from the category filter dropdown (`aria-label="Filter by category"`) filters visible tasks by matching category.
+- Tasks Board toolbar no longer has a redundant `+ New Task` button; the persistent header CTA remains functional.
+
+**Tests**
+
+- component (`test/components/FilterBar.test.tsx`): verifies search input triggers filtering, category dropdown lists categories and filters on change.
+- hook (`test/hooks/use-todos.test.ts`): verifies search filtering against title and description.
+
+---
+
+## V2.1 Slice 02: Exact mockup task card, short date formatting & overdue task treatment
+
+- [ ] Write tests in `test/components/TodoItem.test.tsx` and `test/lib/date-utils.test.ts` and watch them fail
+- [ ] Implement short date formatting (`Sep 30, 2026`) and overdue calculation in `src/lib/date-utils.ts`
+- [ ] Update `src/components/TodoItem.tsx` to match the exact mockup card from `design/mockups/v1.4.html`:
+  - `border-l-4` priority accent border (`rose-500` high, `amber-500` medium, `blue-500` low, `emerald-500` completed)
+  - Title and 1-line description (`line-clamp-1 text-slate-500 dark:text-zinc-400`)
+  - Metadata pills: Priority badge, Category tag, Time-block range, and short Due date
+  - Overdue cancellation styling and `Overdue (<short date>)` warning badge for active overdue tasks
+  - Inline action buttons: `Edit` button and `✕` delete button with click propagation stopped
+  - Card body click opens `TaskDetailsModal`
+- [ ] Update `DashboardView.tsx` Critical/Important and Today's panels to use short dates and overdue badge
+- [ ] Run `npm run verify` and commit
+
+**Acceptance criteria**
+
+- Dates are rendered as human-readable short dates (e.g. `Sep 30, 2026`) instead of raw `YYYY-MM-DD`.
+- Active tasks with past due dates display an overdue alert badge (e.g. `Overdue (Sep 28)`) and visual cancellation styling matching the mockup.
+- Task card layout matches `design/mockups/v1.4.html` with color-coded left border, 1-line truncated description, metadata pills row, and clean action buttons.
+- Clicking the card body opens `TaskDetailsModal`; clicking `Edit` opens `EditTaskModal`; clicking checkbox toggles completion; clicking `✕` deletes task.
+
+**Tests**
+
+- unit (`test/lib/date-utils.test.ts`): tests date formatting and overdue detection.
+- component (`test/components/TodoItem.test.tsx`): verifies exact mockup card classes, short dates, overdue styling, and click handlers.
+
+---
+
+## V2.1 Slice 03: Calendar & Daily Schedule view/edit interactivity & Polished States
+
+- [ ] Write tests in `test/components/CalendarView.test.tsx` and watch them fail
+- [ ] Update `src/components/CalendarView.tsx` to enable clicking any task item in the Daily Schedule or day view to open `TaskDetailsModal` and `EditTaskModal`
+- [ ] Add polished loading indicator/skeleton during initial server data fetch
+- [ ] Add styled, informative empty states for search and filter empty views
+- [ ] Ensure non-blocking, accessible error banner/toast on network or API failures
+- [ ] Run `npm run verify` and commit
+
+**Acceptance criteria**
+
+- Clicking any task in the Calendar Daily Schedule or day view opens `TaskDetailsModal` with full inspection and `Edit` action opening `EditTaskModal`.
+- Data loading from `/api/todos` displays a clean loading skeleton or spinner until data arrives.
+- Empty states for views and search/filter combinations display clear, helpful guidance.
+- Network or API errors trigger accessible error feedback (`role="status"`, `aria-live="polite"`).
+
+**Tests**
+
+- component (`test/components/CalendarView.test.tsx`): verifies clicking a scheduled task opens details/edit modal.
+- component (`test/components/TasksView.test.tsx`): verifies empty state rendering when search yields no matches.
+
+---
+
+## V2.1 Slice 04: End-to-end verification and Finish Version 2.1
+
+- [ ] Run full test gate: `npm run verify && npm run e2e`
+- [ ] Audit requirements and design mockup alignment
+- [ ] Run `/finish 2.1` — release notes and workflow log
+- [ ] Human reviews output, merges branch to `main`, and tags `v2.1`
+
+**Acceptance criteria**
+
+- All unit, component, contract, and end-to-end tests pass cleanly.
+- End-to-end suite verifies search, category filtering, exact card layout, calendar modal inspection, and persistence on Neon PostgreSQL.
+

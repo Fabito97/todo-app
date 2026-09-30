@@ -4,6 +4,7 @@ Status V1.2: APPROVED by human on 2026-09-29
 Status V1.3: APPROVED by human on 2026-09-30
 Status V1.4: APPROVED by human on 2026-09-30
 Status V2: APPROVED by human on 2026-09-30
+Status V2.1: APPROVED by human on 2026-09-30
 
 ---
 
@@ -480,3 +481,88 @@ All endpoints accept and return JSON. Errors follow a standardized shape: `{ err
 
 ### Open Decisions for Version 2
 - **None (`0` `OPEN` items)**: Database engine confirmed as Neon PostgreSQL via `@neondatabase/serverless` + Drizzle ORM. Service boundary and API shape adhere strictly to project rules.
+
+---
+
+## Version 2.1 Plan — High-Fidelity UI Polish, Tasks Search, Category Filter, Lucide Icons, Date Formatting & Calendar Interactivity
+
+**Mockup Reference**: Relies on [`design/mockups/v1.4.html`](file:///c:/Users/hp/Documents/hng/todo-list/design/mockups/v1.4.html) and [`requirements.md`](file:///c:/Users/hp/Documents/hng/todo-list/requirements.md) (Version 2.1).
+
+### Goal
+
+Align the UI implementation directly with the high-fidelity HTML mockup in `design/mockups/v1.4.html`, resolving all user-identified gaps: replace raw SVGs and emojis with cohesive `lucide-react` iconography, introduce a real-time search input and category filter dropdown in the Tasks Board toolbar (while removing redundant `+ New Task` toolbar button), implement the exact mockup task card with short readable dates (`Sep 30, 2026`) and overdue cancellation styling, enable inspecting and editing tasks directly from the Calendar view, and polish loading, empty, and error feedback states—all while keeping full server persistence on Neon PostgreSQL via Drizzle ORM and `HttpTodoService`.
+
+### What is New in Version 2.1 (and what it leaves alone)
+
+1. **Crisp Lucide React Iconography**:
+   - Install `lucide-react`.
+   - Replace emojis and generic SVGs across the entire application with standard Lucide React icons:
+     - Sidebar (`SidebarNav.tsx`): `LayoutDashboard` (Dashboard), `CheckSquare` (Tasks), `Calendar` (Calendar).
+     - Content Header (`ContentHeader.tsx`): `Plus` (New Task), `Bell` (Notifications).
+     - Metric Cards (`MetricCard.tsx`): `ClipboardList` (Total), `Zap` (Active), `CheckCircle2` (Completed), `Flame` (Critical).
+     - Dashboard Sections (`DashboardView.tsx`): `Flame` (Important/Critical), `Clock` (Recent Tasks), `Plus` (Quick Add).
+     - Tasks Toolbar (`TasksView.tsx`, `FilterBar.tsx`): `Search` (Search tasks input), `Tag` (Category filter).
+     - Task Cards & Items (`TodoItem.tsx`, `TaskDetailsModal.tsx`, `EditTaskModal.tsx`): `Pencil` / `SquarePen` (Edit), `Trash2` / `X` (Delete), `Calendar` (Due Date), `Clock` (Time block).
+     - Calendar (`CalendarView.tsx`): `ChevronLeft` (Previous Month), `ChevronRight` (Next Month).
+2. **Tasks Board Toolbar Search & Category Filter**:
+   - In `TasksView.tsx` / `FilterBar.tsx`, add a live search text input (`aria-label="Search tasks"`, placeholder `"Search tasks..."`) that filters tasks matching title or description in real time.
+   - Add a dedicated category filter dropdown (`aria-label="Filter by category"`, options: `All Categories` plus dynamically extracted categories from existing tasks) alongside Status tabs (`All`, `Active`, `Done`), Priority filter, and Sort selector.
+   - Remove redundant `+ New Task` button from the Tasks board toolbar (as the primary `+ New Task` CTA is persistently anchored in the top content header).
+3. **Exact Mockup Task Card, Short Date Formatting & Overdue Treatment**:
+   - In `TodoItem.tsx` and wherever dates are rendered: format dates as short, human-readable strings (e.g. `Sep 30, 2026` via a lightweight date formatter helper) instead of raw `YYYY-MM-DD`.
+   - Adopt the exact task card layout from `design/mockups/v1.4.html`:
+     - Left accent border (`border-l-4 border-l-rose-500` for high, `border-l-amber-500` for medium, `border-l-blue-500` for low, `border-l-emerald-500` for completed).
+     - Single-line title and 1-line description (`line-clamp-1 text-slate-500 dark:text-zinc-400`).
+     - Metadata tags row: Priority badge (`high`, `medium`, `low`), Category badge (e.g. `Work`), Time-block badge (`09:00 – 10:30` / `All day`), and Due date tag (`Due: Sep 30, 2026`).
+     - Overdue treatment: For any active incomplete task whose due date is in the past, render prominent `Overdue (<date>)` badge and visual strike-through/cancel out treatment matching the mockup (`Fix zero-flash theme bug in Safari` - `Overdue (Sep 28)`).
+     - Inline action buttons: `Edit` button and `✕` delete button with click propagation stopped, while clicking the card body opens `TaskDetailsModal`.
+4. **Calendar View Task Interactivity (View & Edit)**:
+   - In `CalendarView.tsx`, allow clicking any scheduled task item in the Daily Schedule panel or day view to open `TaskDetailsModal` for full inspection, with direct action to open `EditTaskModal`.
+5. **Polished Application States**:
+   - Loading state: sleek skeleton or spinner while tasks are fetched from `/api/todos`.
+   - Empty states: contextual, informative messages when no tasks match current search/filter criteria.
+   - Error states: accessible toast and banner notifications when network or server operations encounter issues.
+6. **What Version 2.1 Leaves Alone**:
+   - The underlying PostgreSQL schema (`src/server/schema.ts`), Route Handlers (`src/app/api/todos/`), and `TodoService` interface remain unchanged.
+   - Binary completion (`completed: boolean` / Active vs. Done) is strictly preserved (no `in_progress` field, keeping single-click toggle performance).
+
+### Files Expected to be Added or Changed in Version 2.1
+
+| File | Change |
+| :--- | :--- |
+| `package.json` | Add `lucide-react` dependency |
+| `src/lib/date-utils.ts` | **New file**: Helper to format dates as short human-readable strings (e.g. `Sep 30, 2026`) and calculate overdue status |
+| `src/components/SidebarNav.tsx` | Replace SVG icons with Lucide React `LayoutDashboard`, `CheckSquare`, `Calendar` |
+| `src/components/ContentHeader.tsx` | Replace SVG icons with Lucide React `Plus`, `Bell` |
+| `src/components/MetricCard.tsx` | Replace emojis with Lucide React `ClipboardList`, `Zap`, `CheckCircle2`, `Flame` |
+| `src/components/DashboardView.tsx` | Replace emojis with Lucide icons; format short dates; handle overdue badge in Important/Critical panel |
+| `src/components/FilterBar.tsx` | Add live search input (`aria-label="Search tasks"`) and category dropdown (`aria-label="Filter by category"`); remove redundant `+ New Task` button |
+| `src/components/TodoItem.tsx` | Match exact mockup card: `border-l-4`, 1-line description, short dates, overdue styling, Lucide icons |
+| `src/components/CalendarView.tsx` | Replace raw symbols with Lucide `ChevronLeft`, `ChevronRight`; wire task items to `TaskDetailsModal` and `EditTaskModal` |
+| `src/components/AddTaskModal.tsx` | Use Lucide icons (`X`, `Clock`, `Calendar`, `Tag`) |
+| `src/components/TaskDetailsModal.tsx` | Use Lucide icons; display formatted short dates and overdue badge |
+| `src/components/EditTaskModal.tsx` | Use Lucide icons (`X`, `Clock`, `Calendar`, `Tag`) |
+| `src/hooks/use-todos.ts` | Support real-time search term filtering across title and description |
+| `test/components/FilterBar.test.tsx` | Update tests for search input and category filter |
+| `test/components/TodoItem.test.tsx` | Update tests for short date formatting, overdue cancellation styling, and Lucide icons |
+| `test/components/CalendarView.test.tsx` | Update tests for clicking tasks to view/edit in modal |
+| `test/lib/date-utils.test.ts` | **New test file**: Unit tests for date formatting and overdue checks |
+| `e2e/todos.spec.ts` | End-to-end tests for search filtering, category filtering, calendar task modal opening, and overdue display |
+
+### Testing Strategy for Version 2.1
+
+1. **Unit Tests (`test/lib/date-utils.test.ts`)**:
+   - Verify date formatting produces short readable dates (`Sep 30, 2026`).
+   - Verify overdue calculation correctly flags past active dates while ignoring today/future dates or completed tasks.
+2. **Component Tests (`test/components/`)**:
+   - Verify `FilterBar` search input fires on change and filters items by text.
+   - Verify `FilterBar` category dropdown lists all available categories and filters properly.
+   - Verify `TodoItem` applies exact mockup card classes, short dates, and overdue badges.
+   - Verify `CalendarView` daily schedule tasks trigger `onSelectTask` to open `TaskDetailsModal`.
+3. **End-to-End Tests (`e2e/todos.spec.ts`)**:
+   - Full flow: create tasks, search by keyword, filter by category, inspect in Calendar, view details and edit from Calendar.
+
+### Open Decisions for Version 2.1
+
+- **None (`0` `OPEN` items)**: All design questions and user specifications (e.g. dropping `in_progress` to maintain binary checkbox speed, using `lucide-react`, short date format) have been resolved.
+
