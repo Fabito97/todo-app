@@ -640,8 +640,8 @@ definitions, the API contract, and the data model live in
 
 ## V2 Slice 05: Finish version 2
 
-- [ ] Run `npm run verify && npm run e2e`
-- [ ] Run `/finish 2` — audit, README update, and release notes
+- [x] Run `npm run verify && npm run e2e`
+- [x] Run `/finish 2` — audit, README update, and release notes
 - [ ] Human reviews output, merges branch to `main`, tags `v2`, and deploys to Vercel
 
 **Acceptance criteria**

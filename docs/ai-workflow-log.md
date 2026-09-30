@@ -241,5 +241,11 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Checks run**: lint (pass), typecheck (pass), tests (151 pass across 25 test files in `test/`), Playwright e2e (12 pass across 2 test files), post-task gate (`GATE PASSED (full)`).
 - **Review**: In-session review by autopilot; verified `useTodos` error handling across all mutation methods and initial fetch, derived effective error toasts in `src/app/page.tsx` avoiding cascading renders, and updated Playwright test suite to clear API data before each test.
 - **Bug or issue caught**: Resolved Playwright shared backend interference by configuring single-worker execution and adding API cleanup in `beforeEach`. Handled input clearing race in quick add test. Computed `effectiveToasts` via `useMemo` to conform with React 19 rules.
+## 2026-09-30 - V2 Slice 05: Finish version 2
+- **Commit**: `docs(v2): update README and complete version 2 audit`
+- **Key prompt or instruction**: "/autopilot 2"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (151 pass across 25 test files in `test/`), Playwright e2e (12 pass across 2 test files), post-task gate (`GATE PASSED (full)`).
+- **Review**: `project-auditor` audit completed. All requirements in `requirements.md`, `implementation_plan.md`, and `task.md` for Version 2 verified. Zero leftovers of `TODO`, `FIXME`, or `console.log`. Zero tracked `.env` or `.db` files. `README.md` comprehensively updated for Version 2 (Neon PostgreSQL, Drizzle ORM, Route Handlers, environment variables, migrations, API spec).
+- **Bug or issue caught**: None.
 - **Rule or prompt improvement**: None.
-
