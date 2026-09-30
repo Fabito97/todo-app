@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ClipboardList, Zap, CheckCircle2, Flame, Clock, Plus } from "lucide-react";
+import { ClipboardList, Zap, CheckCircle2, Flame, Clock, Plus, Loader2 } from "lucide-react";
 import { Todo } from "@/lib/schemas";
 import { formatShortDate, isOverdue, formatOverdueLabel } from "@/lib/date-utils";
 import { MetricCard } from "./MetricCard";
@@ -26,6 +26,7 @@ export function DashboardView({
 }: DashboardViewProps) {
   const [quickTitle, setQuickTitle] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   const totalCount = todos.length;
   const activeCount = todos.filter((t) => !t.completed).length;
@@ -64,7 +65,14 @@ export function DashboardView({
 
   // Recent tasks: 5 newest by createdAt descending
   const recentTasks = [...todos]
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .sort((a, b) => {
+      const timeA = new Date(a.createdAt).getTime();
+      const timeB = new Date(b.createdAt).getTime();
+      if (!isNaN(timeA) && !isNaN(timeB) && timeB !== timeA) {
+        return timeB - timeA;
+      }
+      return (b.createdAt || "").localeCompare(a.createdAt || "");
+    })
     .slice(0, 5);
 
   const formatRelativeDate = (isoStr: string) => {
@@ -89,10 +97,19 @@ export function DashboardView({
     }
   };
 
+  const handleRecentToggle = async (id: string, completed: boolean) => {
+    setTogglingId(id);
+    try {
+      await onToggle(id, completed);
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* 4 Metric Cards Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-10 pb-20">
         <MetricCard
           label="Total Tasks"
           value={totalCount}
@@ -124,30 +141,6 @@ export function DashboardView({
       </div>
 
       {/* Quick Add Task Bar */}
-      <form
-        onSubmit={handleQuickAddSubmit}
-        className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-2.5 shadow-md flex items-center gap-2"
-      >
-        <div className="pl-2 text-slate-400 dark:text-zinc-500">
-          <Plus aria-hidden="true" className="w-5 h-5" />
-        </div>
-        <input
-          type="text"
-          value={quickTitle}
-          onChange={(e) => setQuickTitle(e.target.value)}
-          aria-label="Quick add task title — Todo title"
-          placeholder="Add a task quickly…"
-          className="flex-1 min-w-0 bg-transparent px-2 py-1.5 text-sm text-slate-900 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none"
-        />
-        <button
-          type="submit"
-          disabled={!quickTitle.trim() || isSubmitting}
-          aria-label="Quick add task — Add todo"
-          className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold shadow-xs transition-all cursor-pointer"
-        >
-          Add
-        </button>
-      </form>
 
       {/* Two Column Dashboard Layout: Today's Tasks + (Critical & Recent) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -191,6 +184,30 @@ export function DashboardView({
         {/* Right Column (5 cols): Important / Critical & Recent */}
         <div className="lg:col-span-5 space-y-6">
           {/* Important / Critical Tasks Panel */}
+           <form
+        onSubmit={handleQuickAddSubmit}
+        className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-2.5 shadow-md flex items-center gap-2"
+      >
+        <div className="pl-2 text-slate-400 dark:text-zinc-500">
+          <Plus aria-hidden="true" className="w-5 h-5" />
+        </div>
+        <input
+          type="text"
+          value={quickTitle}
+          onChange={(e) => setQuickTitle(e.target.value)}
+          aria-label="Quick add task title — Todo title"
+          placeholder="Add a task quickly…"
+          className="flex-1 min-w-0 bg-transparent px-2 py-1.5 text-sm text-slate-900 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none"
+        />
+        <button
+          type="submit"
+          disabled={!quickTitle.trim() || isSubmitting}
+          aria-label="Quick add task — Add todo"
+          className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold shadow-xs transition-all cursor-pointer"
+        >
+          Add
+        </button>
+      </form>
           <section
             aria-label="Important and critical tasks"
             className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-5 shadow-sm space-y-3"
@@ -271,17 +288,30 @@ export function DashboardView({
                     className="pt-2 flex items-center justify-between gap-2 hover:bg-slate-50 dark:hover:bg-[#22262f]/40 p-1.5 rounded-lg transition cursor-pointer"
                   >
                     <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                      <input
-                        type="checkbox"
-                        checked={task.completed}
-                        onChange={(e) => {
-                          e.stopPropagation();
-                          onToggle(task.id, e.target.checked);
-                        }}
-                        onClick={(e) => e.stopPropagation()}
-                        aria-label={`Toggle completion for ${task.title}`}
-                        className="w-4 h-4 rounded border-slate-300 dark:border-zinc-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer shrink-0"
-                      />
+                      {togglingId === task.id ? (
+                        <span
+                          role="status"
+                          aria-label={`Updating completion for ${task.title}`}
+                          className="w-4 h-4 flex items-center justify-center shrink-0"
+                        >
+                          <Loader2
+                            aria-hidden="true"
+                            className="w-3.5 h-3.5 animate-spin text-indigo-600 dark:text-indigo-400"
+                          />
+                        </span>
+                      ) : (
+                        <input
+                          type="checkbox"
+                          checked={task.completed}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleRecentToggle(task.id, e.target.checked);
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          aria-label={`Toggle completion for ${task.title}`}
+                          className="w-4 h-4 rounded border-slate-300 dark:border-zinc-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer shrink-0"
+                        />
+                      )}
                       <span
                         className={`truncate font-medium ${
                           task.completed

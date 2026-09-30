@@ -129,17 +129,17 @@ const memoryQuery = async (sqlText: string, params: unknown[] = []) => {
           if (a.startTime && b.startTime && a.startTime !== b.startTime) {
             return a.startTime.localeCompare(b.startTime);
           }
-          return b.createdAt.localeCompare(a.createdAt);
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         });
       } else if (lower.includes("priority") && lower.includes("case")) {
         const weight: Record<string, number> = { high: 1, medium: 2, low: 3 };
         items.sort((a, b) => {
           const diff = (weight[a.priority] || 2) - (weight[b.priority] || 2);
           if (diff !== 0) return diff;
-          return b.createdAt.localeCompare(a.createdAt);
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         });
       } else if (lower.includes("created_at") && lower.includes("desc")) {
-        items.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+        items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       }
     }
 

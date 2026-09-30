@@ -25,7 +25,12 @@ export function DashboardOverview({ todos, onToggle }: DashboardOverviewProps) {
       }
       if (a.startTime && !b.startTime) return -1;
       if (!a.startTime && b.startTime) return 1;
-      return b.createdAt.localeCompare(a.createdAt);
+      const timeA = new Date(a.createdAt).getTime();
+      const timeB = new Date(b.createdAt).getTime();
+      if (!isNaN(timeA) && !isNaN(timeB) && timeB !== timeA) {
+        return timeB - timeA;
+      }
+      return (b.createdAt || "").localeCompare(a.createdAt || "");
     });
 
   return (

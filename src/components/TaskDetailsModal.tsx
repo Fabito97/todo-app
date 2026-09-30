@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 import { Todo } from "@/lib/schemas";
 
 interface TaskDetailsModalProps {
   isOpen: boolean;
   todo: Todo | null;
   onClose: () => void;
-  onToggle: (id: string, completed: boolean) => void;
+  onToggle: (id: string, completed: boolean) => Promise<unknown> | void;
   onEdit: (todo: Todo) => void;
   onDelete: (id: string) => void;
 }
@@ -43,11 +43,21 @@ function TaskDetailsModalContent({
 }: {
   todo: Todo;
   onClose: () => void;
-  onToggle: (id: string, completed: boolean) => void;
+  onToggle: (id: string, completed: boolean) => Promise<unknown> | void;
   onEdit: (todo: Todo) => void;
   onDelete: (id: string) => void;
 }) {
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
+
+  const handleToggle = async () => {
+    setIsToggling(true);
+    try {
+      await onToggle(todo.id, !todo.completed);
+    } finally {
+      setIsToggling(false);
+    }
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -194,16 +204,24 @@ function TaskDetailsModalContent({
             <div className="flex items-center justify-between gap-2">
               <button
                 type="button"
-                onClick={() => {
-                  onToggle(todo.id, !todo.completed);
-                }}
-                className={`px-3 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                disabled={isToggling}
+                onClick={handleToggle}
+                className={`px-3 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-all flex items-center gap-1.5 ${
                   todo.completed
                     ? "bg-slate-100 dark:bg-[#22262f] text-slate-700 dark:text-zinc-200 hover:bg-slate-200"
                     : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
-                }`}
+                } ${isToggling ? "opacity-75 cursor-wait" : ""}`}
               >
-                {todo.completed ? "Mark as active" : "Mark as completed"}
+                {isToggling && (
+                  <Loader2 aria-hidden="true" className="w-3.5 h-3.5 animate-spin" />
+                )}
+                <span>
+                  {isToggling
+                    ? "Updating..."
+                    : todo.completed
+                    ? "Mark as active"
+                    : "Mark as completed"}
+                </span>
               </button>
 
               <div className="flex items-center gap-2">

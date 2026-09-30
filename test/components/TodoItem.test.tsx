@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import { TodoItem } from "@/components/TodoItem";
@@ -83,6 +83,43 @@ describe("TodoItem (V1.4 view-only row)", () => {
     await user.click(checkbox);
 
     expect(onToggle).toHaveBeenCalledWith(mockTodo.id, true);
+  });
+
+  it("displays a loader while marking task as completed", async () => {
+    let resolveToggle!: () => void;
+    const onToggle = vi.fn().mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveToggle = resolve;
+        })
+    );
+    const user = userEvent.setup();
+
+    render(
+      <TodoItem
+        todo={mockTodo}
+        onToggle={onToggle}
+        onOpenEdit={vi.fn()}
+        onOpenDetails={vi.fn()}
+        onDelete={vi.fn()}
+      />
+    );
+
+    const checkbox = screen.getByRole("checkbox", {
+      name: /toggle completion for test todo item/i,
+    });
+    await user.click(checkbox);
+
+    expect(
+      screen.getByRole("status", { name: /updating completion/i })
+    ).toBeInTheDocument();
+
+    resolveToggle();
+    await waitFor(() => {
+      expect(
+        screen.queryByRole("status", { name: /updating completion/i })
+      ).not.toBeInTheDocument();
+    });
   });
 
   it("triggers onOpenDetails modal when title is clicked", async () => {

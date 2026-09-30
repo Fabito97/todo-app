@@ -12,6 +12,12 @@ import { db as defaultDb, type AppDatabase } from "./db";
 import { eq, and, sql, desc, asc } from "drizzle-orm";
 
 function toTodo(row: TodoRow): Todo {
+  const createdAtIso = row.createdAt
+    ? new Date(row.createdAt).toISOString()
+    : new Date().toISOString();
+  const updatedAtIso = row.updatedAt
+    ? new Date(row.updatedAt).toISOString()
+    : new Date().toISOString();
   return {
     id: row.id,
     title: row.title,
@@ -22,8 +28,8 @@ function toTodo(row: TodoRow): Todo {
     startTime: row.startTime ?? null,
     endTime: row.endTime ?? null,
     category: row.category ?? null,
-    createdAt: typeof row.createdAt === "string" ? row.createdAt : new Date(row.createdAt).toISOString(),
-    updatedAt: typeof row.updatedAt === "string" ? row.updatedAt : new Date(row.updatedAt).toISOString(),
+    createdAt: createdAtIso,
+    updatedAt: updatedAtIso,
   };
 }
 

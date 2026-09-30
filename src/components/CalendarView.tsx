@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Edit3 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Edit3, Loader2 } from "lucide-react";
 import { Todo } from "@/lib/schemas";
 
 interface CalendarViewProps {
   todos: Todo[];
-  onToggle: (id: string, completed: boolean) => void;
+  onToggle: (id: string, completed: boolean) => Promise<unknown> | void;
   onOpenEdit?: (todo: Todo) => void;
   onOpenDetails?: (todo: Todo) => void;
   onDelete?: (id: string) => void;
@@ -47,6 +47,16 @@ export function CalendarView({
   const [currentYear, setCurrentYear] = useState(() => today.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(() => today.getMonth());
   const [selectedDate, setSelectedDate] = useState(() => todayStr);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
+
+  const handleTaskToggle = async (id: string, completed: boolean) => {
+    setTogglingId(id);
+    try {
+      await onToggle(id, completed);
+    } finally {
+      setTogglingId(null);
+    }
+  };
 
   const handlePrevMonth = () => {
     if (currentMonth === 0) {
@@ -183,7 +193,7 @@ export function CalendarView({
   const totalScheduledItems = timeBlockedTasks.length + allDayTasks.length;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 max-w-7xl mx-auto flex-1 min-h-0">
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 max-w-7xl mx-auto flex-1 min-h-0 pt-10">
       {/* Month Grid Section */}
       <section
         aria-label="Monthly calendar"
@@ -342,13 +352,26 @@ export function CalendarView({
                           {task.startTime} – {task.endTime || "..."}
                         </span>
                         <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                          <input
-                            type="checkbox"
-                            checked={task.completed}
-                            onChange={(e) => onToggle(task.id, e.target.checked)}
-                            aria-label={`Toggle completion for ${task.title}`}
-                            className="h-4 w-4 rounded-md border-slate-300 dark:border-zinc-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                          />
+                          {togglingId === task.id ? (
+                            <span
+                              role="status"
+                              aria-label={`Updating completion for ${task.title}`}
+                              className="h-4 w-4 flex items-center justify-center shrink-0"
+                            >
+                              <Loader2
+                                aria-hidden="true"
+                                className="w-3.5 h-3.5 animate-spin text-indigo-600 dark:text-indigo-400"
+                              />
+                            </span>
+                          ) : (
+                            <input
+                              type="checkbox"
+                              checked={task.completed}
+                              onChange={(e) => handleTaskToggle(task.id, e.target.checked)}
+                              aria-label={`Toggle completion for ${task.title}`}
+                              className="h-4 w-4 rounded-md border-slate-300 dark:border-zinc-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                            />
+                          )}
                           {onOpenEdit && (
                             <button
                               type="button"
@@ -414,13 +437,26 @@ export function CalendarView({
                           {task.title}
                         </button>
                         <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                          <input
-                            type="checkbox"
-                            checked={task.completed}
-                            onChange={(e) => onToggle(task.id, e.target.checked)}
-                            aria-label={`Toggle completion for ${task.title}`}
-                            className="h-4 w-4 rounded-md border-slate-300 dark:border-zinc-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                          />
+                          {togglingId === task.id ? (
+                            <span
+                              role="status"
+                              aria-label={`Updating completion for ${task.title}`}
+                              className="h-4 w-4 flex items-center justify-center shrink-0"
+                            >
+                              <Loader2
+                                aria-hidden="true"
+                                className="w-3.5 h-3.5 animate-spin text-indigo-600 dark:text-indigo-400"
+                              />
+                            </span>
+                          ) : (
+                            <input
+                              type="checkbox"
+                              checked={task.completed}
+                              onChange={(e) => handleTaskToggle(task.id, e.target.checked)}
+                              aria-label={`Toggle completion for ${task.title}`}
+                              className="h-4 w-4 rounded-md border-slate-300 dark:border-zinc-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                            />
+                          )}
                           {onOpenEdit && (
                             <button
                               type="button"

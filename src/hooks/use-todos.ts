@@ -191,7 +191,12 @@ export function useTodos() {
         }
       }
       // Default / fallback to newest (createdAt descending)
-      return b.createdAt.localeCompare(a.createdAt);
+      const timeA = new Date(a.createdAt).getTime();
+      const timeB = new Date(b.createdAt).getTime();
+      if (!isNaN(timeA) && !isNaN(timeB) && timeB !== timeA) {
+        return timeB - timeA;
+      }
+      return (b.createdAt || "").localeCompare(a.createdAt || "");
     });
   }, [todos, filter, priorityFilter, categoryFilter, searchTerm, sortBy]);
 

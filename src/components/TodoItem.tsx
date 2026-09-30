@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { Edit3, X } from "lucide-react";
+import { Edit3, X, Loader2 } from "lucide-react";
 import type { Todo, TodoPatchInput } from "@/lib/schemas";
 import { formatShortDate, isOverdue, formatOverdueLabel } from "@/lib/date-utils";
 
 interface TodoItemProps {
   todo: Todo;
-  onToggle: (id: string, completed: boolean) => void;
+  onToggle: (id: string, completed: boolean) => Promise<unknown> | void;
   onOpenEdit?: (todo: Todo) => void;
   onOpenDetails?: (todo: Todo) => void;
   onDelete: (id: string) => void;
@@ -22,6 +22,18 @@ export function TodoItem({
   onDelete,
 }: TodoItemProps) {
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
+
+  const handleToggle = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.stopPropagation();
+    const newCompleted = e.target.checked;
+    setIsToggling(true);
+    try {
+      await onToggle(todo.id, newCompleted);
+    } finally {
+      setIsToggling(false);
+    }
+  };
 
   const isOverdueItem = isOverdue(todo.dueDate, todo.completed);
 
@@ -42,17 +54,27 @@ export function TodoItem({
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0 flex-1">
-            <input
-              type="checkbox"
-              checked={todo.completed}
-              onChange={(e) => {
-                e.stopPropagation();
-                onToggle(todo.id, e.target.checked);
-              }}
-              onClick={(e) => e.stopPropagation()}
-              aria-label={`Toggle completion for ${todo.title}`}
-              className="h-4 w-4 rounded-md border-slate-300 dark:border-zinc-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer transition-colors shrink-0"
-            />
+            {isToggling ? (
+              <span
+                role="status"
+                aria-label={`Updating completion for ${todo.title}`}
+                className="h-4 w-4 flex items-center justify-center shrink-0"
+              >
+                <Loader2
+                  aria-hidden="true"
+                  className="w-3.5 h-3.5 animate-spin text-indigo-600 dark:text-indigo-400"
+                />
+              </span>
+            ) : (
+              <input
+                type="checkbox"
+                checked={todo.completed}
+                onChange={handleToggle}
+                onClick={(e) => e.stopPropagation()}
+                aria-label={`Toggle completion for ${todo.title}`}
+                className="h-4 w-4 rounded-md border-slate-300 dark:border-zinc-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer transition-colors shrink-0"
+              />
+            )}
             <div className="min-w-0 flex-1">
               <button
                 type="button"

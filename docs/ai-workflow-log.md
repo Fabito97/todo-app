@@ -294,3 +294,13 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Review**: Verified Today's tasks renders full `TodoItem` task cards with color-coded left borders, 1-line clamped descriptions, metadata pills, details modal click triggers, and action buttons; verified 12-column split layout (`lg:grid-cols-12`); verified Recent tasks has zero dummy data and empty state fallback.
 - **Bug or issue caught**: Added `afterAll` cleanup hook in `e2e/todos.spec.ts` to prevent test-created tasks from lingering in the live dev server store.
 - **Rule or prompt improvement**: None.
+
+## 2026-09-30 - Fix newest sort comparator and add completion loading spinners
+- **Commit**: `fix(sorting,completion): fix newest sort comparator and add completion loader`
+- **Key prompt or instruction**: "Can you check why the sort menu on the search bar doesn't apply the newest filter. It doesn't start with the latest task I added. Also we need to display a loader when marking as completed"
+- **Human decision or correction**: Correct sorting comparator to evaluate actual epoch timestamps (`new Date().getTime()`), normalize repository row dates to ISO-8601 strings, and display a spinning loader state when completing tasks.
+- **Checks run**: lint (pass), typecheck (pass), tests (165 pass across 26 test files in `test/`), Playwright e2e (13 pass across 2 test files in `e2e/`), verify gate (pass).
+- **Review**: Fixed the "Sort: Newest" ordering issue caused by string `localeCompare` mismatch between PostgreSQL format (`YYYY-MM-DD HH:mm:ss+00`) and newly created client ISO-8601 strings (`YYYY-MM-DDTHH:mm:ss.sssZ`). Converted `toTodo` in `todo-repository.ts` to normalize all timestamps to ISO strings and updated `useTodos`, `DashboardView`, `DashboardOverview`, and memory database query to sort by numeric timestamp difference (`timeB - timeA`). Added completion loading spinners with Lucide `Loader2` replacing or augmenting checkboxes and buttons during async toggle in `TodoItem.tsx`, `DashboardView.tsx`, `CalendarView.tsx`, and `TaskDetailsModal.tsx`.
+- **Bug or issue caught**: ASCII comparison in `b.createdAt.localeCompare(a.createdAt)` evaluated ISO strings with `'T'` (ASCII 84) differently than PostgreSQL space `' '` (ASCII 32), causing sorting inversion; resolved with `new Date(createdAt).getTime()`.
+- **Rule or prompt improvement**: None.
+

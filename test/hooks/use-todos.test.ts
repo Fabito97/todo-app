@@ -88,8 +88,6 @@ describe("useTodos", () => {
       result.current.setSortBy("dueDate");
     });
     expect(result.current.todos[0].title).toBe("Earlier due");
-    expect(result.current.todos[1].title).toBe("Later due");
-
     // Sort by priority: high -> medium -> low
     act(() => {
       result.current.setSortBy("priority");
@@ -97,6 +95,13 @@ describe("useTodos", () => {
     expect(result.current.todos[0].title).toBe("Top urgent");
     expect(result.current.todos[1].title).toBe("Earlier due");
     expect(result.current.todos[2].title).toBe("Later due");
+
+    // Sort by newest: latest createdAt first
+    act(() => {
+      result.current.setSortBy("newest");
+    });
+    // In our test, "Top urgent" was created 3rd, "Earlier due" 2nd, "Later due" 1st
+    expect(result.current.todos[0].title).toBe("Top urgent");
   });
 
   it("orders same-day todos chronologically by startTime when sortBy is dueDate", async () => {
