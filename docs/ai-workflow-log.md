@@ -267,3 +267,12 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Review**: In-session review by autopilot; verified `TodoItem.tsx` matches `design/mockups/v1.4.html` with `border-l-4` color-coded accent borders, 1-line description clamp (`line-clamp-1`), short human-readable dates (e.g. `Due: Sep 30, 2026`), overdue warning badge (`Overdue (Sep 28)`) and cancellation styling, interactive card body click opening `TaskDetailsModal`, and Lucide `Edit3`/`X` buttons with stop propagation.
 - **Bug or issue caught**: None.
 - **Rule or prompt improvement**: None.
+
+## 2026-09-30 - V2.1 Slice 03: Calendar & Daily Schedule view/edit interactivity & Polished States
+- **Commit**: `feat(v2.1): calendar interactivity, polished loading skeleton and empty states`
+- **Key prompt or instruction**: "/autopilot 2.1"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (163 pass across 26 test files in `test/`), verify gate (pass).
+- **Review**: In-session review by autopilot; verified `CalendarView.tsx` with Lucide `CalendarIcon` and `Edit3` icons, full card click-to-open details and edit button triggers for scheduled tasks; verified `TodoList.tsx` skeleton loading states and contextual search empty states; wired `searchTerm` through `TasksView.tsx`.
+- **Bug or issue caught**: None.
+- **Rule or prompt improvement**: None.

@@ -82,4 +82,32 @@ describe("TasksView component", () => {
     expect(screen.getByRole("region", { name: /task filters and sorting/i })).toBeInTheDocument();
     expect(screen.getByText("Task in Board")).toBeInTheDocument();
   });
+
+  it("renders polished empty state when search term yields zero matches", () => {
+    render(
+      <TasksView
+        todos={[]}
+        totalCount={1}
+        activeCount={1}
+        filter="all"
+        onFilterChange={vi.fn()}
+        priorityFilter="all"
+        onPriorityFilterChange={vi.fn()}
+        categoryFilter="all"
+        onCategoryFilterChange={vi.fn()}
+        categories={["Design"]}
+        searchTerm="nonexistent task"
+        onSearchChange={vi.fn()}
+        sortBy="newest"
+        onSortChange={vi.fn()}
+        onToggle={vi.fn()}
+        onOpenEdit={vi.fn()}
+        onOpenDetails={vi.fn()}
+        onDelete={vi.fn()}
+        onOpenNewTask={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText(/no tasks matching "nonexistent task"/i)).toBeInTheDocument();
+  });
 });

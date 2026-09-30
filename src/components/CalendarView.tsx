@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Edit3 } from "lucide-react";
 import { Todo } from "@/lib/schemas";
 
 interface CalendarViewProps {
@@ -319,9 +319,7 @@ export function CalendarView({
 
         {totalScheduledItems === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center py-12 text-center text-slate-400 dark:text-zinc-500 text-xs">
-            <svg className="w-8 h-8 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
+            <CalendarIcon aria-hidden="true" className="w-8 h-8 mb-2 opacity-50" />
             <p>No tasks scheduled for this date.</p>
           </div>
         ) : (
@@ -336,13 +334,14 @@ export function CalendarView({
                   {timeBlockedTasks.map((task) => (
                     <div
                       key={task.id}
-                      className="p-3 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-200/80 dark:border-indigo-900/60 space-y-1.5 transition hover:border-indigo-300 dark:hover:border-indigo-800"
+                      onClick={() => onOpenDetails?.(task)}
+                      className="p-3 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-200/80 dark:border-indigo-900/60 space-y-1.5 transition hover:border-indigo-300 dark:hover:border-indigo-800 cursor-pointer"
                     >
                       <div className="flex items-center justify-between gap-2">
                         <span className="font-mono text-xs font-bold text-indigo-700 dark:text-indigo-300">
                           {task.startTime} – {task.endTime || "..."}
                         </span>
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                           <input
                             type="checkbox"
                             checked={task.completed}
@@ -350,22 +349,25 @@ export function CalendarView({
                             aria-label={`Toggle completion for ${task.title}`}
                             className="h-4 w-4 rounded-md border-slate-300 dark:border-zinc-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                           />
-                          <button
-                            type="button"
-                            onClick={() => onOpenEdit(task)}
-                            aria-label={`Edit ${task.title}`}
-                            className="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition cursor-pointer"
-                          >
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </button>
+                          {onOpenEdit && (
+                            <button
+                              type="button"
+                              onClick={() => onOpenEdit(task)}
+                              aria-label={`Edit ${task.title}`}
+                              className="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition cursor-pointer"
+                            >
+                              <Edit3 aria-hidden="true" className="w-3.5 h-3.5" />
+                            </button>
+                          )}
                         </div>
                       </div>
 
                       <button
                         type="button"
-                        onClick={() => onOpenDetails(task)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onOpenDetails?.(task);
+                        }}
                         aria-label={`View details for ${task.title}`}
                         className={`text-xs font-semibold text-left transition text-slate-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer ${
                           task.completed ? "line-through text-slate-400 dark:text-zinc-500" : ""
@@ -394,12 +396,16 @@ export function CalendarView({
                   {allDayTasks.map((task) => (
                     <div
                       key={task.id}
-                      className="p-3 rounded-xl bg-slate-50 dark:bg-[#22262f] border border-slate-200 dark:border-[#2e3340] space-y-1.5 transition hover:border-slate-300 dark:hover:border-zinc-700"
+                      onClick={() => onOpenDetails?.(task)}
+                      className="p-3 rounded-xl bg-slate-50 dark:bg-[#22262f] border border-slate-200 dark:border-[#2e3340] space-y-1.5 transition hover:border-slate-300 dark:hover:border-zinc-700 cursor-pointer"
                     >
                       <div className="flex items-center justify-between gap-2">
                         <button
                           type="button"
-                          onClick={() => onOpenDetails(task)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onOpenDetails?.(task);
+                          }}
                           aria-label={`View details for ${task.title}`}
                           className={`text-xs font-semibold text-left transition text-slate-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer flex-1 truncate ${
                             task.completed ? "line-through text-slate-400 dark:text-zinc-500" : ""
@@ -407,7 +413,7 @@ export function CalendarView({
                         >
                           {task.title}
                         </button>
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                           <input
                             type="checkbox"
                             checked={task.completed}
@@ -415,16 +421,16 @@ export function CalendarView({
                             aria-label={`Toggle completion for ${task.title}`}
                             className="h-4 w-4 rounded-md border-slate-300 dark:border-zinc-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                           />
-                          <button
-                            type="button"
-                            onClick={() => onOpenEdit(task)}
-                            aria-label={`Edit ${task.title}`}
-                            className="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition cursor-pointer"
-                          >
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </button>
+                          {onOpenEdit && (
+                            <button
+                              type="button"
+                              onClick={() => onOpenEdit(task)}
+                              aria-label={`Edit ${task.title}`}
+                              className="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition cursor-pointer"
+                            >
+                              <Edit3 aria-hidden="true" className="w-3.5 h-3.5" />
+                            </button>
+                          )}
                         </div>
                       </div>
 

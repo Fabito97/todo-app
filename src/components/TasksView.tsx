@@ -105,6 +105,7 @@ export function TasksView({
             loading={loading}
             filter={filter}
             hasActiveFilters={hasActiveFilters}
+            searchTerm={searchTerm}
             onToggle={onToggle}
             onOpenEdit={onOpenEdit}
             onOpenDetails={onOpenDetails}

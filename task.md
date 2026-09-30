@@ -709,12 +709,12 @@ definitions, the API contract, and the data model live in
 
 ## V2.1 Slice 03: Calendar & Daily Schedule view/edit interactivity & Polished States
 
-- [ ] Write tests in `test/components/CalendarView.test.tsx` and watch them fail
-- [ ] Update `src/components/CalendarView.tsx` to enable clicking any task item in the Daily Schedule or day view to open `TaskDetailsModal` and `EditTaskModal`
-- [ ] Add polished loading indicator/skeleton during initial server data fetch
-- [ ] Add styled, informative empty states for search and filter empty views
-- [ ] Ensure non-blocking, accessible error banner/toast on network or API failures
-- [ ] Run `npm run verify` and commit
+- [x] Write tests in `test/components/CalendarView.test.tsx` and watch them fail
+- [x] Update `src/components/CalendarView.tsx` to enable clicking any task item in the Daily Schedule or day view to open `TaskDetailsModal` and `EditTaskModal`
+- [x] Add polished loading indicator/skeleton during initial server data fetch
+- [x] Add styled, informative empty states for search and filter empty views
+- [x] Ensure non-blocking, accessible error banner/toast on network or API failures
+- [x] Run `npm run verify` and commit
 
 **Acceptance criteria**
 
