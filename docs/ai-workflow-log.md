@@ -217,4 +217,14 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Bug or issue caught**: Fixed `@typescript-eslint/no-explicit-any` in `TodoRepository` query builder by passing conditional where clause. Corrected case sensitivity of ORDER BY inspections in in-memory test database mock.
 - **Rule or prompt improvement**: None.
 
+## 2026-09-30 - V2 Slice 01: Next.js API Route Handlers
+- **Commit**: `feat(v2): add Next.js API route handlers for todos`
+- **Key prompt or instruction**: "/autopilot 2"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (135 pass across 24 test files in `test/`), post-task gate (`GATE PASSED (fast)`).
+- **Review**: In-session review by autopilot; verified `GET /api/todos`, `POST /api/todos`, `PATCH /api/todos/[id]`, and `DELETE /api/todos/[id]` with Zod schema validation, correct HTTP response codes (200, 201, 400, 404, 500), error response shapes `{ error, details? }`, and query parameter handling. Zero UI modifications under `src/components/` or `src/hooks/`.
+- **Bug or issue caught**: Handled both synchronous and asynchronous Promise-wrapped dynamic Route Handler parameters (`context.params`) for Next.js App Router.
+- **Rule or prompt improvement**: None.
+
+
 

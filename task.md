@@ -568,10 +568,10 @@ definitions, the API contract, and the data model live in
 
 ## V2 Slice 01: Next.js API Route Handlers
 
-- [ ] Write tests in `test/api/todos.test.ts` and watch them fail
-- [ ] Implement `src/app/api/todos/route.ts` (`GET /api/todos` and `POST /api/todos`) with Zod validation
-- [ ] Implement `src/app/api/todos/[id]/route.ts` (`PATCH /api/todos/[id]` and `DELETE /api/todos/[id]`) with Zod validation
-- [ ] Run `npm run verify` and commit
+- [x] Write tests in `test/api/todos.test.ts` and watch them fail
+- [x] Implement `src/app/api/todos/route.ts` (`GET /api/todos` and `POST /api/todos`) with Zod validation
+- [x] Implement `src/app/api/todos/[id]/route.ts` (`PATCH /api/todos/[id]` and `DELETE /api/todos/[id]`) with Zod validation
+- [x] Run `npm run verify` and commit
 
 **Acceptance criteria**
 
