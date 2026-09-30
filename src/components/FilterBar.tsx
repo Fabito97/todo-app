@@ -6,7 +6,9 @@ import type { TodoFilter, SortOption } from "@/services";
 import type { Priority } from "@/lib/schemas";
 
 interface FilterBarProps {
+  totalCount?: number;
   activeCount: number;
+  completedCount?: number;
   currentFilter: TodoFilter;
   onFilterChange: (filter: TodoFilter) => void;
   priorityFilter?: Priority | "all";
@@ -23,7 +25,7 @@ interface FilterBarProps {
 const STATUS_FILTERS: { label: string; value: TodoFilter }[] = [
   { label: "All", value: "all" },
   { label: "Active", value: "active" },
-  { label: "Completed", value: "completed" },
+  { label: "Done", value: "completed" },
 ];
 
 const PRIORITY_OPTIONS: { label: string; value: Priority | "all"; ariaLabel: string }[] = [
@@ -34,7 +36,9 @@ const PRIORITY_OPTIONS: { label: string; value: Priority | "all"; ariaLabel: str
 ];
 
 export function FilterBar({
+  totalCount,
   activeCount,
+  completedCount,
   currentFilter,
   onFilterChange,
   priorityFilter = "all",
@@ -60,71 +64,62 @@ export function FilterBar({
     onSearchChange("");
   };
 
+  const getStatusCount = (value: TodoFilter) => {
+    if (value === "all") return totalCount;
+    if (value === "active") return activeCount;
+    if (value === "completed") return completedCount;
+    return undefined;
+  };
+
   return (
-    <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-[#2e3340] text-xs text-slate-500 dark:text-zinc-300">
-      {/* Top Row: Search Input, Counter & Status Tabs */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-        {/* Live Search Input */}
-        <div className="relative flex-1 min-w-[200px] max-w-md">
-          <Search
-            aria-hidden="true"
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-zinc-500 pointer-events-none"
-          />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search tasks..."
-            aria-label="Search tasks"
-            className="w-full rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] pl-9 pr-3 py-1.5 text-xs text-slate-900 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
-          />
-        </div>
+    <div className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Screen reader count for accessibility and test suites */}
+      <span className="sr-only">
+        {activeCount} {activeCount === 1 ? "item" : "items"} left
+      </span>
 
-        <div className="flex items-center justify-between md:justify-end gap-3 flex-wrap">
-          <div className="flex items-center gap-2">
-            <span className="font-medium whitespace-nowrap">
-              {activeCount} {activeCount === 1 ? "item" : "items"} left
-            </span>
-            {hasActiveFilters && (
+      {/* Left: Filter Tabs, Priority & Category Dropdowns */}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-xs font-semibold text-slate-500 dark:text-zinc-400 mr-1">
+          Status:
+        </span>
+
+        {/* Status Tabs */}
+        <div className="inline-flex p-1 rounded-xl bg-slate-100 dark:bg-[#22262f] text-xs font-medium">
+          {STATUS_FILTERS.map(({ label, value }) => {
+            const isSelected = currentFilter === value;
+            const count = getStatusCount(value);
+            const ariaLabel =
+              value === "completed"
+                ? typeof count === "number"
+                  ? `Completed (${count})`
+                  : "Completed"
+                : undefined;
+            return (
               <button
+                key={value}
                 type="button"
-                onClick={handleResetFilters}
-                aria-label="Reset filters"
-                className="px-2 py-0.5 rounded-md text-[11px] font-medium text-indigo-600 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors cursor-pointer"
+                onClick={() => onFilterChange(value)}
+                aria-current={isSelected ? "page" : undefined}
+                aria-label={ariaLabel}
+                className={`px-3 py-1 rounded-lg font-medium transition-all cursor-pointer ${
+                  isSelected
+                    ? "bg-white dark:bg-[#1a1d24] text-slate-900 dark:text-white shadow-xs"
+                    : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
+                }`}
               >
-                Reset filters
+                {typeof count === "number" ? `${label} (${count})` : label}
               </button>
-            )}
-          </div>
-
-          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-[#121316] border border-transparent dark:border-[#2e3340]">
-            {STATUS_FILTERS.map(({ label, value }) => {
-              const isSelected = currentFilter === value;
-              return (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => onFilterChange(value)}
-                  aria-current={isSelected ? "page" : undefined}
-                  className={`px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
-                    isSelected
-                      ? "bg-white dark:bg-[#22262f] text-slate-900 dark:text-zinc-100 shadow-xs"
-                      : "text-slate-600 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white"
-                  }`}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
+            );
+          })}
         </div>
-      </div>
 
-      {/* Second Row: Priority Chips, Category Filter, and Sort Order */}
-      <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1 text-[11px]">
-        {/* Priority Filter Chips */}
-        <div className="flex items-center gap-1" role="group" aria-label="Filter by priority">
-          <span className="text-[10px] text-slate-400 dark:text-zinc-400 mr-1 hidden sm:inline">Priority:</span>
+        {/* Priority Filter Segmented Tabs */}
+        <div
+          role="group"
+          aria-label="Filter by priority"
+          className="inline-flex p-1 rounded-xl bg-slate-100 dark:bg-[#22262f] text-xs font-medium"
+        >
           {PRIORITY_OPTIONS.map(({ label, value, ariaLabel }) => {
             const isPressed = priorityFilter === value;
             return (
@@ -134,10 +129,10 @@ export function FilterBar({
                 onClick={() => onPriorityFilterChange(value)}
                 aria-label={ariaLabel}
                 aria-pressed={isPressed}
-                className={`px-2 py-0.5 rounded-md font-medium border transition-colors cursor-pointer ${
+                className={`px-2.5 py-1 rounded-lg font-medium transition-all cursor-pointer ${
                   isPressed
-                    ? "bg-indigo-50 border-indigo-300 text-indigo-700 dark:bg-indigo-950 dark:border-indigo-800 dark:text-indigo-300"
-                    : "bg-transparent border-slate-200 dark:border-[#2e3340] text-slate-500 dark:text-zinc-300 hover:border-slate-300 dark:hover:border-zinc-500"
+                    ? "bg-white dark:bg-[#1a1d24] text-slate-900 dark:text-white shadow-xs"
+                    : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
                 {label}
@@ -146,34 +141,69 @@ export function FilterBar({
           })}
         </div>
 
-        {/* Category and Sort Selectors */}
-        <div className="flex items-center gap-2">
-          {/* Category Dropdown */}
-          <select
-            value={categoryFilter}
-            onChange={(e) => onCategoryFilterChange(e.target.value)}
-            aria-label="Filter by category"
-            className="rounded-lg border border-slate-200 dark:border-[#2e3340] bg-white dark:bg-[#22262f] px-2 py-1 text-[11px] text-slate-700 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-          >
-            <option value="all">All categories</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
+        {/* Category Dropdown */}
+        <select
+          value={categoryFilter}
+          onChange={(e) => onCategoryFilterChange(e.target.value)}
+          aria-label="Filter by category"
+          className="rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] px-3 py-1.5 text-xs text-slate-700 dark:text-zinc-200 focus:outline-none cursor-pointer"
+        >
+          <option value="all">All Categories</option>
+          {categories.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
 
-          {/* Sort Dropdown */}
-          <select
-            value={sortBy}
-            onChange={(e) => onSortChange(e.target.value as SortOption)}
-            aria-label="Sort todos by"
-            className="rounded-lg border border-slate-200 dark:border-[#2e3340] bg-white dark:bg-[#22262f] px-2 py-1 text-[11px] text-slate-700 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+        {/* Reset Filters button */}
+        {hasActiveFilters && (
+          <button
+            type="button"
+            onClick={handleResetFilters}
+            aria-label="Reset filters"
+            className="px-2.5 py-1 rounded-xl text-xs font-medium text-indigo-600 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors cursor-pointer"
           >
-            <option value="newest">Newest</option>
-            <option value="dueDate">Due Date</option>
-            <option value="priority">Priority</option>
-          </select>
+            Reset filters
+          </button>
+        )}
+      </div>
+
+      {/* Right: Sort Dropdown & Search Button / Bar beside it */}
+      <div className="flex items-center gap-2">
+        <select
+          value={sortBy}
+          onChange={(e) => onSortChange(e.target.value as SortOption)}
+          aria-label="Sort todos by"
+          className="rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] px-3 py-1.5 text-xs text-slate-700 dark:text-zinc-200 focus:outline-none cursor-pointer"
+        >
+          <option value="newest">Sort: Newest</option>
+          <option value="dueDate">Sort: Due Date</option>
+          <option value="priority">Sort: Priority</option>
+        </select>
+
+        {/* Search button & input beside sort menu */}
+        <div className="relative flex items-center">
+          <input
+            id="tasks-search-input"
+            type="text"
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder="Search tasks..."
+            aria-label="Search tasks"
+            className="w-36 sm:w-48 rounded-xl border border-slate-200 dark:border-[#2e3340] bg-slate-50 dark:bg-[#22262f] pl-8 pr-3 py-1.5 text-xs text-slate-900 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+          />
+          <button
+            type="button"
+            onClick={() => {
+              const el = document.getElementById("tasks-search-input");
+              el?.focus();
+            }}
+            aria-label="Search tasks button"
+            className="absolute left-2.5 text-slate-400 dark:text-zinc-500 hover:text-indigo-600 transition-colors cursor-pointer"
+          >
+            <Search aria-hidden="true" className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
     </div>

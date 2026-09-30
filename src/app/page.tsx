@@ -100,7 +100,11 @@ export default function Home() {
     <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-[#121316]">
       {/* Desktop Persistent Left Sidebar */}
       <div className="hidden lg:flex h-full flex-none">
-        <SidebarNav activeView={activeView} onSelectView={setActiveView} />
+        <SidebarNav
+          activeView={activeView}
+          onSelectView={setActiveView}
+          taskCount={allTodos.length}
+        />
       </div>
 
       {/* Main Content Area */}

@@ -60,7 +60,7 @@ export function TasksView({
     Boolean(searchTerm && searchTerm.trim().length > 0);
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto">
       {/* Board Header Bar */}
       <div className="flex items-center justify-between">
         <div>
@@ -85,52 +85,49 @@ export function TasksView({
         )}
       </div>
 
-      {/* Main Task List Card */}
-      <section
-        aria-label="Task list board"
-        className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-6 shadow-md space-y-6"
-      >
-        {error && (
-          <div
-            role="alert"
-            className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-xs text-rose-600 dark:text-rose-300"
-          >
-            {error}
-          </div>
-        )}
-
-        <div>
-          <TodoList
-            todos={todos}
-            loading={loading}
-            filter={filter}
-            hasActiveFilters={hasActiveFilters}
-            searchTerm={searchTerm}
-            onToggle={onToggle}
-            onOpenEdit={onOpenEdit}
-            onOpenDetails={onOpenDetails}
-            onDelete={onDelete}
-          />
+      {/* Error alert if any */}
+      {error && (
+        <div
+          role="alert"
+          className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-xs text-rose-600 dark:text-rose-300"
+        >
+          {error}
         </div>
+      )}
 
-        {!loading && (
-          <section aria-label="Task filters and sorting">
-            <FilterBar
-              activeCount={activeCount}
-              currentFilter={filter}
-              onFilterChange={onFilterChange}
-              priorityFilter={priorityFilter}
-              onPriorityFilterChange={onPriorityFilterChange}
-              categoryFilter={categoryFilter}
-              onCategoryFilterChange={onCategoryFilterChange}
-              categories={categories}
-              searchTerm={searchTerm}
-              onSearchChange={onSearchChange}
-              sortBy={sortBy}
-              onSortChange={onSortChange}
-            />
-          </section>
-        )}
+      {/* Controls & Filters Bar (placed at the top as in v1.4 mockup) */}
+      <section aria-label="Task filters and sorting">
+        <FilterBar
+          totalCount={totalCount}
+          activeCount={activeCount}
+          completedCount={Math.max(0, totalCount - activeCount)}
+          currentFilter={filter}
+          onFilterChange={onFilterChange}
+          priorityFilter={priorityFilter}
+          onPriorityFilterChange={onPriorityFilterChange}
+          categoryFilter={categoryFilter}
+          onCategoryFilterChange={onCategoryFilterChange}
+          categories={categories}
+          searchTerm={searchTerm}
+          onSearchChange={onSearchChange}
+          sortBy={sortBy}
+          onSortChange={onSortChange}
+        />
+      </section>
+
+      {/* Task List Items (rendered directly as individual cards in space-y-3) */}
+      <section aria-label="Task list board" className="space-y-3">
+        <TodoList
+          todos={todos}
+          loading={loading}
+          filter={filter}
+          hasActiveFilters={hasActiveFilters}
+          searchTerm={searchTerm}
+          onToggle={onToggle}
+          onOpenEdit={onOpenEdit}
+          onOpenDetails={onOpenDetails}
+          onDelete={onDelete}
+        />
       </section>
     </div>
   );
