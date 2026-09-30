@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
-import { TodoList } from "./TodoList";
+import { TodoList } from "@/components/TodoList";
 import type { Todo } from "@/lib/schemas";
 
 const sampleTodos: Todo[] = [

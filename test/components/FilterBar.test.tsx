@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
-import { FilterBar } from "./FilterBar";
+import { FilterBar } from "@/components/FilterBar";
 
 describe("FilterBar", () => {
   it("renders active item count correctly with singular and plural forms", () => {
@@ -123,4 +123,48 @@ describe("FilterBar", () => {
     await user.selectOptions(sortSelect, "dueDate");
     expect(onSortChange).toHaveBeenCalledWith("dueDate");
   });
+
+  it("hides 'Reset filters' when all filters are default and resets all active filters when clicked", async () => {
+    const onFilterChange = vi.fn();
+    const onPriorityFilterChange = vi.fn();
+    const onCategoryFilterChange = vi.fn();
+    const user = userEvent.setup();
+
+    const { rerender } = render(
+      <FilterBar
+        activeCount={3}
+        currentFilter="all"
+        priorityFilter="all"
+        categoryFilter="all"
+        onFilterChange={onFilterChange}
+        onPriorityFilterChange={onPriorityFilterChange}
+        onCategoryFilterChange={onCategoryFilterChange}
+      />
+    );
+
+    expect(
+      screen.queryByRole("button", { name: /reset filters/i })
+    ).not.toBeInTheDocument();
+
+    rerender(
+      <FilterBar
+        activeCount={1}
+        currentFilter="active"
+        priorityFilter="high"
+        categoryFilter="Work"
+        onFilterChange={onFilterChange}
+        onPriorityFilterChange={onPriorityFilterChange}
+        onCategoryFilterChange={onCategoryFilterChange}
+      />
+    );
+
+    const resetBtn = screen.getByRole("button", { name: /reset filters/i });
+    expect(resetBtn).toBeInTheDocument();
+
+    await user.click(resetBtn);
+    expect(onFilterChange).toHaveBeenCalledWith("all");
+    expect(onPriorityFilterChange).toHaveBeenCalledWith("all");
+    expect(onCategoryFilterChange).toHaveBeenCalledWith("all");
+  });
 });
+

@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
-import { AddTodoForm } from "./AddTodoForm";
+import { AddTodoForm } from "@/components/AddTodoForm";
 
 describe("AddTodoForm", () => {
   it("submits valid title alone with default priority 'medium' and clears input", async () => {

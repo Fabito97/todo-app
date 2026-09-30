@@ -26,7 +26,7 @@ export function TodoList({
 }: TodoListProps) {
   if (loading) {
     return (
-      <div className="py-12 flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500">
+      <div className="py-12 flex flex-col items-center justify-center text-slate-400 dark:text-slate-400">
         <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent mb-3" />
         <p className="text-sm font-medium">Loading todos...</p>
       </div>
@@ -57,9 +57,9 @@ export function TodoList({
       : emptyMessages[filter] || emptyMessages.all;
 
     return (
-      <div className="py-12 flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl">
+      <div className="py-12 flex flex-col items-center justify-center text-slate-500 dark:text-slate-300 border border-dashed border-slate-200 dark:border-slate-700 bg-slate-50/40 dark:bg-slate-900/30 rounded-2xl">
         <p className="text-sm font-medium">{currentMsg.title}</p>
-        <p className="text-xs text-zinc-400 dark:text-zinc-600 mt-1">
+        <p className="text-xs text-slate-400 dark:text-slate-400 mt-1">
           {currentMsg.subtitle}
         </p>
       </div>

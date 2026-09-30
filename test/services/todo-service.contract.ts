@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import type { TodoService } from "./todo-service";
+import type { TodoService } from "@/services/todo-service";
 import { NotFoundError } from "@/lib/errors";
 import { ZodError } from "zod";
 

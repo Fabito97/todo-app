@@ -294,5 +294,47 @@ test.describe.serial("Todo App", () => {
     await expect(items.nth(1)).toContainText("Work Standard Item");
     await expect(items.nth(2)).toContainText("Personal Low Item");
   });
+
+  test("persists theme toggle across reload, updates completion progress bar, and resets active filters", async ({ page }) => {
+    // 1. Toggle dark theme and verify persistence after reload
+    const darkThemeBtn = page.getByRole("button", { name: /dark theme/i });
+    await darkThemeBtn.click();
+    await expect(page.locator("html")).toHaveClass(/dark/);
+
+    await page.reload();
+    await expect(page.locator("html")).toHaveClass(/dark/);
+
+    // Switch back to light theme
+    const lightThemeBtn = page.getByRole("button", { name: /light theme/i });
+    await lightThemeBtn.click();
+    await expect(page.locator("html")).not.toHaveClass(/dark/);
+
+    // 2. Verify progress bar updates when adding and completing tasks
+    const progressbar = page.getByRole("progressbar");
+    await expect(progressbar).toHaveAttribute("aria-valuenow", "0");
+
+    const titleInput = page.getByRole("textbox", { name: /todo title/i });
+    const addButton = page.getByRole("button", { name: /add todo/i });
+
+    await titleInput.fill("Dashboard Task 1");
+    await addButton.click();
+    await titleInput.fill("Dashboard Task 2");
+    await addButton.click();
+
+    await page.getByRole("checkbox", { name: /toggle completion for dashboard task 1/i }).click();
+    await expect(progressbar).toHaveAttribute("aria-valuenow", "50");
+
+    // 3. Filter to Completed and use Reset filters button to restore all tasks
+    await page.getByRole("button", { name: /^completed/i }).click();
+    await expect(page.getByText("Dashboard Task 2")).not.toBeVisible();
+
+    const resetBtn = page.getByRole("button", { name: /reset filters/i });
+    await expect(resetBtn).toBeVisible();
+    await resetBtn.click();
+
+    await expect(page.getByText("Dashboard Task 1")).toBeVisible();
+    await expect(page.getByText("Dashboard Task 2")).toBeVisible();
+  });
 });
+
 

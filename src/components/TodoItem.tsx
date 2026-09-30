@@ -89,10 +89,16 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
   const isOverdue = !!(todo.dueDate && !todo.completed && todo.dueDate < todayStr);
 
   const priorityStyles = {
-    high: "bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800",
+    high: "bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950/70 dark:text-rose-300 dark:border-rose-700",
     medium:
-      "bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800",
-    low: "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800",
+      "bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-700",
+    low: "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-950/70 dark:text-blue-300 dark:border-blue-700",
+  }[todo.priority || "medium"];
+
+  const priorityAccentBorder = {
+    high: "border-l-rose-500 dark:border-l-rose-400",
+    medium: "border-l-amber-500 dark:border-l-amber-400",
+    low: "border-l-blue-500 dark:border-l-blue-400",
   }[todo.priority || "medium"];
 
   return (
@@ -104,7 +110,7 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
           handleCancelEdit();
         }
       }}
-      className="group flex flex-col p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/80 bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm transition-all hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-sm"
+      className={`group flex flex-col p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 border-l-4 ${priorityAccentBorder} bg-white dark:bg-slate-800/70 backdrop-blur-sm transition-all hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-xs`}
     >
       {/* Normal view mode */}
       {!isEditing ? (
@@ -116,15 +122,15 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
                 checked={todo.completed}
                 onChange={(e) => onToggle(todo.id, e.target.checked)}
                 aria-label={`Toggle completion for ${todo.title}`}
-                className="h-4 w-4 rounded-md border-zinc-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer transition-colors"
+                className="h-4 w-4 rounded-md border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500 cursor-pointer transition-colors"
               />
 
               <span
                 onDoubleClick={handleStartEdit}
                 className={`text-sm truncate select-none cursor-pointer flex-1 ${
                   todo.completed
-                    ? "line-through text-zinc-400 dark:text-zinc-600"
-                    : "text-zinc-800 dark:text-zinc-200 font-medium"
+                    ? "line-through text-slate-400 dark:text-slate-500"
+                    : "text-slate-800 dark:text-slate-100 font-medium"
                 }`}
               >
                 {todo.title}
@@ -136,7 +142,7 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
                 type="button"
                 onClick={handleStartEdit}
                 aria-label={`Edit ${todo.title}`}
-                className="p-1.5 rounded-lg text-zinc-400 hover:text-indigo-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-700/70 transition-colors"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -152,7 +158,7 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
                 type="button"
                 onClick={() => onDelete(todo.id)}
                 aria-label={`Delete ${todo.title}`}
-                className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-700/70 transition-colors"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -181,7 +187,7 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
 
             {/* Category Tag */}
             {todo.category && (
-              <span className="px-2 py-0.5 rounded-full border bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700">
+              <span className="px-2 py-0.5 rounded-full border bg-slate-100 dark:bg-slate-700/70 text-slate-600 dark:text-slate-200 border-slate-200 dark:border-slate-600">
                 {todo.category}
               </span>
             )}
@@ -191,8 +197,8 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
               <span
                 className={`px-2 py-0.5 rounded-full border font-medium flex items-center gap-1 ${
                   isOverdue
-                    ? "bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-900"
-                    : "bg-zinc-50 text-zinc-600 border-zinc-200 dark:bg-zinc-800/50 dark:text-zinc-400 dark:border-zinc-700"
+                    ? "bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800"
+                    : "bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-700/60 dark:text-slate-300 dark:border-slate-600"
                 }`}
               >
                 {isOverdue ? `Overdue: ${todo.dueDate}` : `Due: ${todo.dueDate}`}
@@ -205,7 +211,7 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
                 type="button"
                 onClick={() => setShowNotes((prev) => !prev)}
                 aria-label={showNotes ? "Hide description" : "Show description"}
-                className="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 underline text-[10px] ml-1 cursor-pointer"
+                className="text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white underline text-[10px] ml-1 cursor-pointer"
               >
                 {showNotes ? "Hide notes" : "View notes"}
               </button>
@@ -214,7 +220,7 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
 
           {/* Notes display */}
           {showNotes && todo.description && (
-            <p className="text-xs text-zinc-600 dark:text-zinc-400 pl-7 pt-1 whitespace-pre-wrap leading-relaxed">
+            <p className="text-xs text-slate-600 dark:text-slate-300 pl-7 pt-1 whitespace-pre-wrap leading-relaxed">
               {todo.description}
             </p>
           )}
@@ -234,7 +240,7 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
               onKeyDown={handleTitleKeyDown}
               aria-label="Edit todo title"
               aria-invalid={!!error}
-              className="w-full rounded-lg border border-indigo-300 dark:border-indigo-600 bg-white dark:bg-zinc-800 px-3 py-1.5 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+              className="w-full rounded-lg border border-indigo-300 dark:border-indigo-500 bg-white dark:bg-slate-700/80 px-3 py-1.5 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
             />
           </div>
 
@@ -248,14 +254,14 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
               placeholder="Description (optional)"
               aria-label="Edit description"
               rows={2}
-              className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 resize-none"
+              className="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/80 px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 resize-none"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
             {/* Priority selection */}
             <div className="space-y-1">
-              <label className="text-[10px] text-zinc-400">Priority</label>
+              <label className="text-[10px] text-slate-400 dark:text-slate-300">Priority</label>
               <div className="flex gap-1" role="group" aria-label="Edit priority">
                 {(["low", "medium", "high"] as const).map((p) => (
                   <button
@@ -265,8 +271,8 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
                     aria-label={`Priority ${p}`}
                     className={`flex-1 capitalize py-1 px-1.5 rounded border text-[10px] font-semibold cursor-pointer ${
                       editPriority === p
-                        ? "bg-indigo-100 text-indigo-700 border-indigo-300 dark:bg-indigo-950 dark:text-indigo-300"
-                        : "bg-white/60 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400"
+                        ? "bg-indigo-100 text-indigo-700 border-indigo-300 dark:bg-indigo-950/80 dark:text-indigo-300 dark:border-indigo-700"
+                        : "bg-white dark:bg-slate-700/70 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300"
                     }`}
                   >
                     {p}
@@ -277,26 +283,26 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
 
             {/* Due date picker */}
             <div className="space-y-1">
-              <label className="text-[10px] text-zinc-400">Due date</label>
+              <label className="text-[10px] text-slate-400 dark:text-slate-300">Due date</label>
               <input
                 type="date"
                 value={editDueDate}
                 onChange={(e) => setEditDueDate(e.target.value)}
                 aria-label="Edit due date"
-                className="w-full rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-2 py-1 text-xs text-zinc-900 dark:text-zinc-100"
+                className="w-full rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/80 px-2 py-1 text-xs text-slate-900 dark:text-slate-100"
               />
             </div>
 
             {/* Category input */}
             <div className="space-y-1">
-              <label className="text-[10px] text-zinc-400">Category</label>
+              <label className="text-[10px] text-slate-400 dark:text-slate-300">Category</label>
               <input
                 type="text"
                 value={editCategory}
                 onChange={(e) => setEditCategory(e.target.value)}
                 placeholder="Category"
                 aria-label="Edit category"
-                className="w-full rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-2 py-1 text-xs text-zinc-900 dark:text-zinc-100"
+                className="w-full rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/80 px-2 py-1 text-xs text-slate-900 dark:text-slate-100"
               />
             </div>
           </div>
@@ -312,7 +318,7 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
               type="button"
               onClick={handleCancelEdit}
               aria-label="Cancel editing"
-              className="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-xs font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+              className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 text-xs font-medium text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
             >
               Cancel
             </button>
