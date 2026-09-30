@@ -117,4 +117,17 @@ describe("Home page workspace layout and resilience", () => {
     expect(document.documentElement.classList.contains("dark")).toBe(true);
     expect(localStorage.getItem("theme:v1")).toBe("dark");
   });
+
+  it("surfaces an accessible error toast notice when service returns an error", async () => {
+    vi.spyOn(todoService, "list").mockRejectedValueOnce(new Error("Unable to connect to server"));
+
+    render(<Home />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Unable to connect to server")).toBeInTheDocument();
+    });
+
+    const statusElements = screen.getAllByRole("status");
+    expect(statusElements.some((el) => el.textContent?.includes("Unable to connect to server"))).toBe(true);
+  });
 });

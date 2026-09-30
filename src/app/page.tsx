@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTodos } from "@/hooks/use-todos";
 import { SidebarNav, WorkspaceView } from "@/components/SidebarNav";
 import { ContentHeader } from "@/components/ContentHeader";
@@ -54,9 +54,25 @@ export default function Home() {
     deleteTodo,
   } = useTodos();
 
+  const effectiveToasts = useMemo<ToastMessage[]>(() => {
+    const list = [...toasts];
+    if (error && !toasts.some((t) => t.text === error)) {
+      list.push({
+        id: "hook-error",
+        type: "error",
+        text: error,
+      });
+    }
+    return list;
+  }, [toasts, error]);
+
   const handleQuickAdd = async (title: string) => {
-    await addTodo({ title, priority: "medium" });
-    addToast("success", "Task added");
+    try {
+      await addTodo({ title, priority: "medium" });
+      addToast("success", "Task added");
+    } catch {
+      // error toast triggered via useTodos error state
+    }
   };
 
   const handleOpenDetails = (todo: Todo) => {
@@ -70,8 +86,12 @@ export default function Home() {
   };
 
   const handleDelete = async (id: string) => {
-    await deleteTodo(id);
-    addToast("success", "Task deleted");
+    try {
+      await deleteTodo(id);
+      addToast("success", "Task deleted");
+    } catch {
+      // error toast triggered via useTodos error state
+    }
   };
 
   return (
@@ -202,15 +222,19 @@ export default function Home() {
       </main>
 
       {/* Floating Toast Notification Container */}
-      <Toast toasts={toasts} onDismiss={dismissToast} />
+      <Toast toasts={effectiveToasts} onDismiss={dismissToast} />
 
       {/* Modals */}
       <AddTaskModal
         isOpen={isAddTaskModalOpen}
         onClose={() => setIsAddTaskModalOpen(false)}
         onAdd={async (input) => {
-          await addTodo(input);
-          addToast("success", "Task added");
+          try {
+            await addTodo(input);
+            addToast("success", "Task added");
+          } catch {
+            // error toast triggered via useTodos error state
+          }
         }}
       />
 
@@ -228,8 +252,12 @@ export default function Home() {
         todo={selectedTodo}
         onClose={() => setIsEditTaskModalOpen(false)}
         onSave={async (id, updates) => {
-          await editTodo(id, updates);
-          addToast("success", "Task updated");
+          try {
+            await editTodo(id, updates);
+            addToast("success", "Task updated");
+          } catch {
+            // error toast triggered via useTodos error state
+          }
         }}
       />
     </div>

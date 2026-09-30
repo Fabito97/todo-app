@@ -1,7 +1,14 @@
 import { test, expect } from "@playwright/test";
 
 test.describe.serial("Todo App", () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page, request }) => {
+    const res = await request.get("/api/todos");
+    if (res.ok()) {
+      const items = (await res.json()) as Array<{ id: string }>;
+      for (const item of items) {
+        await request.delete(`/api/todos/${item.id}`);
+      }
+    }
     await page.goto("/");
     await page.evaluate(() => localStorage.clear());
     await page.reload();
@@ -350,8 +357,13 @@ test.describe.serial("Todo App", () => {
 
     await titleInput.fill("Dashboard Task 1");
     await addButton.click();
+    await expect(page.getByText("Dashboard Task 1")).toBeVisible();
+    await expect(titleInput).toHaveValue("");
+
     await titleInput.fill("Dashboard Task 2");
     await addButton.click();
+    await expect(page.getByText("Dashboard Task 2")).toBeVisible();
+    await expect(titleInput).toHaveValue("");
 
     await page.getByRole("checkbox", { name: /toggle completion for dashboard task 1/i }).first().click();
     await expect(progressbar).toHaveAttribute("aria-valuenow", "50");

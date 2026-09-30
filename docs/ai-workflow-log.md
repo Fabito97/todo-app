@@ -234,7 +234,12 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Review**: In-session review by autopilot; verified `HttpTodoService` client calling `/api/todos`, `src/services/index.ts` provider switch to `httpTodoService`, and unit tests in `test/services/http-todo-service.test.ts`. Zero modifications to `src/components/` or `src/hooks/`.
 - **Bug or issue caught**: Added URL normalization for Node/jsdom test environments and configured `vitest.setup.ts` to dispatch `/api/todos` requests to the Route Handlers.
 - **Rule or prompt improvement**: None.
-
-
-
+## 2026-09-30 - V2 Slice 04: Error handling and network resilience
+- **Commit**: `feat(v2): add API error resilience and verify e2e flows`
+- **Key prompt or instruction**: "/autopilot 2"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (151 pass across 25 test files in `test/`), Playwright e2e (12 pass across 2 test files), post-task gate (`GATE PASSED (full)`).
+- **Review**: In-session review by autopilot; verified `useTodos` error handling across all mutation methods and initial fetch, derived effective error toasts in `src/app/page.tsx` avoiding cascading renders, and updated Playwright test suite to clear API data before each test.
+- **Bug or issue caught**: Resolved Playwright shared backend interference by configuring single-worker execution and adding API cleanup in `beforeEach`. Handled input clearing race in quick add test. Computed `effectiveToasts` via `useMemo` to conform with React 19 rules.
+- **Rule or prompt improvement**: None.
 

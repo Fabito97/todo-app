@@ -130,4 +130,90 @@ describe("useTodos", () => {
       "Unscheduled today",
     ]);
   });
+
+  describe("error handling and resilience", () => {
+    it("surfaces error message and clears loading when initial fetch fails", async () => {
+      vi.spyOn(todoService, "list").mockRejectedValueOnce(new Error("Network connection lost"));
+
+      const { result } = renderHook(() => useTodos());
+
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+
+      expect(result.current.error).toBe("Network connection lost");
+      expect(result.current.todos).toEqual([]);
+    });
+
+    it("surfaces error when addTodo fails", async () => {
+      const { result } = renderHook(() => useTodos());
+      await waitFor(() => expect(result.current.loading).toBe(false));
+
+      vi.spyOn(todoService, "create").mockRejectedValueOnce(new Error("500 Server Error"));
+
+      await act(async () => {
+        try {
+          await result.current.addTodo("Failed Task");
+        } catch {
+          // expected rejection
+        }
+      });
+
+      expect(result.current.error).toBe("500 Server Error");
+    });
+
+    it("surfaces error when toggleTodo fails", async () => {
+      const created = await todoService.create({ title: "Toggle Test" });
+      const { result } = renderHook(() => useTodos());
+      await waitFor(() => expect(result.current.loading).toBe(false));
+
+      vi.spyOn(todoService, "update").mockRejectedValueOnce(new Error("Update failed"));
+
+      await act(async () => {
+        try {
+          await result.current.toggleTodo(created.id, true);
+        } catch {
+          // expected rejection
+        }
+      });
+
+      expect(result.current.error).toBe("Update failed");
+    });
+
+    it("surfaces error when editTodo fails", async () => {
+      const created = await todoService.create({ title: "Edit Test" });
+      const { result } = renderHook(() => useTodos());
+      await waitFor(() => expect(result.current.loading).toBe(false));
+
+      vi.spyOn(todoService, "update").mockRejectedValueOnce(new Error("Edit failed"));
+
+      await act(async () => {
+        try {
+          await result.current.editTodo(created.id, { title: "New Title" });
+        } catch {
+          // expected rejection
+        }
+      });
+
+      expect(result.current.error).toBe("Edit failed");
+    });
+
+    it("surfaces error when deleteTodo fails", async () => {
+      const created = await todoService.create({ title: "Delete Test" });
+      const { result } = renderHook(() => useTodos());
+      await waitFor(() => expect(result.current.loading).toBe(false));
+
+      vi.spyOn(todoService, "remove").mockRejectedValueOnce(new Error("Delete failed"));
+
+      await act(async () => {
+        try {
+          await result.current.deleteTodo(created.id);
+        } catch {
+          // expected rejection
+        }
+      });
+
+      expect(result.current.error).toBe("Delete failed");
+    });
+  });
 });

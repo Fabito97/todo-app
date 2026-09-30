@@ -620,10 +620,10 @@ definitions, the API contract, and the data model live in
 
 ## V2 Slice 04: Error handling and network resilience
 
-- [ ] Write tests in `test/hooks/use-todos.test.ts` for API failure scenarios and watch them fail
-- [ ] Ensure `useTodos` surfaces network and server errors to the user via toast notices
-- [ ] Ensure loading states display properly during initial server fetch
-- [ ] Run `npm run verify && npm run e2e` and commit
+- [x] Write tests in `test/hooks/use-todos.test.ts` for API failure scenarios and watch them fail
+- [x] Ensure `useTodos` surfaces network and server errors to the user via toast notices
+- [x] Ensure loading states display properly during initial server fetch
+- [x] Run `npm run verify && npm run e2e` and commit
 
 **Acceptance criteria**
 
