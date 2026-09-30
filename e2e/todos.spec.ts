@@ -158,9 +158,13 @@ test.describe.serial("Todo App", () => {
 
     await input.fill("Task 1 Active");
     await addButton.click();
+    await expect(page.getByText("Task 1 Active")).toBeVisible();
+    await expect(input).toHaveValue("");
 
     await input.fill("Task 2 Completed");
     await addButton.click();
+    await expect(page.getByText("Task 2 Completed")).toBeVisible();
+    await expect(input).toHaveValue("");
 
     // Switch to Tasks View for full list and filter bar
     await page.getByRole("button", { name: /^tasks/i }).first().click();
@@ -422,5 +426,39 @@ test.describe.serial("Todo App", () => {
     await expect(page.getByRole("region", { name: /today's tasks/i })).toContainText(
       "Product Roadmap Time-Block"
     );
+  });
+
+  test("filters tasks in real-time via search input on the Tasks board", async ({ page }) => {
+    const input = page.getByRole("textbox", { name: /todo title/i });
+    const addButton = page.getByRole("button", { name: /add todo/i });
+
+    await input.fill("Alpha Architecture Review");
+    await addButton.click();
+    await expect(page.getByText("Alpha Architecture Review")).toBeVisible();
+    await expect(input).toHaveValue("");
+
+    await input.fill("Beta Design Sprint");
+    await addButton.click();
+    await expect(page.getByText("Beta Design Sprint")).toBeVisible();
+    await expect(input).toHaveValue("");
+
+    // Switch to Tasks view
+    await page.getByRole("button", { name: /^tasks/i }).first().click();
+
+    // Verify both are visible
+    await expect(page.getByText("Alpha Architecture Review")).toBeVisible();
+    await expect(page.getByText("Beta Design Sprint")).toBeVisible();
+
+    // Type in search input
+    const searchInput = page.getByRole("textbox", { name: /search tasks/i });
+    await searchInput.fill("Architecture");
+
+    // Only Alpha should be visible
+    await expect(page.getByText("Alpha Architecture Review")).toBeVisible();
+    await expect(page.getByText("Beta Design Sprint")).not.toBeVisible();
+
+    // Clear search
+    await searchInput.fill("");
+    await expect(page.getByText("Beta Design Sprint")).toBeVisible();
   });
 });

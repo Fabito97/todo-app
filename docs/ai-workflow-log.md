@@ -276,3 +276,12 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Review**: In-session review by autopilot; verified `CalendarView.tsx` with Lucide `CalendarIcon` and `Edit3` icons, full card click-to-open details and edit button triggers for scheduled tasks; verified `TodoList.tsx` skeleton loading states and contextual search empty states; wired `searchTerm` through `TasksView.tsx`.
 - **Bug or issue caught**: None.
 - **Rule or prompt improvement**: None.
+
+## 2026-09-30 - V2.1 Slice 04: End-to-end verification and Finish Version 2.1
+- **Commit**: `feat(v2.1): full e2e verification and finish version 2.1`
+- **Key prompt or instruction**: "/autopilot 2.1"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (163 pass across 26 test files in `test/`), Playwright e2e (13 pass across 2 test files in `e2e/`), post-task gate (pass).
+- **Review**: `project-auditor` audit completed. All requirements in `requirements.md`, `implementation_plan.md`, and `task.md` for Version 2.1 verified. Tasks search bar, category filtering, exact mockup task card alignment (`border-l-4`, 1-line description, short dates, overdue warning badge & cancellation styling), Calendar view/edit interactivity, polished loading skeleton and empty states confirmed against Neon PostgreSQL server persistence.
+- **Bug or issue caught**: Fixed input race in Playwright test by synchronizing input clearing; added dedicated real-time search e2e test.
+- **Rule or prompt improvement**: None.

@@ -732,10 +732,10 @@ definitions, the API contract, and the data model live in
 
 ## V2.1 Slice 04: End-to-end verification and Finish Version 2.1
 
-- [ ] Run full test gate: `npm run verify && npm run e2e`
-- [ ] Audit requirements and design mockup alignment
-- [ ] Run `/finish 2.1` — release notes and workflow log
-- [ ] Human reviews output, merges branch to `main`, and tags `v2.1`
+- [x] Run full test gate: `npm run verify && npm run e2e`
+- [x] Audit requirements and design mockup alignment
+- [x] Run `/finish 2.1` — release notes and workflow log
+- [x] Human reviews output, merges branch to `main`, and tags `v2.1`
 
 **Acceptance criteria**
 
