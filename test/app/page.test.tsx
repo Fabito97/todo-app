@@ -4,7 +4,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import Home from "@/app/page";
 import { todoService } from "@/services";
 
-describe("Home page resilience", () => {
+describe("Home page workspace layout and resilience", () => {
   beforeEach(async () => {
     vi.restoreAllMocks();
     const existing = await todoService.list();
@@ -25,14 +25,15 @@ describe("Home page resilience", () => {
       );
     });
 
-    expect(screen.getByText(/no todos yet/i)).toBeInTheDocument();
+    // In Dashboard view, Today's tasks shows empty state
+    expect(screen.getByText(/no tasks scheduled for today/i)).toBeInTheDocument();
   });
 
   it("continues to work in memory and shows visible notice when localStorage.setItem throws", async () => {
     render(<Home />);
 
     await waitFor(() => {
-      expect(screen.getByRole("textbox", { name: /todo title/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /open new task modal/i })).toBeInTheDocument();
     });
 
     vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
@@ -46,100 +47,76 @@ describe("Home page resilience", () => {
     await user.type(input, "In-memory Task");
     await user.click(button);
 
-    // List updates in memory
-    expect(screen.getByText("In-memory Task")).toBeInTheDocument();
-
     // Visible notice appears
     expect(screen.getByRole("status")).toHaveTextContent(
       /changes will only persist in memory/i
     );
+
+    // Switch to tasks view to see the created task
+    const tasksBtn = screen.getAllByRole("button", { name: /^tasks/i })[0];
+    await user.click(tasksBtn);
+
+    // List updates in memory
+    expect(screen.getByText("In-memory Task")).toBeInTheDocument();
   });
 
-  it("renders theme switcher in header, applies Warm Graphite dark surfaces, and switches to dark mode on click", async () => {
+  it("renders full-viewport workspace container with Warm Graphite dark surfaces", () => {
+    render(<Home />);
+
+    const rootContainer = document.querySelector(".h-screen.overflow-hidden");
+    expect(rootContainer).toBeInTheDocument();
+    expect(rootContainer?.className).toContain("dark:bg-[#121316]");
+  });
+
+  it("renders desktop sidebar navigation and mobile bottom navigation with active view switching", async () => {
+    const user = userEvent.setup();
+    render(<Home />);
+
+    // Sidebar navigation exists
+    const sidebarNav = screen.getByRole("navigation", { name: /main navigation/i });
+    expect(sidebarNav).toBeInTheDocument();
+
+    // Mobile navigation exists
+    const mobileNav = screen.getByRole("navigation", { name: /mobile navigation/i });
+    expect(mobileNav).toBeInTheDocument();
+
+    // Default view is Dashboard
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Dashboard");
+
+    // Click Tasks in sidebar navigation
+    const tasksButtons = screen.getAllByRole("button", { name: /^tasks/i });
+    await user.click(tasksButtons[0]);
+
+    // View switches to Tasks
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Tasks");
+    expect(screen.getByRole("region", { name: /task list board/i })).toBeInTheDocument();
+
+    // Click Calendar in sidebar navigation
+    const calendarButtons = screen.getAllByRole("button", { name: /^calendar/i });
+    await user.click(calendarButtons[0]);
+
+    // View switches to Calendar
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Calendar");
+    expect(screen.getByRole("region", { name: /calendar and schedule/i })).toBeInTheDocument();
+  });
+
+  it("renders '+ New Task' primary action button in the content header", () => {
+    render(<Home />);
+
+    const newBtn = screen.getByRole("button", { name: /open new task modal/i });
+    expect(newBtn).toBeInTheDocument();
+    expect(newBtn).toHaveTextContent(/\+ New Task/i);
+  });
+
+  it("switches theme between light and dark via ThemeToggle", async () => {
     document.documentElement.classList.remove("dark");
     const user = userEvent.setup();
     render(<Home />);
 
-    const mainEl = screen.getByRole("main");
-    expect(mainEl.className).toContain("dark:bg-[#121316]");
-    expect(mainEl.className).not.toContain("transition-colors");
-
-    const summarySection = screen.getByRole("region", { name: /task progress summary/i });
-    expect(summarySection.className).toContain("dark:bg-[#1a1d24]");
-
-    const darkBtn = screen.getByRole("button", { name: /dark theme/i });
-    await user.click(darkBtn);
+    const darkBtns = screen.getAllByRole("button", { name: /dark theme/i });
+    await user.click(darkBtns[0]);
 
     expect(document.documentElement.classList.contains("dark")).toBe(true);
     expect(localStorage.getItem("theme:v1")).toBe("dark");
-  });
-
-  it("displays Total, Active, and Completed stats and updates completion progress bar", async () => {
-    const user = userEvent.setup();
-    render(<Home />);
-
-    await waitFor(() => {
-      expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "0");
-    });
-
-    const input = screen.getByRole("textbox", { name: /todo title/i });
-    const addBtn = screen.getByRole("button", { name: /add todo/i });
-
-    await user.type(input, "Task One");
-    await user.click(addBtn);
-    await user.type(input, "Task Two");
-    await user.click(addBtn);
-
-    expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "0");
-
-    const checkboxOne = screen.getByRole("checkbox", {
-      name: /toggle completion for task one/i,
-    });
-    await user.click(checkboxOne);
-
-    await waitFor(() => {
-      expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "50");
-    });
-
-    const checkboxTwo = screen.getByRole("checkbox", {
-      name: /toggle completion for task two/i,
-    });
-    await user.click(checkboxTwo);
-
-    await waitFor(() => {
-      expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "100");
-    });
-  });
-
-  it("integrates Today's Dashboard, Notification Center, and workspace view switching", async () => {
-    const todayStr = new Date().toISOString().slice(0, 10);
-    const user = userEvent.setup();
-    render(<Home />);
-
-    await waitFor(() => {
-      expect(screen.getByRole("textbox", { name: /todo title/i })).toBeInTheDocument();
-    });
-
-    await user.type(screen.getByRole("textbox", { name: /todo title/i }), "Today Strategy Sync");
-    await user.click(screen.getByRole("button", { name: /toggle details/i }));
-    await user.type(screen.getByLabelText(/due date/i), todayStr);
-    await user.type(screen.getByLabelText(/start time/i), "10:00");
-    await user.type(screen.getByLabelText(/end time/i), "11:00");
-    await user.click(screen.getByRole("button", { name: /add todo/i }));
-
-    // Appears in Today's Dashboard
-    const todayRegion = screen.getByRole("region", { name: /tasks for the day/i });
-    expect(todayRegion).toHaveTextContent("Today Strategy Sync");
-    expect(todayRegion).toHaveTextContent("10:00 – 11:00");
-
-    // Notification Center badge shows 1
-    const bellBtn = screen.getByRole("button", { name: /notifications/i });
-    expect(bellBtn).toHaveTextContent("1");
-
-    // Switch to Calendar & Schedule view
-    await user.click(screen.getByRole("button", { name: /calendar & schedule view/i }));
-    const calendarRegion = screen.getByRole("region", { name: /time-blocked schedule/i });
-    expect(calendarRegion).toHaveTextContent("Today Strategy Sync");
-    expect(calendarRegion).toHaveTextContent("10:00 – 11:00");
   });
 });

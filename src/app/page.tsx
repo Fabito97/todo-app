@@ -2,18 +2,16 @@
 
 import { useState } from "react";
 import { useTodos } from "@/hooks/use-todos";
+import { SidebarNav, WorkspaceView } from "@/components/SidebarNav";
+import { ContentHeader } from "@/components/ContentHeader";
 import { AddTodoForm } from "@/components/AddTodoForm";
 import { TodoList } from "@/components/TodoList";
 import { FilterBar } from "@/components/FilterBar";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { CalendarScheduleView } from "@/components/CalendarScheduleView";
-import { NotificationCenter } from "@/components/NotificationCenter";
-
-type WorkspaceView = "tasks" | "calendar" | "split";
 
 export default function Home() {
-  const [viewMode, setViewMode] = useState<WorkspaceView>("tasks");
+  const [activeView, setActiveView] = useState<WorkspaceView>("dashboard");
 
   const {
     todos,
@@ -41,114 +39,68 @@ export default function Home() {
     priorityFilter !== "all" || categoryFilter !== "all";
 
   return (
-    <main className="min-h-screen bg-slate-50 dark:bg-[#121316] py-12 px-4 sm:px-6 lg:px-8">
-      <div className={`${viewMode === "split" ? "max-w-5xl" : "max-w-2xl"} mx-auto space-y-6`}>
-        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="space-y-1 text-center sm:text-left">
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-600 dark:from-white dark:via-zinc-100 dark:to-indigo-400 bg-clip-text text-transparent">
-              Todo List
-            </h1>
-            <p className="text-sm text-slate-600 dark:text-zinc-300">
-              Plan your tasks, daily schedule, and time blocks
-            </p>
-          </div>
-          <div className="flex items-center justify-center sm:justify-end gap-2.5">
-            <NotificationCenter todos={allTodos} />
-            <ThemeToggle />
-          </div>
-        </header>
+    <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-[#121316]">
+      {/* Desktop Persistent Left Sidebar */}
+      <div className="hidden lg:flex h-full flex-none">
+        <SidebarNav activeView={activeView} onSelectView={setActiveView} />
+      </div>
 
-        {/* Today's Dashboard & Progress Summary */}
-        <DashboardOverview todos={allTodos} onToggle={toggleTodo} />
+      {/* Main Content Area */}
+      <main className="flex-1 min-w-0 flex flex-col overflow-hidden">
+        {/* Content Top Header */}
+        <ContentHeader
+          activeView={activeView}
+          onOpenNewTask={() => {
+            // In Slice 03, this opens AddTaskModal
+            if (activeView !== "dashboard") {
+              setActiveView("dashboard");
+            }
+          }}
+          todos={allTodos}
+        />
 
-        {storageNotice && (
-          <div
-            role="status"
-            className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300/80 dark:border-amber-700/80 text-xs font-medium text-amber-900 dark:text-amber-200 shadow-sm flex items-start gap-3"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
+        {/* Dynamic View Content */}
+        <div className="flex-1 min-w-0 overflow-y-auto p-4 sm:p-6 space-y-6">
+          {storageNotice && (
+            <div
+              role="status"
+              className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300/80 dark:border-amber-700/80 text-xs font-medium text-amber-900 dark:text-amber-200 shadow-sm flex items-start gap-3"
             >
-              <path
-                fillRule="evenodd"
-                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <p className="leading-relaxed">{storageNotice}</p>
-          </div>
-        )}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <p className="leading-relaxed">{storageNotice}</p>
+            </div>
+          )}
 
-        {/* Demarcated Task Creation Card */}
-        <section
-          aria-label="Create task"
-          className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-4 sm:p-5 shadow-md shadow-slate-200/40 dark:shadow-black/40"
-        >
-          <AddTodoForm onAdd={addTodo} />
-        </section>
+          {activeView === "dashboard" && (
+            <div className="space-y-6 max-w-5xl mx-auto">
+              {/* Today's Dashboard & Progress Summary */}
+              <DashboardOverview todos={allTodos} onToggle={toggleTodo} />
 
-        {/* Workspace View Switcher */}
-        <div
-          role="group"
-          aria-label="Workspace view"
-          className="inline-flex items-center gap-1 rounded-xl border border-slate-200 dark:border-[#2e3340] bg-white dark:bg-[#1a1d24] p-1 shadow-xs"
-        >
-          <button
-            type="button"
-            onClick={() => setViewMode("tasks")}
-            aria-label="Tasks view"
-            aria-pressed={viewMode === "tasks"}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-              viewMode === "tasks"
-                ? "bg-indigo-600 text-white shadow-xs"
-                : "text-slate-600 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#22262f]"
-            }`}
-          >
-            Tasks
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode("calendar")}
-            aria-label="Calendar & Schedule view"
-            aria-pressed={viewMode === "calendar"}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-              viewMode === "calendar"
-                ? "bg-indigo-600 text-white shadow-xs"
-                : "text-slate-600 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#22262f]"
-            }`}
-          >
-            Calendar &amp; Schedule
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode("split")}
-            aria-label="Split View"
-            aria-pressed={viewMode === "split"}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-              viewMode === "split"
-                ? "bg-indigo-600 text-white shadow-xs"
-                : "text-slate-600 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#22262f]"
-            }`}
-          >
-            Split View
-          </button>
-        </div>
+              {/* Quick Task Creation Section */}
+              <section
+                aria-label="Create task"
+                className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-4 sm:p-5 shadow-md shadow-slate-200/40 dark:shadow-black/40"
+              >
+                <AddTodoForm onAdd={addTodo} />
+              </section>
+            </div>
+          )}
 
-        {/* Workspace Content */}
-        <div
-          className={
-            viewMode === "split"
-              ? "grid grid-cols-1 lg:grid-cols-2 gap-6 items-start"
-              : "space-y-6"
-          }
-        >
-          {(viewMode === "tasks" || viewMode === "split") && (
+          {activeView === "tasks" && (
             <section
               aria-label="Task list board"
-              className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-6 shadow-md shadow-slate-200/40 dark:shadow-black/40 space-y-6"
+              className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-6 shadow-md shadow-slate-200/40 dark:shadow-black/40 space-y-6 max-w-5xl mx-auto"
             >
               {error && (
                 <div
@@ -188,11 +140,56 @@ export default function Home() {
             </section>
           )}
 
-          {(viewMode === "calendar" || viewMode === "split") && (
-            <CalendarScheduleView todos={allTodos} onToggle={toggleTodo} />
+          {activeView === "calendar" && (
+            <div className="max-w-5xl mx-auto">
+              <CalendarScheduleView todos={allTodos} onToggle={toggleTodo} />
+            </div>
           )}
         </div>
-      </div>
-    </main>
+
+        {/* Mobile Bottom Navigation */}
+        <nav
+          aria-label="Mobile navigation"
+          className="lg:hidden h-14 flex items-center justify-around border-t border-slate-200 dark:border-[#2e3340] bg-white dark:bg-[#1a1d24] flex-none px-4 select-none"
+        >
+          <button
+            type="button"
+            onClick={() => setActiveView("dashboard")}
+            aria-current={activeView === "dashboard" ? "page" : undefined}
+            className={`flex-1 min-h-[44px] flex flex-col items-center justify-center text-xs font-semibold cursor-pointer transition-colors ${
+              activeView === "dashboard"
+                ? "text-indigo-600 dark:text-indigo-400"
+                : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100"
+            }`}
+          >
+            <span>Dashboard</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveView("tasks")}
+            aria-current={activeView === "tasks" ? "page" : undefined}
+            className={`flex-1 min-h-[44px] flex flex-col items-center justify-center text-xs font-semibold cursor-pointer transition-colors ${
+              activeView === "tasks"
+                ? "text-indigo-600 dark:text-indigo-400"
+                : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100"
+            }`}
+          >
+            <span>Tasks</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveView("calendar")}
+            aria-current={activeView === "calendar" ? "page" : undefined}
+            className={`flex-1 min-h-[44px] flex flex-col items-center justify-center text-xs font-semibold cursor-pointer transition-colors ${
+              activeView === "calendar"
+                ? "text-indigo-600 dark:text-indigo-400"
+                : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100"
+            }`}
+          >
+            <span>Calendar</span>
+          </button>
+        </nav>
+      </main>
+    </div>
   );
 }

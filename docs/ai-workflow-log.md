@@ -162,3 +162,13 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Review**: Project auditor check passed (`APPROVE`); zero leftover TODO/FIXME/console.log markers, zero tracked `.env`/`.db` files, all V1.3 slices checked off and logged, and `README.md` updated for Version 1.3.
 - **Bug or issue caught**: None.
 - **Rule or prompt improvement**: None.
+
+## 2026-09-30 - V1.4 Slice 01: Workspace shell, sidebar navigation, and content header
+- **Commit**: `feat(v1.4): add workspace shell, sidebar navigation, and content header`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (80 pass across 14 test files in `test/`).
+- **Review**: In-session review by autopilot; verified full-viewport layout (`flex h-screen overflow-hidden`), desktop sidebar with brand and 3 navigation buttons (`aria-current="page"`), mobile bottom navigation bar (`lg:hidden`), top header with view title/subtitle and primary `+ New Task` CTA button (`aria-label="Open new task modal"`), and ThemeToggle placement.
+- **Bug or issue caught**: Resolved TypeScript prop matching for `NotificationCenter` in `ContentHeader`.
+- **Rule or prompt improvement**: None.
+

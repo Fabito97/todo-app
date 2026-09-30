@@ -433,11 +433,11 @@ definitions, the API contract, and the data model live in
 
 ## V1.4 Slice 01: Workspace shell, sidebar navigation, and content header
 
-- [ ] Write tests in `test/components/SidebarNav.test.tsx`, `test/components/ContentHeader.test.tsx`, and `test/app/page.test.tsx` and watch them fail
-- [ ] Implement `src/components/SidebarNav.tsx` (`design.md` §4.8): desktop left sidebar (`w-60 flex-none bg-slate-100 dark:bg-[#161920] border-r border-slate-200 dark:border-[#2e3340]`) with brand logo/name, three navigation buttons (`Dashboard`, `Tasks`, `Calendar`) using `aria-current="page"` when active, and desktop `<ThemeToggle>` anchored at the bottom
-- [ ] Implement `src/components/ContentHeader.tsx` (`design.md` §4.9): view title/subtitle on the left, and persistent `+ New Task` CTA button (`aria-label="Open new task modal"`) beside the `<NotificationCenter>` trigger (and mobile theme toggle) on the right
-- [ ] Refactor `src/app/page.tsx` (`design.md` §4.7) into full-viewport container (`flex h-screen overflow-hidden bg-slate-50 dark:bg-[#121316]`) with client-side SPA view state (`activeView: "dashboard" | "tasks" | "calendar"`) and mobile bottom nav bar (`<nav aria-label="Mobile navigation">`)
-- [ ] Run `npm run verify` and commit
+- [x] Write tests in `test/components/SidebarNav.test.tsx`, `test/components/ContentHeader.test.tsx`, and `test/app/page.test.tsx` and watch them fail
+- [x] Implement `src/components/SidebarNav.tsx` (`design.md` §4.8): desktop left sidebar (`w-60 flex-none bg-slate-100 dark:bg-[#161920] border-r border-slate-200 dark:border-[#2e3340]`) with brand logo/name, three navigation buttons (`Dashboard`, `Tasks`, `Calendar`) using `aria-current="page"` when active, and desktop `<ThemeToggle>` anchored at the bottom
+- [x] Implement `src/components/ContentHeader.tsx` (`design.md` §4.9): view title/subtitle on the left, and persistent `+ New Task` CTA button (`aria-label="Open new task modal"`) beside the `<NotificationCenter>` trigger (and mobile theme toggle) on the right
+- [x] Refactor `src/app/page.tsx` (`design.md` §4.7) into full-viewport container (`flex h-screen overflow-hidden bg-slate-50 dark:bg-[#121316]`) with client-side SPA view state (`activeView: "dashboard" | "tasks" | "calendar"`) and mobile bottom nav bar (`<nav aria-label="Mobile navigation">`)
+- [x] Run `npm run verify` and commit
 
 **Acceptance criteria**
 
