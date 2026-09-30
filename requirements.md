@@ -2,7 +2,7 @@
 
 ## Goal
 
-A fast, resilient, single-user task and schedule workspace where a user can create, view, edit, complete, categorize, time-block, and delete tasks with rich metadata, an intuitive Today's Dashboard, an interactive Calendar/Schedule view, in-app notifications, and a zero-flash Warm Graphite dark mode experience, with data that persists across reloads. It doubles as a showcase of an AI-assisted, spec-first, test-gated engineering workflow.
+A fast, resilient, single-user task and schedule workspace with a full-viewport sidebar layout, an executive Dashboard (dedicated metric cards, Today's Tasks, Important/Critical Tasks, Recent Tasks, and Quick Add), a dedicated Tasks view, a full month-by-month interactive Calendar view, in-app notifications, true modal overlays for creating, inspecting, and editing tasks, and a zero-flash Warm Graphite dark mode experience, with data that persists across reloads. It doubles as a showcase of an AI-assisted, spec-first, test-gated engineering workflow.
 
 ## Versions
 
@@ -11,7 +11,8 @@ A fast, resilient, single-user task and schedule workspace where a user can crea
 | **Version 1** | Browser `localStorage` (`todos:v1`) | Core CRUD: title, completed, basic filters, counter, resilience | **Complete** (`v1`) |
 | **Version 1.1** | Browser `localStorage` (`todos:v1`) | Rich metadata: description, priority, due date, category, sorting | **Complete** (`v1.1`) |
 | **Version 1.2** | Browser `localStorage` (`todos:v1`, `theme:v1`) | `/test` folder reorganization, theme toggle, dashboard progress stats | **Complete** (`v1.2`) |
-| **Version 1.3** | Browser `localStorage` (`todos:v1`, `theme:v1`) | Zero-flash Warm Graphite dark mode, Modal Composer, nullable `startTime`/`endTime`, Today's Dashboard, Calendar/Schedule & Notifications | **Approved** (current target) |
+| **Version 1.3** | Browser `localStorage` (`todos:v1`, `theme:v1`) | Zero-flash Warm Graphite dark mode, nullable `startTime`/`endTime`, initial schedule & notifications | **Complete** (`v1.3`) |
+| **Version 1.4** | Browser `localStorage` (`todos:v1`, `theme:v1`) | Full-viewport Sidebar Workspace (`Dashboard`, `Tasks`, `Calendar`), Dedicated Metric Cards, Critical & Recent Tasks, Full Month-by-Month Calendar Grid, and True Modal Overlays for Add, Edit & Task Details | **Approved** (current target) |
 | **Version 2** | Route Handlers + Neon PostgreSQL | REST API routes, Drizzle ORM, server validation, Vercel deployment | Planned |
 | **Version 3+** | Multi-user / Cloud sync | Authentication, multi-tenant workspaces, external calendar sync | Postponed |
 
@@ -44,24 +45,42 @@ A fast, resilient, single-user task and schedule workspace where a user can crea
 - **Dashboard Progress & Filter Reset**:
   - Visual completion progress bar and stat pills (Total, Active, Completed) plus a one-click **Reset filters** button when any non-default filter is active.
 
-### Version 1.3 (Current Scope)
+### Version 1.3 (Completed)
 - **Time-Blocking Schema (`startTime` & `endTime`)**:
-  - Add optional, nullable `startTime` (`"HH:mm"` | `null`, default `null`) and `endTime` (`"HH:mm"` | `null`, default `null`) to `TodoSchema`, `CreateTodoSchema`, and `TodoPatchSchema`.
-  - Validate that `endTime > startTime` whenever both `startTime` and `endTime` are provided (`"End time must be after start time"`).
-  - Seamless backwards compatibility with existing Version 1, 1.1, and 1.2 `localStorage` items (missing `startTime` and `endTime` default to `null`).
-  - When sorting by `dueDate`, order items sharing the same `dueDate` chronologically by `startTime` (earliest first, followed by items without a `startTime`).
+  - Optional, nullable `startTime` (`"HH:mm"` | `null`, default `null`) and `endTime` (`"HH:mm"` | `null`, default `null`) on `TodoSchema`, `CreateTodoSchema`, and `TodoPatchSchema`.
+  - Validation ensuring `endTime > startTime` whenever both `startTime` and `endTime` are provided (`"End time must be after start time"`).
+  - Chronological secondary sorting by `startTime` when sorting by `dueDate`.
 - **Zero-Flash Theme Load & Warm Graphite Dark Palette**:
-  - Inject a synchronous blocking `<script>` in `<head>` inside `src/app/layout.tsx` that reads `localStorage.getItem("theme:v1")` (or system `prefers-color-scheme: dark`) and applies `.dark` to `<html>` before first paint so reloading never flashes light.
-  - Replace the blue-heavy `slate-900` (`#0f172a`) dark background with a neutral **Warm Graphite** surface hierarchy (`#121316` page canvas, `#1a1d24` elevated cards, `#22262f` interactive inputs/controls, `#2e3340` subtle borders).
-- **Demarcated Task Creation & Modal Composer**:
-  - Render `AddTodoForm` in its own dedicated Quick Command card visually separated from the Task Board card.
-  - Opening full task/schedule details (`Toggle details`) opens an accessible **Modal Dialog** (`role="dialog"`, `aria-modal="true"`, `Escape` or close button to dismiss) containing Description, Priority, Due Date, `Start time`, `End time`, and Category without pushing the todo list inline.
-  - Display a visible time-block badge (e.g., `09:00 – 10:30`) on `TodoItem` when `startTime` / `endTime` are set, and allow editing `startTime` and `endTime` in `TodoItem` edit mode.
-- **Intuitive Today's Dashboard, Calendar/Schedule View & Notification Center**:
-  - **Today's Dashboard (`DashboardOverview`)**: Highlights **Tasks for the Day** (`dueDate === today`, ordered by `startTime`, with quick completion toggles and time-block badges) alongside daily stat pills (Total, Active, Completed, Due Today) and the completion progress bar.
-  - **Interactive Calendar & Schedule View (`CalendarScheduleView`)**: Date navigation (Previous Day, Today, Next Day, date picker, and 7-day week strip) + daily schedule separating **Time-Blocked Schedule** slots (`startTime – endTime`) from **All-Day / Unscheduled Tasks** for the selected date.
-  - **Workspace View Switcher**: Switch cleanly between **Tasks**, **Calendar & Schedule**, and **Split View** in `src/app/page.tsx`.
-  - **Notification Center (`NotificationCenter`)**: Header notification button (`aria-label="Notifications"`) with an active count badge for **Overdue** and **Today's Scheduled** incomplete tasks, opening an accessible notifications popover.
+  - Synchronous blocking `<script>` in `<head>` inside `src/app/layout.tsx` that reads `localStorage.getItem("theme:v1")` / `prefers-color-scheme: dark` and applies `.dark` to `<html>` before first paint.
+  - Neutral **Warm Graphite** dark surface hierarchy (`#121316` page canvas, `#1a1d24` elevated cards, `#22262f` interactive controls, `#2e3340` subtle borders).
+- **In-App Notification Center (`NotificationCenter`)**:
+  - Header notification button (`aria-label="Notifications"`) with active count badge for **Overdue** and **Today's Scheduled** incomplete tasks, opening an accessible notifications popover.
+
+### Version 1.4 (Current Scope)
+- **Full-Viewport Workspace Layout & Sidebar Navigation**:
+  - Replace the single narrow column (`max-w-2xl`) with a full-viewport responsive workspace shell (`w-full`, desktop left **Sidebar** + top header bar, and responsive mobile navigation bar).
+  - Clear, purposeful navigation items to switch between separate workspace views instead of crowding everything onto one page:
+    1. **Dashboard** (`aria-label="Dashboard"`): Executive overview, metrics, today's agenda, critical tasks, recent tasks, and month calendar preview.
+    2. **Tasks** (`aria-label="Tasks"`): Focused full-width task management board with filters, sorting, and list actions.
+    3. **Calendar** (`aria-label="Calendar"`): Full month-by-month interactive calendar grid alongside the selected day's time-blocked schedule and tasks.
+  - Persistent **+ New Task** primary button in the workspace navigation/header that opens the Add Task Modal from any view.
+- **Spacious Executive Dashboard (`DashboardOverview`)**:
+  - **Dedicated Metric Cards**: 4 full-sized metric cards (in a responsive grid) for **Total Tasks**, **Active Tasks**, **Completed Tasks** (with progress bar), and **Important / Critical Tasks** (active `high` priority count).
+  - **Quick Add Task Bar**: Lightweight single-line input on the Dashboard (`aria-label="Todo title"` + `Add Todo` submit button) for rapid title-only task capture without opening the full modal.
+  - **Today's Tasks Panel**: Lists tasks due today (`dueDate === today`) ordered chronologically by `startTime`, with time-block badges, quick completion toggles, and click-to-inspect details.
+  - **Important / Critical Tasks Panel**: Highlights active high-priority (`priority === "high"`) tasks requiring immediate attention.
+  - **Recent Tasks Panel**: Displays the most recently created tasks across the workspace.
+- **Full Month-by-Month Calendar Grid (`CalendarScheduleView`)**:
+  - Full 7-column monthly calendar grid (`Sun`–`Sat`) displaying the entire month day-by-day.
+  - Month-by-month navigation (**Previous month**, **Today**, **Next month**, plus direct date selection) with clear month/year heading (e.g., `September 2026`).
+  - Visually highlights **Today's date**, **Selected date**, and displays task count / priority indicators inside each day cell.
+  - Clicking any day cell selects that date and updates the adjacent **Daily Schedule** panel (**Time-Blocked Schedule** slots ordered by `startTime` and **All-Day Tasks** for that date).
+- **True Modal Overlays for Add, Edit, and Task Details (No Inline List Distortion)**:
+  - **Add Task Modal (`role="dialog"`, `aria-modal="true"`)**: Triggered by the **New Task** / **Toggle details** button; renders a centered modal overlay with backdrop where users can submit a task with just a title or full metadata (Description, Priority, Due Date, Start Time, End Time, Category). Closes automatically on submit, `Escape`, or clicking close.
+  - **Task Details Modal (`role="dialog"`, `aria-modal="true"`, `aria-label="Task details"`)**: Clicking a task's title/body opens a clean inspection modal displaying the full title, full description/notes, priority badge, category, due date, time block (`startTime – endTime`), and status, with direct action buttons: **Edit**, **Toggle Complete**, and **Delete**.
+  - **Edit Task Modal (`role="dialog"`, `aria-modal="true"`, `aria-label="Edit task"`)**: Clicking **Edit** on a task card (or inside the Task Details Modal) opens a centered modal overlay pre-populated with all task fields (Title, Description, Priority, Due Date, Start Time, End Time, Category) instead of expanding an inline form inside the list row.
+- **Purposeful, Self-Explanatory Language**:
+  - Every navigation item, card header, badge, and button uses natural, direct copy that communicates its exact function (`Dashboard`, `Tasks`, `Calendar`, `New Task`, `Important / Critical`, `Today's Tasks`, `Recent Tasks`).
 
 ### Version 2 (Upcoming Backend)
 - Neon (PostgreSQL) database backing with Drizzle ORM.
@@ -100,7 +119,7 @@ export interface Todo {
 - Playwright for end-to-end tests in `e2e/`.
 - Package manager: npm.
 
-### Version 1, 1.1, 1.2 & 1.3 — Local
+### Version 1, 1.1, 1.2, 1.3 & 1.4 — Local
 - Client-side storage in browser `localStorage` (`todos:v1`, `theme:v1`).
 - Asynchronous `TodoService` interface (`LocalTodoService`) and theme storage helper in `src/services/`.
 - ESLint boundary banning `localStorage`, `sessionStorage`, and `fetch` from `src/components/` and `src/hooks/`.
@@ -124,7 +143,7 @@ Upgrading between versions modifies schema definitions and service implementatio
 ## Constraints
 
 - Every mutation and creation must validate through Zod schemas.
-- Full backwards compatibility with existing Version 1, 1.1, and 1.2 items stored in `localStorage`.
+- Full backwards compatibility with existing Version 1, 1.1, 1.2, and 1.3 items stored in `localStorage`.
 - No new dependencies without prior approval.
 - Every acceptance criterion in `task.md` maps to at least one passing test.
 - Keyboard accessibility and zero unhandled console errors during test execution.
