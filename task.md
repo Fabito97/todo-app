@@ -590,10 +590,10 @@ definitions, the API contract, and the data model live in
 
 ## V2 Slice 02: Switch client to the API via HttpTodoService
 
-- [ ] Write tests in `test/services/http-todo-service.test.ts` and watch them fail
-- [ ] Implement `src/services/http-todo-service.ts` implementing `TodoService` via client `fetch('/api/todos')`
-- [ ] Update `src/services/index.ts` to export `HttpTodoService` as the active service provider
-- [ ] Run `npm run verify` and commit
+- [x] Write tests in `test/services/http-todo-service.test.ts` and watch them fail
+- [x] Implement `src/services/http-todo-service.ts` implementing `TodoService` via client `fetch('/api/todos')`
+- [x] Update `src/services/index.ts` to export `HttpTodoService` as the active service provider
+- [x] Run `npm run verify` and commit
 
 **Acceptance criteria**
 

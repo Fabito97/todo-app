@@ -226,5 +226,15 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Bug or issue caught**: Handled both synchronous and asynchronous Promise-wrapped dynamic Route Handler parameters (`context.params`) for Next.js App Router.
 - **Rule or prompt improvement**: None.
 
+## 2026-09-30 - V2 Slice 02: Switch client to the API via HttpTodoService
+- **Commit**: `feat(v2): implement HttpTodoService and switch service provider`
+- **Key prompt or instruction**: "/autopilot 2"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (145 pass across 25 test files in `test/`), post-task gate (`GATE PASSED (fast)`).
+- **Review**: In-session review by autopilot; verified `HttpTodoService` client calling `/api/todos`, `src/services/index.ts` provider switch to `httpTodoService`, and unit tests in `test/services/http-todo-service.test.ts`. Zero modifications to `src/components/` or `src/hooks/`.
+- **Bug or issue caught**: Added URL normalization for Node/jsdom test environments and configured `vitest.setup.ts` to dispatch `/api/todos` requests to the Route Handlers.
+- **Rule or prompt improvement**: None.
+
+
 
 
