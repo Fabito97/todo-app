@@ -177,5 +177,45 @@ describe("TodoItem", () => {
     );
     expect(screen.getByRole("listitem").className).toMatch(/border-l-blue-500/);
   });
+
+  it("renders startTime and endTime badge and updates them in edit mode", async () => {
+    const onEdit = vi.fn().mockResolvedValue(undefined);
+    const user = userEvent.setup();
+
+    render(
+      <TodoItem
+        todo={{ ...mockTodo, startTime: "09:00", endTime: "10:30" }}
+        onToggle={vi.fn()}
+        onEdit={onEdit}
+        onDelete={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText("09:00 – 10:30")).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", { name: `Edit ${mockTodo.title}` })
+    );
+
+    const startInput = screen.getByLabelText(/edit start time/i);
+    const endInput = screen.getByLabelText(/edit end time/i);
+    expect(startInput).toHaveValue("09:00");
+    expect(endInput).toHaveValue("10:30");
+
+    await user.clear(startInput);
+    await user.type(startInput, "13:00");
+    await user.clear(endInput);
+    await user.type(endInput, "14:15");
+
+    await user.click(screen.getByRole("button", { name: /save changes/i }));
+
+    expect(onEdit).toHaveBeenCalledWith(
+      mockTodo.id,
+      expect.objectContaining({
+        startTime: "13:00",
+        endTime: "14:15",
+      })
+    );
+  });
 });
 

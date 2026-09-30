@@ -18,6 +18,8 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
   const [editDescription, setEditDescription] = useState(todo.description || "");
   const [editPriority, setEditPriority] = useState<Priority>(todo.priority || "medium");
   const [editDueDate, setEditDueDate] = useState(todo.dueDate || "");
+  const [editStartTime, setEditStartTime] = useState(todo.startTime || "");
+  const [editEndTime, setEditEndTime] = useState(todo.endTime || "");
   const [editCategory, setEditCategory] = useState(todo.category || "");
   const [showNotes, setShowNotes] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,6 +36,8 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
     setEditDescription(todo.description || "");
     setEditPriority(todo.priority || "medium");
     setEditDueDate(todo.dueDate || "");
+    setEditStartTime(todo.startTime || "");
+    setEditEndTime(todo.endTime || "");
     setEditCategory(todo.category || "");
     setError(null);
     setIsEditing(true);
@@ -44,6 +48,8 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
     setEditDescription(todo.description || "");
     setEditPriority(todo.priority || "medium");
     setEditDueDate(todo.dueDate || "");
+    setEditStartTime(todo.startTime || "");
+    setEditEndTime(todo.endTime || "");
     setEditCategory(todo.category || "");
     setError(null);
     setIsEditing(false);
@@ -51,12 +57,20 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
 
   const handleSaveEdit = async () => {
     try {
+      const hasTimeFields =
+        Boolean(todo.startTime || todo.endTime || editStartTime || editEndTime);
       const patchData: TodoPatchInput = {
         title: editTitle.trim(),
         description: editDescription.trim(),
         priority: editPriority,
         dueDate: editDueDate ? editDueDate : null,
         category: editCategory.trim() ? editCategory.trim() : null,
+        ...(hasTimeFields
+          ? {
+              startTime: editStartTime ? editStartTime : null,
+              endTime: editEndTime ? editEndTime : null,
+            }
+          : {}),
       };
 
       const validated = TodoPatchSchema.parse(patchData);
@@ -176,7 +190,7 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
             </div>
           </div>
 
-          {/* Badges: Priority, Due Date, Category */}
+          {/* Badges: Priority, Time-Block, Due Date, Category */}
           <div className="flex flex-wrap items-center gap-1.5 pl-7 text-[11px]">
             {/* Priority Badge */}
             <span
@@ -184,6 +198,17 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
             >
               {todo.priority || "medium"}
             </span>
+
+            {/* Time-Block Badge */}
+            {(todo.startTime || todo.endTime) && (
+              <span className="px-2 py-0.5 rounded-full border font-semibold font-mono bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/70 dark:text-indigo-300 dark:border-indigo-800">
+                {todo.startTime && todo.endTime
+                  ? `${todo.startTime} – ${todo.endTime}`
+                  : todo.startTime
+                    ? `From ${todo.startTime}`
+                    : `Until ${todo.endTime}`}
+              </span>
+            )}
 
             {/* Category Tag */}
             {todo.category && (
@@ -302,6 +327,36 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
                 onChange={(e) => setEditCategory(e.target.value)}
                 placeholder="Category"
                 aria-label="Edit category"
+                className="w-full rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/80 px-2 py-1 text-xs text-slate-900 dark:text-slate-100"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            <div className="space-y-1">
+              <label className="text-[10px] text-slate-400 dark:text-slate-300">Start time</label>
+              <input
+                type="time"
+                value={editStartTime}
+                onChange={(e) => {
+                  setEditStartTime(e.target.value);
+                  if (error) setError(null);
+                }}
+                aria-label="Edit start time"
+                className="w-full rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/80 px-2 py-1 text-xs text-slate-900 dark:text-slate-100"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] text-slate-400 dark:text-slate-300">End time</label>
+              <input
+                type="time"
+                value={editEndTime}
+                onChange={(e) => {
+                  setEditEndTime(e.target.value);
+                  if (error) setError(null);
+                }}
+                aria-label="Edit end time"
                 className="w-full rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/80 px-2 py-1 text-xs text-slate-900 dark:text-slate-100"
               />
             </div>

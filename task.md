@@ -376,11 +376,11 @@ definitions, the API contract, and the data model live in
 
 ## V1.3 Slice 03: Demarcated task creation, Modal Composer, and time-block badges/editing
 
-- [ ] Write tests in `test/components/AddTodoForm.test.tsx` and `test/components/TodoItem.test.tsx` and watch them fail
-- [ ] Update `src/components/AddTodoForm.tsx` (`design.md` §4.2) so clicking `Toggle details` opens an accessible Modal Dialog (`role="dialog"`, `aria-modal="true"`, `aria-label="Task details and schedule"`, `Escape` or `Close modal` button to dismiss) containing Description, Priority, Due Date, `Start time` (`aria-label="Start time"`), `End time` (`aria-label="End time"`), and Category, and closes the modal after successful submission
-- [ ] Update `src/components/TodoItem.tsx` (`design.md` §4.3) to display a monospace time-block badge (e.g., `09:00 – 10:30`) when `startTime` or `endTime` is present, and add `Edit start time` (`aria-label="Edit start time"`) and `Edit end time` (`aria-label="Edit end time"`) inputs in edit mode
-- [ ] Update `src/app/page.tsx` (`design.md` §3 & §4.2) so `AddTodoForm` sits in its own dedicated Quick Command card (`aria-label="Create task"`) visually demarcated from the Task Board card
-- [ ] Run `npm run verify` and commit
+- [x] Write tests in `test/components/AddTodoForm.test.tsx` and `test/components/TodoItem.test.tsx` and watch them fail
+- [x] Update `src/components/AddTodoForm.tsx` (`design.md` §4.2) so clicking `Toggle details` opens an accessible Modal Dialog (`role="dialog"`, `aria-modal="true"`, `aria-label="Task details and schedule"`, `Escape` or `Close modal` button to dismiss) containing Description, Priority, Due Date, `Start time` (`aria-label="Start time"`), `End time` (`aria-label="End time"`), and Category, and closes the modal after successful submission
+- [x] Update `src/components/TodoItem.tsx` (`design.md` §4.3) to display a monospace time-block badge (e.g., `09:00 – 10:30`) when `startTime` or `endTime` is present, and add `Edit start time` (`aria-label="Edit start time"`) and `Edit end time` (`aria-label="Edit end time"`) inputs in edit mode
+- [x] Update `src/app/page.tsx` (`design.md` §3 & §4.2) so `AddTodoForm` sits in its own dedicated Quick Command card (`aria-label="Create task"`) visually demarcated from the Task Board card
+- [x] Run `npm run verify` and commit
 
 **Acceptance criteria**
 

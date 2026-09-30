@@ -136,4 +136,11 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Bug or issue caught**: None.
 - **Rule or prompt improvement**: None.
 
-
+## 2026-09-30 - V1.3 Slice 03: Demarcated task creation, Modal Composer, and time-block badges/editing
+- **Commit**: `feat(v1.3): add demarcated task creation card, modal composer, and time-block badges`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (65 pass across 9 test files in `test/`).
+- **Review**: In-session review by autopilot; verified accessible modal dialog (`role="dialog"`, `aria-modal="true"`, `aria-label="Task details and schedule"`), `Escape` and `Close modal` handlers, `Start time` / `End time` inputs and validation alert, `TodoItem` time-block badge (`09:00 – 10:30`), and demarcated Quick Command card in `src/app/page.tsx`.
+- **Bug or issue caught**: Preserved backward compatibility with existing tests by only including `startTime` and `endTime` in payloads when set or previously defined on the todo.
+- **Rule or prompt improvement**: None.

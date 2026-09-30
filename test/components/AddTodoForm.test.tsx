@@ -118,4 +118,47 @@ describe("AddTodoForm", () => {
     expect(onAdd).not.toHaveBeenCalled();
     expect(screen.getByRole("alert")).toHaveTextContent(/1000 characters or fewer/i);
   });
+
+  it("opens an accessible modal dialog for task details and schedule, submits startTime and endTime, validates time range, and closes on Escape", async () => {
+    const onAdd = vi.fn().mockResolvedValue(undefined);
+    const user = userEvent.setup();
+
+    render(<AddTodoForm onAdd={onAdd} />);
+
+    expect(screen.queryByRole("dialog", { name: /task details and schedule/i })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /toggle details/i }));
+
+    const dialog = screen.getByRole("dialog", { name: /task details and schedule/i });
+    expect(dialog).toBeInTheDocument();
+    expect(dialog).toHaveAttribute("aria-modal", "true");
+
+    const titleInput = screen.getByRole("textbox", { name: /todo title/i });
+    const startTimeInput = screen.getByLabelText(/start time/i);
+    const endTimeInput = screen.getByLabelText(/end time/i);
+
+    await user.type(titleInput, "Sprint planning block");
+    await user.type(startTimeInput, "14:00");
+    await user.type(endTimeInput, "13:00");
+
+    await user.click(screen.getByRole("button", { name: /add todo/i }));
+    expect(onAdd).not.toHaveBeenCalled();
+    expect(screen.getByRole("alert")).toHaveTextContent(/end time must be after start time/i);
+
+    await user.clear(endTimeInput);
+    await user.type(endTimeInput, "15:30");
+    await user.click(screen.getByRole("button", { name: /add todo/i }));
+
+    expect(onAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: "Sprint planning block",
+        startTime: "14:00",
+        endTime: "15:30",
+      })
+    );
+
+    // Pressing Escape closes the modal dialog
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog", { name: /task details and schedule/i })).not.toBeInTheDocument();
+  });
 });

@@ -112,9 +112,19 @@ export default function Home() {
           </div>
         )}
 
-        <section className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-6 shadow-md shadow-slate-200/40 dark:shadow-black/40 space-y-6">
+        {/* Demarcated Task Creation Card */}
+        <section
+          aria-label="Create task"
+          className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-4 sm:p-5 shadow-md shadow-slate-200/40 dark:shadow-black/40"
+        >
           <AddTodoForm onAdd={addTodo} />
+        </section>
 
+        {/* Task Board Card */}
+        <section
+          aria-label="Task list board"
+          className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-6 shadow-md shadow-slate-200/40 dark:shadow-black/40 space-y-6"
+        >
           {error && (
             <div
               role="alert"
@@ -124,7 +134,7 @@ export default function Home() {
             </div>
           )}
 
-          <div className="pt-2">
+          <div>
             <TodoList
               todos={todos}
               loading={loading}
