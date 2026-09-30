@@ -173,6 +173,91 @@ export function runContractTests(createService: () => TodoService | Promise<Todo
       });
     });
 
+    describe("V1.3 time-blocking (startTime and endTime)", () => {
+      it("defaults startTime and endTime to null when omitted", async () => {
+        const service = await createService();
+        const todo = await service.create({ title: "Unscheduled task" });
+        expect(todo.startTime).toBeNull();
+        expect(todo.endTime).toBeNull();
+      });
+
+      it("creates and updates a todo with valid startTime and endTime", async () => {
+        const service = await createService();
+        const todo = await service.create({
+          title: "Morning deep work",
+          dueDate: "2026-09-30",
+          startTime: "09:00",
+          endTime: "10:30",
+        });
+
+        expect(todo.startTime).toBe("09:00");
+        expect(todo.endTime).toBe("10:30");
+
+        const updated = await service.update(todo.id, {
+          startTime: "11:00",
+          endTime: "12:15",
+        });
+        expect(updated.startTime).toBe("11:00");
+        expect(updated.endTime).toBe("12:15");
+      });
+
+      it("rejects create or update when endTime is not after startTime", async () => {
+        const service = await createService();
+        await expect(
+          service.create({
+            title: "Invalid block",
+            startTime: "14:00",
+            endTime: "13:00",
+          })
+        ).rejects.toThrow(/End time must be after start time/);
+
+        await expect(
+          service.create({
+            title: "Zero duration block",
+            startTime: "14:00",
+            endTime: "14:00",
+          })
+        ).rejects.toThrow(/End time must be after start time/);
+
+        const valid = await service.create({
+          title: "Valid block",
+          startTime: "10:00",
+          endTime: "11:00",
+        });
+
+        await expect(
+          service.update(valid.id, { endTime: "09:30" })
+        ).rejects.toThrow(/End time must be after start time/);
+      });
+
+      it("sorts items sharing the same dueDate chronologically by startTime (unscheduled last)", async () => {
+        const service = await createService();
+        await service.create({
+          title: "Afternoon sync",
+          dueDate: "2026-09-30",
+          startTime: "14:00",
+          endTime: "15:00",
+        });
+        await service.create({
+          title: "All-day task",
+          dueDate: "2026-09-30",
+        });
+        await service.create({
+          title: "Morning standup",
+          dueDate: "2026-09-30",
+          startTime: "09:00",
+          endTime: "09:30",
+        });
+
+        const sorted = await service.list({ sortBy: "dueDate" });
+        expect(sorted.map((t) => t.title)).toEqual([
+          "Morning standup",
+          "Afternoon sync",
+          "All-day task",
+        ]);
+      });
+    });
+
     describe("update", () => {
       it("updates only matching todo and updates updatedAt", async () => {
         const service = await createService();

@@ -122,7 +122,18 @@ export class LocalTodoService implements TodoService {
         if (!a.dueDate && !b.dueDate) return 0;
         if (!a.dueDate) return 1;
         if (!b.dueDate) return -1;
-        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+        const dateDiff =
+          new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+        if (dateDiff !== 0) return dateDiff;
+
+        if (a.startTime && b.startTime) {
+          const timeDiff = a.startTime.localeCompare(b.startTime);
+          if (timeDiff !== 0) return timeDiff;
+        } else if (a.startTime && !b.startTime) {
+          return -1;
+        } else if (!a.startTime && b.startTime) {
+          return 1;
+        }
       }
 
       if (sortBy === "priority") {
@@ -151,6 +162,8 @@ export class LocalTodoService implements TodoService {
       description: validated.description ?? "",
       priority: validated.priority ?? "medium",
       dueDate: validated.dueDate ?? null,
+      startTime: validated.startTime ?? null,
+      endTime: validated.endTime ?? null,
       category: validated.category ?? null,
     });
 
@@ -187,6 +200,12 @@ export class LocalTodoService implements TodoService {
         : {}),
       ...(validatedPatch.dueDate !== undefined
         ? { dueDate: validatedPatch.dueDate }
+        : {}),
+      ...(validatedPatch.startTime !== undefined
+        ? { startTime: validatedPatch.startTime }
+        : {}),
+      ...(validatedPatch.endTime !== undefined
+        ? { endTime: validatedPatch.endTime }
         : {}),
       ...(validatedPatch.category !== undefined
         ? { category: validatedPatch.category }

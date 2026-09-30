@@ -84,6 +84,8 @@ describe("LocalTodoService", () => {
       expect(list[0].priority).toBe("medium");
       expect(list[0].completed).toBe(false);
       expect(list[0].description).toBe("");
+      expect(list[0].startTime).toBeNull();
+      expect(list[0].endTime).toBeNull();
     });
   });
 });

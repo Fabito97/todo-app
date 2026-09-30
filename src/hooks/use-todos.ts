@@ -158,6 +158,14 @@ export function useTodos() {
         if (a.dueDate && b.dueDate) {
           const cmp = a.dueDate.localeCompare(b.dueDate);
           if (cmp !== 0) return cmp;
+          if (a.startTime && b.startTime) {
+            const timeCmp = a.startTime.localeCompare(b.startTime);
+            if (timeCmp !== 0) return timeCmp;
+          } else if (a.startTime && !b.startTime) {
+            return -1;
+          } else if (!a.startTime && b.startTime) {
+            return 1;
+          }
         } else if (a.dueDate && !b.dueDate) {
           return -1;
         } else if (!a.dueDate && b.dueDate) {

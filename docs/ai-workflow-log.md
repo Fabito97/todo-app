@@ -117,3 +117,13 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Review**: In-session review by autopilot; verified accessible progressbar (`role="progressbar"`), Total/Active/Completed stat pills, priority left-accent borders (`border-l-4`), and one-click "Reset filters" button.
 - **Bug or issue caught**: In `test/app/page.test.tsx`, `beforeEach` previously only cleared `localStorage` and did not clear `todoService` in-memory fallback items from the quota-exceeded test; updated `beforeEach` to clear `todoService.list()` items before each test.
 - **Rule or prompt improvement**: None.
+
+## 2026-09-30 - V1.3 Slice 01: Time-blocking schema (nullable startTime & endTime) and service support
+- **Commit**: `feat(v1.3): add nullable startTime and endTime time-blocking schema and sorting`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (63 pass across 9 test files in `test/`).
+- **Review**: In-session review by autopilot; verified `TimeStringSchema`, `endTime > startTime` refinement across create/update, legacy `localStorage` normalization to `null`, and chronological secondary sorting by `startTime`.
+- **Bug or issue caught**: `CreateTodoSchema` needed `TimeStringSchema.nullable().optional()` without `.default(null)` so `CreateTodoSchema.parse` in `AddTodoForm` does not inject `startTime: null` when omitted, while `TodoSchema` and `LocalTodoService.create` normalize omitted values to `null`.
+- **Rule or prompt improvement**: None.
+

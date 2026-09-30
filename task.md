@@ -335,10 +335,10 @@ definitions, the API contract, and the data model live in
 
 ## V1.3 Slice 01: Time-blocking schema (nullable startTime & endTime) and service support
 
-- [ ] Write tests in `test/services/todo-service.contract.ts`, `test/services/local-todo-service.test.ts`, and `test/hooks/use-todos.test.ts` and watch them fail
-- [ ] Update `src/lib/schemas.ts`: add `TimeStringSchema` (`HH:MM` 24-hour format) and nullable `startTime` and `endTime` (`null` default) to `TodoSchema`, `CreateTodoSchema`, and `TodoPatchSchema`, plus refinement ensuring `endTime > startTime` when both are provided
-- [ ] Update `src/services/local-todo-service.ts` and `src/hooks/use-todos.ts`: normalize `startTime` and `endTime` to `null` for legacy records, validate merged time ranges on `update`, and use `startTime` as secondary sort key when sorting by `dueDate`
-- [ ] Run `npm run verify` and commit
+- [x] Write tests in `test/services/todo-service.contract.ts`, `test/services/local-todo-service.test.ts`, and `test/hooks/use-todos.test.ts` and watch them fail
+- [x] Update `src/lib/schemas.ts`: add `TimeStringSchema` (`HH:MM` 24-hour format) and nullable `startTime` and `endTime` (`null` default) to `TodoSchema`, `CreateTodoSchema`, and `TodoPatchSchema`, plus refinement ensuring `endTime > startTime` when both are provided
+- [x] Update `src/services/local-todo-service.ts` and `src/hooks/use-todos.ts`: normalize `startTime` and `endTime` to `null` for legacy records, validate merged time ranges on `update`, and use `startTime` as secondary sort key when sorting by `dueDate`
+- [x] Run `npm run verify` and commit
 
 **Acceptance criteria**
 

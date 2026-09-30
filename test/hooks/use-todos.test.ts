@@ -98,4 +98,36 @@ describe("useTodos", () => {
     expect(result.current.todos[1].title).toBe("Earlier due");
     expect(result.current.todos[2].title).toBe("Later due");
   });
+
+  it("orders same-day todos chronologically by startTime when sortBy is dueDate", async () => {
+    await todoService.create({
+      title: "Afternoon review",
+      dueDate: "2026-09-30",
+      startTime: "15:00",
+      endTime: "16:00",
+    });
+    await todoService.create({
+      title: "Unscheduled today",
+      dueDate: "2026-09-30",
+    });
+    await todoService.create({
+      title: "Morning planning",
+      dueDate: "2026-09-30",
+      startTime: "08:30",
+      endTime: "09:00",
+    });
+
+    const { result } = renderHook(() => useTodos());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    act(() => {
+      result.current.setSortBy("dueDate");
+    });
+
+    expect(result.current.todos.map((t) => t.title)).toEqual([
+      "Morning planning",
+      "Afternoon review",
+      "Unscheduled today",
+    ]);
+  });
 });
