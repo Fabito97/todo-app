@@ -424,7 +424,7 @@ definitions, the API contract, and the data model live in
 
 ## V1.3 Slice 05: Finish version 1.3
 
-- [ ] Run `/finish 1.3` — audit, README update, and release notes
+- [x] Run `/finish 1.3` — audit, README update, and release notes
 - [ ] Human reviews output, merges branch to `main`, and tags `v1.3`
 
 ---

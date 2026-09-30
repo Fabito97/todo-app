@@ -153,3 +153,12 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Review**: In-session review by autopilot; verified `DashboardOverview` (**Tasks for the Day** ordered by `startTime`), `CalendarScheduleView` (date navigation, 7-day strip, time-blocked vs all-day slots), `NotificationCenter` (overdue + today's reminders popover), and workspace view tabs (`Tasks`, `Calendar & Schedule`, `Split View`).
 - **Bug or issue caught**: Controlled `<input type="date">` in `CalendarScheduleView` needed `onChange={(e) => setSelectedDate(e.target.value)}` without guarding on `if (e.target.value)` so `userEvent.clear` followed by `userEvent.type` could update the date cleanly in tests.
 - **Rule or prompt improvement**: None.
+
+## 2026-09-30 - V1.3 Slice 05: Finish version 1.3
+- **Commit**: `docs(v1.3): update README and finish version 1.3 audit`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (70 pass across 12 test files in `test/`), e2e (12 pass).
+- **Review**: Project auditor check passed (`APPROVE`); zero leftover TODO/FIXME/console.log markers, zero tracked `.env`/`.db` files, all V1.3 slices checked off and logged, and `README.md` updated for Version 1.3.
+- **Bug or issue caught**: None.
+- **Rule or prompt improvement**: None.
