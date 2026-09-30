@@ -357,10 +357,10 @@ definitions, the API contract, and the data model live in
 
 ## V1.3 Slice 02: Zero-flash dark theme initialization and Warm-Graphite dark background palette
 
-- [ ] Write tests in `test/app/page.test.tsx` and `e2e/todos.spec.ts` and watch them fail
-- [ ] Update `src/app/layout.tsx` (`design.md` §4.1) to include a synchronous blocking `<script>` in `<head>` that reads `localStorage.getItem("theme:v1")` (or `window.matchMedia("(prefers-color-scheme: dark)")`) and applies `.dark` to `document.documentElement` before first paint
-- [ ] Update `src/app/globals.css`, `src/app/layout.tsx`, `src/app/page.tsx`, `src/components/ThemeToggle.tsx`, `src/components/FilterBar.tsx`, `src/components/TodoList.tsx`, and `src/components/TodoItem.tsx` to apply the Warm Graphite tokens from `design.md` §2 (`#121316` canvas `dark:bg-[#121316]`, `#1a1d24` cards `dark:bg-[#1a1d24]`, `#22262f` inputs `dark:bg-[#22262f]`, `#2e3340` borders `dark:border-[#2e3340]`) and remove initial page-load background transition flash
-- [ ] Run `npm run verify` and commit
+- [x] Write tests in `test/app/page.test.tsx` and `e2e/todos.spec.ts` and watch them fail
+- [x] Update `src/app/layout.tsx` (`design.md` §4.1) to include a synchronous blocking `<script>` in `<head>` that reads `localStorage.getItem("theme:v1")` (or `window.matchMedia("(prefers-color-scheme: dark)")`) and applies `.dark` to `document.documentElement` before first paint
+- [x] Update `src/app/globals.css`, `src/app/layout.tsx`, `src/app/page.tsx`, `src/components/ThemeToggle.tsx`, `src/components/FilterBar.tsx`, `src/components/TodoList.tsx`, and `src/components/TodoItem.tsx` to apply the Warm Graphite tokens from `design.md` §2 (`#121316` canvas `dark:bg-[#121316]`, `#1a1d24` cards `dark:bg-[#1a1d24]`, `#22262f` inputs `dark:bg-[#22262f]`, `#2e3340` borders `dark:border-[#2e3340]`) and remove initial page-load background transition flash
+- [x] Run `npm run verify` and commit
 
 **Acceptance criteria**
 

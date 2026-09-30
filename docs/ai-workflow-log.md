@@ -127,3 +127,13 @@ This file records the step-by-step progress, verification gates, human decisions
 - **Bug or issue caught**: `CreateTodoSchema` needed `TimeStringSchema.nullable().optional()` without `.default(null)` so `CreateTodoSchema.parse` in `AddTodoForm` does not inject `startTime: null` when omitted, while `TodoSchema` and `LocalTodoService.create` normalize omitted values to `null`.
 - **Rule or prompt improvement**: None.
 
+## 2026-09-30 - V1.3 Slice 02: Zero-flash dark theme initialization and Warm-Graphite dark background palette
+- **Commit**: `feat(v1.3): add zero-flash theme initialization and Warm Graphite dark palette`
+- **Key prompt or instruction**: "/autopilot"
+- **Human decision or correction**: None.
+- **Checks run**: lint (pass), typecheck (pass), tests (63 pass across 9 test files in `test/`).
+- **Review**: In-session review by autopilot; verified synchronous `<head>` theme script in `src/app/layout.tsx` and Warm Graphite tokens (`#121316` canvas, `#1a1d24` cards, `#22262f` controls, `#2e3340` borders) from `design.md`.
+- **Bug or issue caught**: None.
+- **Rule or prompt improvement**: None.
+
+

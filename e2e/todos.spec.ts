@@ -295,14 +295,16 @@ test.describe.serial("Todo App", () => {
     await expect(items.nth(2)).toContainText("Personal Low Item");
   });
 
-  test("persists theme toggle across reload, updates completion progress bar, and resets active filters", async ({ page }) => {
-    // 1. Toggle dark theme and verify persistence after reload
+  test("persists theme toggle across reload with zero-flash Warm Graphite (#121316) dark background, updates completion progress bar, and resets active filters", async ({ page }) => {
+    // 1. Toggle dark theme and verify persistence and Warm Graphite background after reload
     const darkThemeBtn = page.getByRole("button", { name: /dark theme/i });
     await darkThemeBtn.click();
     await expect(page.locator("html")).toHaveClass(/dark/);
 
     await page.reload();
     await expect(page.locator("html")).toHaveClass(/dark/);
+    const bodyBg = await page.locator("body").evaluate((el) => getComputedStyle(el).backgroundColor);
+    expect(bodyBg).toBe("rgb(18, 19, 22)");
 
     // Switch back to light theme
     const lightThemeBtn = page.getByRole("button", { name: /light theme/i });

@@ -55,10 +55,17 @@ describe("Home page resilience", () => {
     );
   });
 
-  it("renders theme switcher in header and switches to dark mode on click", async () => {
+  it("renders theme switcher in header, applies Warm Graphite dark surfaces, and switches to dark mode on click", async () => {
     document.documentElement.classList.remove("dark");
     const user = userEvent.setup();
     render(<Home />);
+
+    const mainEl = screen.getByRole("main");
+    expect(mainEl.className).toContain("dark:bg-[#121316]");
+    expect(mainEl.className).not.toContain("transition-colors");
+
+    const summarySection = screen.getByRole("region", { name: /task progress summary/i });
+    expect(summarySection.className).toContain("dark:bg-[#1a1d24]");
 
     const darkBtn = screen.getByRole("button", { name: /dark theme/i });
     await user.click(darkBtn);

@@ -21,7 +21,7 @@ export function ThemeToggle() {
     <div
       role="group"
       aria-label="Color theme"
-      className="inline-flex items-center gap-1 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-white/80 dark:bg-slate-800/80 p-1 shadow-xs backdrop-blur-sm"
+      className="inline-flex items-center gap-1 rounded-xl border border-slate-200 dark:border-[#2e3340] bg-white dark:bg-[#1a1d24] p-1 shadow-xs"
     >
       {THEME_OPTIONS.map((option) => {
         const isActive = theme === option.value;
@@ -35,7 +35,7 @@ export function ThemeToggle() {
             className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
               isActive
                 ? "bg-indigo-600 text-white shadow-xs"
-                : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-700/60"
+                : "text-slate-600 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#22262f]"
             }`}
           >
             {option.value === "light" && (

@@ -57,9 +57,9 @@ export function TodoList({
       : emptyMessages[filter] || emptyMessages.all;
 
     return (
-      <div className="py-12 flex flex-col items-center justify-center text-slate-500 dark:text-slate-300 border border-dashed border-slate-200 dark:border-slate-700 bg-slate-50/40 dark:bg-slate-900/30 rounded-2xl">
+      <div className="py-12 flex flex-col items-center justify-center text-slate-500 dark:text-zinc-300 border border-dashed border-slate-200 dark:border-[#2e3340] bg-slate-50/40 dark:bg-[#22262f]/50 rounded-2xl">
         <p className="text-sm font-medium">{currentMsg.title}</p>
-        <p className="text-xs text-slate-400 dark:text-slate-400 mt-1">
+        <p className="text-xs text-slate-400 dark:text-zinc-400 mt-1">
           {currentMsg.subtitle}
         </p>
       </div>

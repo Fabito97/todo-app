@@ -17,6 +17,14 @@ export const metadata: Metadata = {
   description: "Next.js Todo Application",
 };
 
+const THEME_INIT_SCRIPT = `(function() {
+  try {
+    var stored = localStorage.getItem("theme:v1");
+    var isDark = stored === "dark" || ((stored === "system" || !stored) && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    document.documentElement.classList.toggle("dark", Boolean(isDark));
+  } catch (e) {}
+})();`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -28,7 +36,10 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
+      <body className="min-h-full flex flex-col bg-slate-50 dark:bg-[#121316] text-slate-900 dark:text-zinc-100">
         {children}
       </body>
     </html>

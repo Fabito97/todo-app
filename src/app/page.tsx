@@ -38,15 +38,15 @@ export default function Home() {
     totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-indigo-50/40 dark:from-slate-900 dark:via-slate-800/95 dark:to-indigo-950/40 py-12 px-4 sm:px-6 lg:px-8 transition-colors">
+    <main className="min-h-screen bg-slate-50 dark:bg-[#121316] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto space-y-6">
         <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="space-y-1 text-center sm:text-left">
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-600 dark:from-white dark:via-slate-100 dark:to-indigo-400 bg-clip-text text-transparent">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-600 dark:from-white dark:via-zinc-100 dark:to-indigo-400 bg-clip-text text-transparent">
               Todo List
             </h1>
-            <p className="text-sm text-slate-600 dark:text-slate-300">
-              Organize your day with local storage simplicity
+            <p className="text-sm text-slate-600 dark:text-zinc-300">
+              Plan your tasks, daily schedule, and time blocks
             </p>
           </div>
           <div className="flex justify-center sm:justify-end">
@@ -57,21 +57,21 @@ export default function Home() {
         {/* Dashboard Progress & Stat Summary */}
         <section
           aria-label="Task progress summary"
-          className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-4 sm:p-5 shadow-md shadow-slate-200/40 dark:shadow-slate-950/40 space-y-3"
+          className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-4 sm:p-5 shadow-md shadow-slate-200/40 dark:shadow-black/40 space-y-3"
         >
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-xs font-medium">
-              <span className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-700/80 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-600/80">
+              <span className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-[#22262f] text-slate-700 dark:text-zinc-200 border border-slate-200 dark:border-[#2e3340]">
                 Total: <strong className="font-semibold">{totalCount}</strong>
               </span>
-              <span className="px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/80">
+              <span className="px-2.5 py-1 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-800">
                 Active: <strong className="font-semibold">{activeCount}</strong>
               </span>
-              <span className="px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/80">
+              <span className="px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
                 Completed: <strong className="font-semibold">{completedCount}</strong>
               </span>
             </div>
-            <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+            <span className="text-xs font-semibold text-slate-600 dark:text-zinc-300">
               {completionPercentage}% done
             </span>
           </div>
@@ -82,7 +82,7 @@ export default function Home() {
             aria-valuenow={completionPercentage}
             aria-valuemin={0}
             aria-valuemax={100}
-            className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-700/80 overflow-hidden"
+            className="w-full h-2 rounded-full bg-slate-100 dark:bg-[#22262f] overflow-hidden"
           >
             <div
               className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-emerald-500 transition-all duration-300"
@@ -112,7 +112,7 @@ export default function Home() {
           </div>
         )}
 
-        <section className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-6 shadow-xl shadow-slate-200/50 dark:shadow-slate-950/50 space-y-6">
+        <section className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2e3340] rounded-2xl p-6 shadow-md shadow-slate-200/40 dark:shadow-black/40 space-y-6">
           <AddTodoForm onAdd={addTodo} />
 
           {error && (

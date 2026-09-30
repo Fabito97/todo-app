@@ -110,7 +110,7 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
           handleCancelEdit();
         }
       }}
-      className={`group flex flex-col p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 border-l-4 ${priorityAccentBorder} bg-white dark:bg-slate-800/70 backdrop-blur-sm transition-all hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-xs`}
+      className={`group flex flex-col p-3.5 rounded-xl border border-slate-200 dark:border-[#2e3340] border-l-4 ${priorityAccentBorder} bg-white dark:bg-[#22262f] transition-all hover:border-slate-300 dark:hover:border-zinc-600 hover:shadow-xs`}
     >
       {/* Normal view mode */}
       {!isEditing ? (
