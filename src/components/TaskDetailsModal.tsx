@@ -56,6 +56,7 @@ function TaskDetailsModalContent({
       await onToggle(todo.id, !todo.completed);
     } finally {
       setIsToggling(false);
+      onClose();
     }
   };
 

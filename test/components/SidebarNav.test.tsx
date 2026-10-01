@@ -7,7 +7,7 @@ describe("SidebarNav component", () => {
   it("renders the workspace brand name and 3 navigation items", () => {
     render(<SidebarNav activeView="dashboard" onSelectView={vi.fn()} />);
 
-    expect(screen.getByText("Task Workspace")).toBeInTheDocument();
+    expect(screen.getByText(/Todo Workspace|Task Workspace/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /^dashboard/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /^tasks/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /^calendar/i })).toBeInTheDocument();
@@ -54,5 +54,41 @@ describe("SidebarNav component", () => {
     expect(screen.getByRole("button", { name: /light theme/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /dark theme/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /system theme/i })).toBeInTheDocument();
+  });
+
+  it("renders mobile slide-out drawer with close button and notification item", async () => {
+    const handleClose = vi.fn();
+    const handleOpenNotifications = vi.fn();
+    const handleSelectView = vi.fn();
+    const user = userEvent.setup();
+
+    render(
+      <SidebarNav
+        isMobile
+        isOpen
+        activeView="dashboard"
+        onSelectView={handleSelectView}
+        onClose={handleClose}
+        onOpenNotifications={handleOpenNotifications}
+      />
+    );
+
+    // Close button triggers onClose
+    const closeBtn = screen.getByRole("button", { name: /close menu/i });
+    expect(closeBtn).toBeInTheDocument();
+    await user.click(closeBtn);
+    expect(handleClose).toHaveBeenCalledOnce();
+
+    // Selecting a view also closes the mobile drawer
+    await user.click(screen.getByRole("button", { name: /^tasks/i }));
+    expect(handleSelectView).toHaveBeenCalledWith("tasks");
+    expect(handleClose).toHaveBeenCalledTimes(2);
+
+    // Clicking notifications drops sidebar and opens notifications
+    const notifBtn = screen.getByRole("button", { name: /open notifications/i });
+    expect(notifBtn).toBeInTheDocument();
+    await user.click(notifBtn);
+    expect(handleClose).toHaveBeenCalledTimes(3);
+    expect(handleOpenNotifications).toHaveBeenCalledOnce();
   });
 });

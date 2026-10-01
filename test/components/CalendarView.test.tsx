@@ -144,13 +144,6 @@ describe("CalendarView component", () => {
     expect(screen.getByText("14:00 – 15:30")).toBeInTheDocument();
     expect(screen.getByText("Submit Expenses")).toBeInTheDocument();
 
-    // Toggle completion on schedule item
-    const standupCheckbox = screen.getByRole("checkbox", {
-      name: /toggle completion for morning sprint standup/i,
-    });
-    await user.click(standupCheckbox);
-    expect(handleToggle).toHaveBeenCalledWith("cal-0000-0000-0000-000000000001", true);
-
     // Click title to open details
     const titleButton = screen.getByRole("button", {
       name: /view details for morning sprint standup/i,

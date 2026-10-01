@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ClipboardList, Zap, CheckCircle2, Flame, Clock, Plus, Loader2 } from "lucide-react";
+import { ClipboardList, Zap, CheckCircle2, Flame, Clock, Plus } from "lucide-react";
 import { Todo } from "@/lib/schemas";
 import { formatShortDate, isOverdue, formatOverdueLabel } from "@/lib/date-utils";
 import { MetricCard } from "./MetricCard";
@@ -26,7 +26,6 @@ export function DashboardView({
 }: DashboardViewProps) {
   const [quickTitle, setQuickTitle] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   const totalCount = todos.length;
   const activeCount = todos.filter((t) => !t.completed).length;
@@ -97,19 +96,10 @@ export function DashboardView({
     }
   };
 
-  const handleRecentToggle = async (id: string, completed: boolean) => {
-    setTogglingId(id);
-    try {
-      await onToggle(id, completed);
-    } finally {
-      setTogglingId(null);
-    }
-  };
-
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* 4 Metric Cards Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-10 pb-20">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-5 pb-10">
         <MetricCard
           label="Total Tasks"
           value={totalCount}
@@ -232,9 +222,9 @@ export function DashboardView({
                   <li
                     key={task.id}
                     onClick={() => onOpenDetails?.(task)}
-                    className="flex items-center justify-between p-2.5 rounded-xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40 hover:bg-rose-100/50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-rose-50/50 dark:bg-rose-950/5 border border-rose-200 dark:border-rose-900/40 hover:bg-rose-100/50 dark:hover:bg-rose-950/40 transition cursor-pointer"
                   >
-                    <div className="truncate pr-2">
+                    <div className="truncate pr-2 flex items-center justify-between w-full gap-2">
                       <p className="font-semibold text-slate-900 dark:text-zinc-100 truncate">
                         {task.title}
                       </p>
@@ -246,19 +236,6 @@ export function DashboardView({
                         </p>
                       )}
                     </div>
-                    {onEditTask && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onEditTask(task);
-                        }}
-                        aria-label={`Edit ${task.title}`}
-                        className="px-2 py-1 rounded-lg bg-white dark:bg-[#22262f] text-slate-700 dark:text-zinc-300 hover:text-indigo-600 border border-slate-200 dark:border-[#2e3340] text-[11px] font-medium shrink-0 cursor-pointer"
-                      >
-                        Edit
-                      </button>
-                    )}
                   </li>
                 ))}
               </ul>
@@ -288,30 +265,6 @@ export function DashboardView({
                     className="pt-2 flex items-center justify-between gap-2 hover:bg-slate-50 dark:hover:bg-[#22262f]/40 p-1.5 rounded-lg transition cursor-pointer"
                   >
                     <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                      {togglingId === task.id ? (
-                        <span
-                          role="status"
-                          aria-label={`Updating completion for ${task.title}`}
-                          className="w-4 h-4 flex items-center justify-center shrink-0"
-                        >
-                          <Loader2
-                            aria-hidden="true"
-                            className="w-3.5 h-3.5 animate-spin text-indigo-600 dark:text-indigo-400"
-                          />
-                        </span>
-                      ) : (
-                        <input
-                          type="checkbox"
-                          checked={task.completed}
-                          onChange={(e) => {
-                            e.stopPropagation();
-                            handleRecentToggle(task.id, e.target.checked);
-                          }}
-                          onClick={(e) => e.stopPropagation()}
-                          aria-label={`Toggle completion for ${task.title}`}
-                          className="w-4 h-4 rounded border-slate-300 dark:border-zinc-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer shrink-0"
-                        />
-                      )}
                       <span
                         className={`truncate font-medium ${
                           task.completed
@@ -324,22 +277,12 @@ export function DashboardView({
                     </div>
 
                     <div
-                      className="flex items-center gap-2 shrink-0"
+                      className="flex items-center gap-1.5 shrink-0"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <span className="text-[10px] text-slate-400 dark:text-zinc-500 font-medium">
                         {formatRelativeDate(task.createdAt)}
                       </span>
-                      {onEditTask && (
-                        <button
-                          type="button"
-                          onClick={() => onEditTask(task)}
-                          aria-label={`Edit ${task.title}`}
-                          className="px-2 py-0.5 rounded bg-white dark:bg-[#22262f] text-slate-600 dark:text-zinc-300 hover:text-indigo-600 border border-slate-200 dark:border-[#2e3340] text-[10px] font-medium cursor-pointer"
-                        >
-                          Edit
-                        </button>
-                      )}
                     </div>
                   </li>
                 ))}

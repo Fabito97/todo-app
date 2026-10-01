@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Edit3, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from "lucide-react";
 import { Todo } from "@/lib/schemas";
 
 interface CalendarViewProps {
   todos: Todo[];
-  onToggle: (id: string, completed: boolean) => Promise<unknown> | void;
+  onToggle?: (id: string, completed: boolean) => Promise<unknown> | void;
   onOpenEdit?: (todo: Todo) => void;
   onOpenDetails?: (todo: Todo) => void;
   onDelete?: (id: string) => void;
@@ -37,8 +37,6 @@ function formatDateKey(year: number, month: number, day: number): string {
 
 export function CalendarView({
   todos,
-  onToggle,
-  onOpenEdit = () => {},
   onOpenDetails = () => {},
 }: CalendarViewProps) {
   const today = useMemo(() => new Date(), []);
@@ -47,16 +45,6 @@ export function CalendarView({
   const [currentYear, setCurrentYear] = useState(() => today.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(() => today.getMonth());
   const [selectedDate, setSelectedDate] = useState(() => todayStr);
-  const [togglingId, setTogglingId] = useState<string | null>(null);
-
-  const handleTaskToggle = async (id: string, completed: boolean) => {
-    setTogglingId(id);
-    try {
-      await onToggle(id, completed);
-    } finally {
-      setTogglingId(null);
-    }
-  };
 
   const handlePrevMonth = () => {
     if (currentMonth === 0) {
@@ -193,7 +181,7 @@ export function CalendarView({
   const totalScheduledItems = timeBlockedTasks.length + allDayTasks.length;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 max-w-7xl mx-auto flex-1 min-h-0 pt-10">
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 max-w-7xl mx-auto flex-1 min-h-0 pt-5">
       {/* Month Grid Section */}
       <section
         aria-label="Monthly calendar"
@@ -351,7 +339,7 @@ export function CalendarView({
                         <span className="font-mono text-xs font-bold text-indigo-700 dark:text-indigo-300">
                           {task.startTime} – {task.endTime || "..."}
                         </span>
-                        <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                        {/* <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                           {togglingId === task.id ? (
                             <span
                               role="status"
@@ -382,7 +370,7 @@ export function CalendarView({
                               <Edit3 aria-hidden="true" className="w-3.5 h-3.5" />
                             </button>
                           )}
-                        </div>
+                        </div> */}
                       </div>
 
                       <button
@@ -436,7 +424,7 @@ export function CalendarView({
                         >
                           {task.title}
                         </button>
-                        <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                        {/* <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                           {togglingId === task.id ? (
                             <span
                               role="status"
@@ -467,7 +455,7 @@ export function CalendarView({
                               <Edit3 aria-hidden="true" className="w-3.5 h-3.5" />
                             </button>
                           )}
-                        </div>
+                        </div> */}
                       </div>
 
                       <div className="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-zinc-400">

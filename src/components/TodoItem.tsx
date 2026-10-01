@@ -38,12 +38,12 @@ export function TodoItem({
   const isOverdueItem = isOverdue(todo.dueDate, todo.completed);
 
   const priorityBorderClass = todo.completed
-    ? "border-l-emerald-500 dark:border-l-emerald-400"
+    ? "border-l-emerald-500 dark:border-l-emerald-400/20"
     : todo.priority === "high"
-    ? "border-l-rose-500 dark:border-l-rose-400"
+    ? "border-l-rose-500 dark:border-l-rose-400/20"
     : todo.priority === "medium"
-    ? "border-l-amber-500 dark:border-l-amber-400"
-    : "border-l-blue-500 dark:border-l-blue-400";
+    ? "border-l-amber-500 dark:border-l-amber-400/20"
+    : "border-l-blue-500 dark:border-l-blue-400/20";
 
   return (
     <li
@@ -165,10 +165,10 @@ export function TodoItem({
           <span
             className={`px-2 py-0.5 rounded-full border font-bold capitalize ${
               todo.priority === "high"
-                ? "bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950/70 dark:text-rose-300 dark:border-rose-700"
+                ? "bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950/20 dark:text-white/50 dark:border-rose-700/50"
                 : todo.priority === "medium"
-                ? "bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-700"
-                : "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-950/70 dark:text-blue-300 dark:border-blue-700"
+                ? "bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950/20 dark:text-white/50 dark:border-amber-500/50"
+                : "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-950/20 dark:text-white/50 dark:border-blue-700/50"
             }`}
           >
             {todo.priority}

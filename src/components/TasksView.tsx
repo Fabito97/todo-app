@@ -58,7 +58,7 @@ export function TasksView({
     Boolean(searchTerm && searchTerm.trim().length > 0);
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pt-10">
+    <div className="space-y-6 max-w-7xl mx-auto pt-5">
       {/* Error alert if any */}
       {error && (
         <div

@@ -62,6 +62,9 @@ test.describe.serial("Todo App", () => {
     await input.fill("Toggle Me");
     await page.getByRole("button", { name: /add todo/i }).click();
 
+    // Switch to Tasks view to interact with task card
+    await page.getByRole("button", { name: /^tasks/i }).first().click();
+
     const checkbox = page.getByRole("checkbox", { name: /toggle completion for toggle me/i }).first();
     await expect(checkbox).not.toBeChecked();
 
@@ -77,6 +80,9 @@ test.describe.serial("Todo App", () => {
     const input = page.getByRole("textbox", { name: /todo title/i });
     await input.fill("Original Title");
     await page.getByRole("button", { name: /add todo/i }).click();
+
+    // Switch to Tasks view to edit from board
+    await page.getByRole("button", { name: /^tasks/i }).first().click();
 
     const editBtn = page.getByRole("button", { name: /edit original title/i }).first();
     await editBtn.click();
@@ -99,6 +105,9 @@ test.describe.serial("Todo App", () => {
     const input = page.getByRole("textbox", { name: /todo title/i });
     await input.fill("Editable Todo");
     await page.getByRole("button", { name: /add todo/i }).click();
+
+    // Switch to Tasks view to edit from board
+    await page.getByRole("button", { name: /^tasks/i }).first().click();
 
     const editBtn = page.getByRole("button", { name: /edit editable todo/i }).first();
     await editBtn.click();
@@ -223,7 +232,14 @@ test.describe.serial("Todo App", () => {
     await addButton.click();
     await expect(page.getByText("Master Full Flow")).toBeVisible();
 
-    // 2. Edit
+    // 2. Switch to mobile Tasks View via slide-out drawer
+    const hamburgerBtn = page.getByRole("button", { name: /open navigation menu/i });
+    if (await hamburgerBtn.isVisible()) {
+      await hamburgerBtn.click();
+    }
+    await page.getByRole("navigation", { name: /mobile navigation/i }).getByRole("button", { name: /tasks/i }).click();
+
+    // 3. Edit
     const editBtn = page.getByRole("button", { name: /edit master full flow/i }).first();
     await editBtn.click();
     const dialog = page.getByRole("dialog", { name: /edit task/i });
@@ -232,13 +248,10 @@ test.describe.serial("Todo App", () => {
     await dialog.getByRole("button", { name: /save changes/i }).click();
     await expect(page.getByText("Master Full Flow Updated").first()).toBeVisible();
 
-    // 3. Toggle
+    // 4. Toggle
     const checkbox = page.getByRole("checkbox", { name: /toggle completion for master full flow updated/i }).first();
     await checkbox.click();
     await expect(checkbox).toBeChecked();
-
-    // 4. Switch to mobile Tasks View
-    await page.getByRole("navigation", { name: /mobile navigation/i }).getByRole("button", { name: /tasks/i }).click();
 
     // 5. Filter
     const activeFilterBtn = page.getByRole("button", { name: /^active/i });
@@ -369,10 +382,15 @@ test.describe.serial("Todo App", () => {
     await expect(page.getByText("Dashboard Task 2")).toBeVisible();
     await expect(titleInput).toHaveValue("");
 
+    // 3. Switch to Tasks View, toggle task 1
+    await page.getByRole("button", { name: /^tasks/i }).first().click();
     await page.getByRole("checkbox", { name: /toggle completion for dashboard task 1/i }).first().click();
+
+    // Switch to Dashboard to verify progress bar
+    await page.getByRole("button", { name: /^dashboard/i }).first().click();
     await expect(progressbar).toHaveAttribute("aria-valuenow", "50");
 
-    // 3. Switch to Tasks View, filter to Completed and use Reset filters button to restore all tasks
+    // Switch back to Tasks View, filter to Completed and use Reset filters button to restore all tasks
     await page.getByRole("button", { name: /^tasks/i }).first().click();
     await page.getByRole("button", { name: /^completed/i }).click();
     await expect(page.getByText("Dashboard Task 2")).not.toBeVisible();
@@ -421,8 +439,14 @@ test.describe.serial("Todo App", () => {
     await expect(scheduleRegion).toContainText("Product Roadmap Time-Block");
     await expect(scheduleRegion).toContainText("09:30 – 11:00");
 
-    // 4. Reload and verify persistence
+    // 4. Reload and verify persistence on Calendar view (reloads staying on ?tab=calendar)
     await page.reload();
+    await expect(page.getByRole("complementary", { name: /daily schedule/i })).toContainText(
+      "Product Roadmap Time-Block"
+    );
+
+    // 5. Switch back to Dashboard view and verify it also shows in Today's tasks
+    await page.getByRole("button", { name: /^dashboard/i }).first().click();
     await expect(page.getByRole("region", { name: /today's tasks/i })).toContainText(
       "Product Roadmap Time-Block"
     );
@@ -460,6 +484,42 @@ test.describe.serial("Todo App", () => {
     // Clear search
     await searchInput.fill("");
     await expect(page.getByText("Beta Design Sprint")).toBeVisible();
+  });
+
+  test("supports tab URL query params (?tab=tasks, ?tab=calendar, none for dashboard) and preserves tab on page reload", async ({ page }) => {
+    // 1. Initial load on "/" is Dashboard
+    await page.goto("/");
+    await expect(page.getByRole("region", { name: /today's tasks/i })).toBeVisible();
+
+    // 2. Direct navigation to ?tab=tasks
+    await page.goto("/?tab=tasks");
+    await expect(page.getByRole("region", { name: /task list board/i })).toBeVisible();
+
+    // Reload keeps Tasks view
+    await page.reload();
+    await expect(page.getByRole("region", { name: /task list board/i })).toBeVisible();
+    expect(page.url()).toContain("tab=tasks");
+
+    // 3. Switch to Calendar via nav button
+    await page.getByRole("button", { name: /^calendar/i }).first().click();
+    await expect(page.getByRole("complementary", { name: /daily schedule/i })).toBeVisible();
+    expect(page.url()).toContain("tab=calendar");
+
+    // Reload keeps Calendar view
+    await page.reload();
+    await expect(page.getByRole("complementary", { name: /daily schedule/i })).toBeVisible();
+    expect(page.url()).toContain("tab=calendar");
+
+    // 4. Switch back to Dashboard
+    await page.getByRole("button", { name: /^dashboard/i }).first().click();
+    await expect(page.getByRole("region", { name: /today's tasks/i })).toBeVisible();
+    // Dashboard should have no tab query param
+    expect(page.url()).not.toContain("tab=");
+
+    // Reload keeps Dashboard view
+    await page.reload();
+    await expect(page.getByRole("region", { name: /today's tasks/i })).toBeVisible();
+    expect(page.url()).not.toContain("tab=");
   });
 
   test.afterAll(async ({ request }) => {

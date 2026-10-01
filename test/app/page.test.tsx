@@ -7,6 +7,7 @@ import { todoService } from "@/services";
 describe("Home page workspace layout and resilience", () => {
   beforeEach(async () => {
     vi.restoreAllMocks();
+    window.history.replaceState({}, "", "/");
     const existing = await todoService.list();
     for (const item of existing) {
       await todoService.remove(item.id);
@@ -129,5 +130,37 @@ describe("Home page workspace layout and resilience", () => {
 
     const statusElements = screen.getAllByRole("status");
     expect(statusElements.some((el) => el.textContent?.includes("Unable to connect to server"))).toBe(true);
+  });
+
+  it("restores active view from ?tab URL search parameter on reload", async () => {
+    window.history.replaceState({}, "", "/?tab=calendar");
+
+    render(<Home />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Calendar");
+    });
+    expect(screen.getByRole("region", { name: /monthly calendar/i })).toBeInTheDocument();
+  });
+
+  it("updates URL query parameter when switching tabs and clears it for dashboard", async () => {
+    window.history.replaceState({}, "", "/");
+    const user = userEvent.setup();
+
+    render(<Home />);
+
+    // Switch to tasks
+    const tasksBtn = screen.getAllByRole("button", { name: /^tasks/i })[0];
+    await user.click(tasksBtn);
+
+    expect(window.location.search).toBe("?tab=tasks");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Tasks");
+
+    // Switch back to dashboard
+    const dashboardBtn = screen.getAllByRole("button", { name: /^dashboard/i })[0];
+    await user.click(dashboardBtn);
+
+    expect(window.location.search).toBe("");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Dashboard");
   });
 });

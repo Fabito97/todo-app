@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useTodos } from "@/hooks/use-todos";
 import { SidebarNav, WorkspaceView } from "@/components/SidebarNav";
 import { ContentHeader } from "@/components/ContentHeader";
@@ -11,11 +11,49 @@ import { Toast, ToastMessage } from "@/components/Toast";
 import { AddTaskModal } from "@/components/AddTaskModal";
 import { TaskDetailsModal } from "@/components/TaskDetailsModal";
 import { EditTaskModal } from "@/components/EditTaskModal";
+import { NotificationModal } from "@/components/NotificationCenter";
 import { Todo } from "@/lib/schemas";
 
 export default function Home() {
   const [activeView, setActiveView] = useState<WorkspaceView>("dashboard");
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  // Mobile Navigation Drawer and Notification Modal States
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
+
+  // Sync tab with URL search parameter (?tab=tasks, ?tab=calendar, or none for dashboard)
+  const handleSelectView = useCallback((view: WorkspaceView) => {
+    setActiveView(view);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (view === "tasks" || view === "calendar") {
+        url.searchParams.set("tab", view);
+      } else {
+        url.searchParams.delete("tab");
+      }
+      const search = url.searchParams.toString();
+      const newUrl = url.pathname + (search ? `?${search}` : "") + url.hash;
+      window.history.replaceState({}, "", newUrl);
+    }
+  }, []);
+
+  useEffect(() => {
+    const syncTabFromUrl = () => {
+      if (typeof window === "undefined") return;
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get("tab");
+      if (tabParam === "tasks" || tabParam === "calendar") {
+        setActiveView(tabParam);
+      } else {
+        setActiveView("dashboard");
+      }
+    };
+
+    syncTabFromUrl();
+    window.addEventListener("popstate", syncTabFromUrl);
+    return () => window.removeEventListener("popstate", syncTabFromUrl);
+  }, []);
 
   // Modal States
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
@@ -102,10 +140,28 @@ export default function Home() {
       <div className="hidden lg:flex h-full flex-none">
         <SidebarNav
           activeView={activeView}
-          onSelectView={setActiveView}
+          onSelectView={handleSelectView}
           taskCount={allTodos.length}
         />
       </div>
+
+      {/* Mobile Slide-Out Drawer Navigation */}
+      <SidebarNav
+        isMobile
+        isOpen={isMobileSidebarOpen}
+        onClose={() => setIsMobileSidebarOpen(false)}
+        activeView={activeView}
+        onSelectView={(view) => {
+          handleSelectView(view);
+          setIsMobileSidebarOpen(false);
+        }}
+        taskCount={allTodos.length}
+        todos={allTodos}
+        onOpenNotifications={() => {
+          setIsMobileSidebarOpen(false);
+          setIsNotificationModalOpen(true);
+        }}
+      />
 
       {/* Main Content Area */}
       <main className="flex-1 min-w-0 flex flex-col overflow-hidden">
@@ -113,6 +169,7 @@ export default function Home() {
         <ContentHeader
           activeView={activeView}
           onOpenNewTask={() => setIsAddTaskModalOpen(true)}
+          onOpenSidebar={() => setIsMobileSidebarOpen(true)}
           todos={allTodos}
         />
 
@@ -187,49 +244,14 @@ export default function Home() {
           )}
         </div>
 
-        {/* Mobile Bottom Navigation */}
-        <nav
-          aria-label="Mobile navigation"
-          className="lg:hidden h-14 flex items-center justify-around border-t border-slate-200 dark:border-[#2e3340] bg-white dark:bg-[#1a1d24] flex-none px-4 select-none"
-        >
-          <button
-            type="button"
-            onClick={() => setActiveView("dashboard")}
-            aria-current={activeView === "dashboard" ? "page" : undefined}
-            className={`flex-1 min-h-[44px] flex flex-col items-center justify-center text-xs font-semibold cursor-pointer transition-colors ${
-              activeView === "dashboard"
-                ? "text-indigo-600 dark:text-indigo-400"
-                : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100"
-            }`}
-          >
-            <span>Dashboard</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveView("tasks")}
-            aria-current={activeView === "tasks" ? "page" : undefined}
-            className={`flex-1 min-h-[44px] flex flex-col items-center justify-center text-xs font-semibold cursor-pointer transition-colors ${
-              activeView === "tasks"
-                ? "text-indigo-600 dark:text-indigo-400"
-                : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100"
-            }`}
-          >
-            <span>Tasks</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveView("calendar")}
-            aria-current={activeView === "calendar" ? "page" : undefined}
-            className={`flex-1 min-h-[44px] flex flex-col items-center justify-center text-xs font-semibold cursor-pointer transition-colors ${
-              activeView === "calendar"
-                ? "text-indigo-600 dark:text-indigo-400"
-                : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100"
-            }`}
-          >
-            <span>Calendar</span>
-          </button>
-        </nav>
       </main>
+
+      {/* Mobile Notification Modal Panel */}
+      <NotificationModal
+        isOpen={isNotificationModalOpen}
+        onClose={() => setIsNotificationModalOpen(false)}
+        todos={allTodos}
+      />
 
       {/* Floating Toast Notification Container */}
       <Toast toasts={effectiveToasts} onDismiss={dismissToast} />

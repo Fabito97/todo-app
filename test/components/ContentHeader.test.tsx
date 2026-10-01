@@ -93,4 +93,34 @@ describe("ContentHeader component", () => {
     expect(notifBtn).toBeInTheDocument();
     expect(notifBtn).toHaveTextContent("1");
   });
+
+  it("renders mobile top bar with app title, compact + button, and hamburger menu trigger", async () => {
+    const handleOpenSidebar = vi.fn();
+    const handleOpenNewTask = vi.fn();
+    const user = userEvent.setup();
+
+    render(
+      <ContentHeader
+        activeView="dashboard"
+        onOpenNewTask={handleOpenNewTask}
+        onOpenSidebar={handleOpenSidebar}
+        todos={sampleTodos}
+      />
+    );
+
+    // App title is present
+    expect(screen.getByText(/^(Tasks|Todo)$/i)).toBeInTheDocument();
+
+    // Compact + button triggers onOpenNewTask
+    const compactBtn = screen.getByRole("button", { name: /^new task$/i });
+    expect(compactBtn).toBeInTheDocument();
+    await user.click(compactBtn);
+    expect(handleOpenNewTask).toHaveBeenCalledOnce();
+
+    // Hamburger button triggers onOpenSidebar
+    const hamburgerBtn = screen.getByRole("button", { name: /open navigation menu/i });
+    expect(hamburgerBtn).toBeInTheDocument();
+    await user.click(hamburgerBtn);
+    expect(handleOpenSidebar).toHaveBeenCalledOnce();
+  });
 });
