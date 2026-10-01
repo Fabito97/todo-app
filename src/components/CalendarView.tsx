@@ -264,7 +264,7 @@ export function CalendarView({
                     {cell.dayNumber}
                   </span>
                   {isToday && (
-                    <span className="text-[9px] uppercase px-1 rounded bg-white/20 font-semibold tracking-wider">
+                    <span className="text-[9px] hidden sm:block uppercase px-1 rounded bg-white/20 font-semibold tracking-wider">
                       Today
                     </span>
                   )}
@@ -339,38 +339,6 @@ export function CalendarView({
                         <span className="font-mono text-xs font-bold text-indigo-700 dark:text-indigo-300">
                           {task.startTime} – {task.endTime || "..."}
                         </span>
-                        {/* <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                          {togglingId === task.id ? (
-                            <span
-                              role="status"
-                              aria-label={`Updating completion for ${task.title}`}
-                              className="h-4 w-4 flex items-center justify-center shrink-0"
-                            >
-                              <Loader2
-                                aria-hidden="true"
-                                className="w-3.5 h-3.5 animate-spin text-indigo-600 dark:text-indigo-400"
-                              />
-                            </span>
-                          ) : (
-                            <input
-                              type="checkbox"
-                              checked={task.completed}
-                              onChange={(e) => handleTaskToggle(task.id, e.target.checked)}
-                              aria-label={`Toggle completion for ${task.title}`}
-                              className="h-4 w-4 rounded-md border-slate-300 dark:border-zinc-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                            />
-                          )}
-                          {onOpenEdit && (
-                            <button
-                              type="button"
-                              onClick={() => onOpenEdit(task)}
-                              aria-label={`Edit ${task.title}`}
-                              className="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition cursor-pointer"
-                            >
-                              <Edit3 aria-hidden="true" className="w-3.5 h-3.5" />
-                            </button>
-                          )}
-                        </div> */}
                       </div>
 
                       <button
@@ -424,38 +392,6 @@ export function CalendarView({
                         >
                           {task.title}
                         </button>
-                        {/* <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                          {togglingId === task.id ? (
-                            <span
-                              role="status"
-                              aria-label={`Updating completion for ${task.title}`}
-                              className="h-4 w-4 flex items-center justify-center shrink-0"
-                            >
-                              <Loader2
-                                aria-hidden="true"
-                                className="w-3.5 h-3.5 animate-spin text-indigo-600 dark:text-indigo-400"
-                              />
-                            </span>
-                          ) : (
-                            <input
-                              type="checkbox"
-                              checked={task.completed}
-                              onChange={(e) => handleTaskToggle(task.id, e.target.checked)}
-                              aria-label={`Toggle completion for ${task.title}`}
-                              className="h-4 w-4 rounded-md border-slate-300 dark:border-zinc-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                            />
-                          )}
-                          {onOpenEdit && (
-                            <button
-                              type="button"
-                              onClick={() => onOpenEdit(task)}
-                              aria-label={`Edit ${task.title}`}
-                              className="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition cursor-pointer"
-                            >
-                              <Edit3 aria-hidden="true" className="w-3.5 h-3.5" />
-                            </button>
-                          )}
-                        </div> */}
                       </div>
 
                       <div className="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-zinc-400">
